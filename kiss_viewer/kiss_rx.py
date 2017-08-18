@@ -2,10 +2,12 @@ import kiss
 
 
 def print_frame(frame):
-    # print(frame)
-    for i in frame[:17]:
+    #print(frame)
+    print len(frame)-17, ":: ",
+    for i in frame[17:]:
+    #for i in frame:
         print hex(ord(i)),
-    print ""
+    print "\n\n"
 
 
 def main():
