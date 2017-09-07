@@ -121,14 +121,39 @@ if __name__ == '__main__':
     RemoteFileTools.save_chunks(args.experiment_file, merged)
     
     # 6. Parse file
-    print("#6. Parse file")
-    parsed = ExperimentFileParser.parse_partial(ensure_string(merged))
-    with open(file_name + "_parsed.txt", 'w') as f:
-        for p in parsed[0]:
-            pprint.pprint(p, f)
+    try:
+        print("#6. Parse file")
+        parsed = ExperimentFileParser.parse_partial(ensure_string(merged))
+        with open(file_name + "_parsed.txt", 'w') as f:
+            for p in parsed[0]:
+                pprint.pprint(p, f)
 
-    if len(parsed[1]) > 0:
-        print 'Remaining data (first 10 bytes, total {} not parsed)'.format(len(parsed[1]))
-        part = parsed[1][0:min(10, len(parsed[1]))]
-        print hexlify(part)
+        if len(parsed[1]) > 0:
+            print 'Remaining data (first 10 bytes, total {} not parsed)'.format(len(parsed[1]))
+            part = parsed[1][0:min(10, len(parsed[1]))]
+            print hexlify(part)
+    except:
+        print("Couldn't parse exp file")
+
+
+    # 7. Receive photos
+    for i in range(6):
+        try:
+            file_to_download = None
+            current_photo_name_sufix = '_{}.jpg'.format(i)
+            for f in file_list:
+                if f['File'] == file_name + current_photo_name_sufix:
+                    file_to_download = f
+                    break
+            print("Selecting " + str(file_to_download))
+            logger.log(file_to_download)
+
+            chunks = downloader.download(file_to_download)
+            print("Download file")
+            RemoteFileTools.save_chunks(args.experiment_file + current_photo_name_sufix + '.raw', chunks)
+            RemoteFileTools.save_photo(args.experiment_file + current_photo_name_sufix, chunks)
+        except:
+            print("Photo failed")
     print("End...")
+
+
