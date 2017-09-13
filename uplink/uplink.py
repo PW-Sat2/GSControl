@@ -6,7 +6,7 @@ import time
 
 
 class Uplink:
-    def __init__(self, host='localhost', port=1234):
+    def __init__(self, host='localhost', port=8001):
         self.kiss = kiss.TCPKISS(host, port)
         self.frame = aprs.Frame()
         self.frame.source = self.frame.destination = aprs.Callsign("PWSAT2-0");
