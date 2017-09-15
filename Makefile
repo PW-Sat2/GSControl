@@ -1,10 +1,10 @@
 .PHONY: uplink run_uplink downlink run_downlink setup_env
 
 uplink/uplink.py: uplink/uplink.grc
-	grcc uplink/uplink.grc -d uplink
+	. $(SETUP_ENV) && grcc uplink/uplink.grc -d uplink
 
 downlink/downlink.py:downlink/downlink.grc
-	grcc downlink/downlink.grc -d downlink
+	. $(SETUP_ENV) && grcc downlink/downlink.grc -d downlink
 
 uplink: uplink/uplink.py
 
