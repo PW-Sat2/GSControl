@@ -15,7 +15,7 @@ downlink: downlink/downlink.py
 
 funcube: downlink/source/funcube_source.py
 
-all: uplink downlink
+all: uplink downlink funcube
 
 clean:
 	rm -f uplink/uplink.py
