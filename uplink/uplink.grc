@@ -46,7 +46,7 @@
     </param>
     <param>
       <key>id</key>
-      <value>afsk_uplink</value>
+      <value>uplink</value>
     </param>
     <param>
       <key>max_nouts</key>
