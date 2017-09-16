@@ -302,11 +302,11 @@
     </param>
     <param>
       <key>value</key>
-      <value>0</value>
+      <value>-20e3</value>
     </param>
     <param>
       <key>_enabled</key>
-      <value>True</value>
+      <value>1</value>
     </param>
     <param>
       <key>_coordinate</key>
@@ -358,6 +358,33 @@
     </param>
   </block>
   <block>
+    <key>variable</key>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(680, 436)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>frequency_offset</value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>-20e3</value>
+    </param>
+  </block>
+  <block>
     <key>variable_qtgui_range</key>
     <param>
       <key>comment</key>
@@ -405,11 +432,11 @@
     </param>
     <param>
       <key>step</key>
-      <value>0.01</value>
+      <value>0.001</value>
     </param>
     <param>
       <key>stop</key>
-      <value>1</value>
+      <value>0.1</value>
     </param>
     <param>
       <key>rangeType</key>
@@ -961,7 +988,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1560, 256)</value>
+      <value>(1304, 256)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -973,7 +1000,7 @@
     </param>
     <param>
       <key>w</key>
-      <value>0.02</value>
+      <value>0.1</value>
     </param>
     <param>
       <key>maxoutbuf</key>
@@ -1451,7 +1478,7 @@
     <key>qtgui_const_sink_x</key>
     <param>
       <key>autoscale</key>
-      <value>False</value>
+      <value>True</value>
     </param>
     <param>
       <key>axislabels</key>
@@ -1747,7 +1774,7 @@
     </param>
     <param>
       <key>size</key>
-      <value>1024</value>
+      <value>128</value>
     </param>
     <param>
       <key>tr_chan</key>
@@ -1842,7 +1869,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1560, 164)</value>
+      <value>(1504, 396)</value>
     </param>
     <param>
       <key>gui_hint</key>
@@ -2428,7 +2455,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1768, 96)</value>
+      <value>(1896, 108)</value>
     </param>
     <param>
       <key>gui_hint</key>
@@ -3154,7 +3181,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1744, 288)</value>
+      <value>(1504, 288)</value>
     </param>
     <param>
       <key>gui_hint</key>
@@ -3509,7 +3536,7 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>0</value>
+      <value>1</value>
     </param>
     <param>
       <key>fftsize</key>
@@ -3736,7 +3763,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1320, 248)</value>
+      <value>(1648, 216)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -3748,7 +3775,7 @@
     </param>
     <param>
       <key>id</key>
-      <value>root_raised_cosine_filter_0</value>
+      <value>root_raised_cosine_filter_0_0</value>
     </param>
     <param>
       <key>interp</key>
@@ -3777,7 +3804,7 @@
   </block>
   <connection>
     <source_block_id>analog_agc_xx_0</source_block_id>
-    <sink_block_id>root_raised_cosine_filter_0</sink_block_id>
+    <sink_block_id>digital_costas_loop_cc_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
@@ -3825,13 +3852,13 @@
   </connection>
   <connection>
     <source_block_id>digital_costas_loop_cc_0</source_block_id>
-    <sink_block_id>digital_symbol_sync_xx_0</sink_block_id>
+    <sink_block_id>qtgui_freq_sink_x_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
   <connection>
     <source_block_id>digital_costas_loop_cc_0</source_block_id>
-    <sink_block_id>qtgui_time_sink_x_0</sink_block_id>
+    <sink_block_id>root_raised_cosine_filter_0_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
@@ -3938,14 +3965,14 @@
     <sink_key>in</sink_key>
   </connection>
   <connection>
-    <source_block_id>root_raised_cosine_filter_0</source_block_id>
-    <sink_block_id>digital_costas_loop_cc_0</sink_block_id>
+    <source_block_id>root_raised_cosine_filter_0_0</source_block_id>
+    <sink_block_id>digital_symbol_sync_xx_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
   <connection>
-    <source_block_id>root_raised_cosine_filter_0</source_block_id>
-    <sink_block_id>qtgui_freq_sink_x_0</sink_block_id>
+    <source_block_id>root_raised_cosine_filter_0_0</source_block_id>
+    <sink_block_id>qtgui_time_sink_x_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
