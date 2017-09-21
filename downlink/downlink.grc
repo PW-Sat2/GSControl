@@ -670,7 +670,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(3200, 72)</value>
+      <value>(3024, 320)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -701,7 +701,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(3328, 160)</value>
+      <value>(3328, 176)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -760,7 +760,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(3328, 264)</value>
+      <value>(3328, 280)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1268,53 +1268,6 @@
     </param>
   </block>
   <block>
-    <key>kiss_check_address</key>
-    <param>
-      <key>address</key>
-      <value>PWSAT2</value>
-    </param>
-    <param>
-      <key>alias</key>
-      <value></value>
-    </param>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>affinity</key>
-      <value></value>
-    </param>
-    <param>
-      <key>direction</key>
-      <value>"from"</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>1</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(2960, 192)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>kiss_check_address_0</value>
-    </param>
-    <param>
-      <key>maxoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>minoutbuf</key>
-      <value>0</value>
-    </param>
-  </block>
-  <block>
     <key>kiss_hdlc_deframer</key>
     <param>
       <key>alias</key>
@@ -1338,7 +1291,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(2696, 196)</value>
+      <value>(2696, 188)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1359,6 +1312,10 @@
     <param>
       <key>minoutbuf</key>
       <value>0</value>
+    </param>
+    <param>
+      <key>trim_fcs</key>
+      <value>False</value>
     </param>
   </block>
   <block>
@@ -1420,7 +1377,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(3160, 192)</value>
+      <value>(3176, 208)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1437,41 +1394,6 @@
     <param>
       <key>minoutbuf</key>
       <value>0</value>
-    </param>
-  </block>
-  <block>
-    <key>kiss_save_frame</key>
-    <param>
-      <key>alias</key>
-      <value></value>
-    </param>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>affinity</key>
-      <value></value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>file</key>
-      <value>/home/pwsat2gs/temp/temp</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(3328, 388)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>kiss_save_frame_0</value>
     </param>
   </block>
   <block>
@@ -3802,6 +3724,41 @@
       <value>symb_rate</value>
     </param>
   </block>
+  <block>
+    <key>save_frame</key>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>affinity</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>file</key>
+      <value>/media/gregg/Ext disk/out_1</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(3000, 276)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>save_frame_0</value>
+    </param>
+  </block>
   <connection>
     <source_block_id>analog_agc_xx_0</source_block_id>
     <sink_block_id>digital_costas_loop_cc_0</sink_block_id>
@@ -3923,20 +3880,20 @@
     <sink_key>1</sink_key>
   </connection>
   <connection>
-    <source_block_id>kiss_check_address_0</source_block_id>
+    <source_block_id>kiss_hdlc_deframer_0</source_block_id>
     <sink_block_id>blocks_message_debug_0</sink_block_id>
-    <source_key>ok</source_key>
+    <source_key>out</source_key>
     <sink_key>print_pdu</sink_key>
   </connection>
   <connection>
-    <source_block_id>kiss_check_address_0</source_block_id>
+    <source_block_id>kiss_hdlc_deframer_0</source_block_id>
     <sink_block_id>kiss_pdu_to_kiss_0</sink_block_id>
-    <source_key>ok</source_key>
+    <source_key>out</source_key>
     <sink_key>in</sink_key>
   </connection>
   <connection>
     <source_block_id>kiss_hdlc_deframer_0</source_block_id>
-    <sink_block_id>kiss_check_address_0</sink_block_id>
+    <sink_block_id>save_frame_0</sink_block_id>
     <source_key>out</source_key>
     <sink_key>in</sink_key>
   </connection>
@@ -3957,12 +3914,6 @@
     <sink_block_id>blocks_socket_pdu_0_0</sink_block_id>
     <source_key>out</source_key>
     <sink_key>pdus</sink_key>
-  </connection>
-  <connection>
-    <source_block_id>kiss_pdu_to_kiss_0</source_block_id>
-    <sink_block_id>kiss_save_frame_0</sink_block_id>
-    <source_key>out</source_key>
-    <sink_key>in</sink_key>
   </connection>
   <connection>
     <source_block_id>root_raised_cosine_filter_0_0</source_block_id>

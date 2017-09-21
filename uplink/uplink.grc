@@ -625,6 +625,41 @@
       <value>0</value>
     </param>
   </block>
+  <block>
+    <key>save_frame</key>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>affinity</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>file</key>
+      <value>downlink</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(416, 76)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>save_frame_0</value>
+    </param>
+  </block>
   <connection>
     <source_block_id>blks2_tcp_source_0</source_block_id>
     <sink_block_id>kiss_kiss_to_pdu_0</sink_block_id>
@@ -676,6 +711,12 @@
   <connection>
     <source_block_id>kiss_kiss_to_pdu_0</source_block_id>
     <sink_block_id>kiss_hdlc_framer_0</sink_block_id>
+    <source_key>out</source_key>
+    <sink_key>in</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>kiss_kiss_to_pdu_0</source_block_id>
+    <sink_block_id>save_frame_0</sink_block_id>
     <source_key>out</source_key>
     <sink_key>in</sink_key>
   </connection>
