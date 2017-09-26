@@ -1,4 +1,4 @@
-import afsk_uplink
+import uplink
 import thread
 from threading import Timer
 import aprs
@@ -12,21 +12,11 @@ class Uplink:
         self.frame.source = self.frame.destination = aprs.Callsign("PWSAT2-0");
         self.frame.text = ""
 
-    def start_tb(self):
-        self.tb = afsk_uplink.afsk_uplink()
-        self.tb.start()
-
     def start(self):
-        thread.start_new_thread(self.start_tb, ())
-
-        time.sleep(0.5)
-
         self.kiss.start()
 
     def stop(self):
-        self.tb.stop()
         self.kiss.stop()
-        self.tb.wait()
 
     def send(self, payload):
         self.frame.text = payload
