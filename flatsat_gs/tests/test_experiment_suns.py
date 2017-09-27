@@ -2,6 +2,7 @@ import imp
 import os
 import sys
 
+sys.path.append(os.path.join(os.path.dirname(__file__), '../build/integration_tests'))
 sys.path.append(os.path.join(os.path.dirname(__file__), '../PWSat2OBC/integration_tests'))
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 import response_frames
@@ -13,9 +14,8 @@ from radio.radio_receiver import *
 from radio.radio_sender import *
 from tools.remote_files import *
 from tools.parse_beacon import *
-
 from telecommand import *
-from response_frames import operation
+from response_frames import common
 from devices import comm
 from tools.tools import SimpleLogger
 import datetime
@@ -65,15 +65,20 @@ if __name__ == '__main__':
     # 2. send telecommand to turn on experiment
     print("#2. send telecommand to turn on experiment")
     correlation_id = 2
-    gain = 1
-    itime = 100
-    samples_count = 10
-    short_delay = datetime.timedelta(seconds=5)
+    gain = 0
+    itime = 10
+    samples_count = 254
+    short_delay = datetime.timedelta(seconds=1)
     session_count = 10
-    long_delay = datetime.timedelta(minutes=10)
-    file_name = 'suns_3'
+    long_delay = datetime.timedelta(minutes=1)
+    file_name = 'suns_long_7'
 
-    sender.send(PerformSunSExperiment(correlation_id, gain, itime, samples_count, short_delay, session_count, long_delay, file_name))
+    while True:
+        sender.send(PerformSunSExperiment(correlation_id, gain, itime, samples_count, short_delay, session_count, long_delay, file_name))
+        recv = receiver.receive_frame()
+        if isinstance(recv, common.ExperimentSuccessFrame):
+            logger.log(recv.payload())
+            break
 
     # 3. receive, save and parse incomming frames
     count_beacons = 0
@@ -84,15 +89,19 @@ if __name__ == '__main__':
 
         if isinstance(recv, comm.BeaconFrame):
             beacon = ParseBeacon.parse(recv)
-            pprint.pprint(beacon['08: Experiments'])
+            pprint.pprint(beacon['09: Experiments'])
             logger.log(beacon)
             count_beacons += 1
 
-            if (count_beacons > 10) and (beacon['08: Experiments']['0518: Current experiment code'] == 0):
+            if (count_beacons > 2) and (str(beacon['09: Experiments']['0540: Current experiment code']) == 'None'):
                 print("Finishing #3.")
                 break
+            else:
+                print(count_beacons)
+                print(str(beacon['09: Experiments']['0540: Current experiment code']))
+                print(type(beacon['09: Experiments']['0540: Current experiment code']))
 
-        if isinstance(recv, operation.OperationSuccessFrame):
+        if isinstance(recv, common.ExperimentSuccessFrame):
             logger.log(recv.payload())
 
     # 4. List files
@@ -103,7 +112,7 @@ if __name__ == '__main__':
         print(recv)
 
         file_list = []
-        if isinstance(recv, operation.OperationSuccessFrame):
+        if isinstance(recv, common.FileListSuccessFrame):
             file_list = RemoteFileTools.parse_file_list(recv)
             logger.log(file_list)
             print("Finishing #4")

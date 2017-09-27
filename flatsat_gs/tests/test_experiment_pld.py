@@ -3,6 +3,7 @@ import os
 import sys
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../PWSat2OBC/integration_tests'))
+sys.path.append(os.path.join(os.path.dirname(__file__), '../build/integration_tests'))
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 import response_frames
 from binascii import hexlify
@@ -26,9 +27,7 @@ if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('-f', '--file', required=True,
-                        help="Log file path")
-    parser.add_argument('-e', '--experiment_file', required=True,
+    parser.add_argument('-f', '--experiment_file', required=True,
                         help="Log file path")
     parser.add_argument('-t', '--target_gr', required=True,
                         help="GNURadio host", default='localhost')                 
@@ -45,7 +44,8 @@ if __name__ == '__main__':
     sender.connect()
     receiver = Receiver(args.target_gr, args.port_gr)
     receiver.connect()
-    logger = SimpleLogger(args.file)
+    base_filename = str(time.time()) + '_' + args.experiment_file
+    logger = SimpleLogger(base_filename + '.log')
     logger.log('Start of the script')
 
     # 1. receive beacon to see the state of sat before experiment
@@ -65,9 +65,7 @@ if __name__ == '__main__':
     # 2. send telecommand to turn on experiment
     print("#2. send telecommand to turn on experiment")
     correlation_id = 2
-    delay = 180
-    samples_count = 100
-    file_name = 'pld_1'
+    file_name = args.experiment_file
 
     sender.send(PerformPayloadCommissioningExperiment(correlation_id, file_name))
 
@@ -118,13 +116,13 @@ if __name__ == '__main__':
     chunks = downloader.download(file_to_download)
     merged = RemoteFileTools.merge_chunks(chunks)
     print("Download file")
-    RemoteFileTools.save_chunks(args.experiment_file, merged)
+    RemoteFileTools.save_chunks(base_filename + '.data', merged)
     
     # 6. Parse file
     try:
         print("#6. Parse file")
         parsed = ExperimentFileParser.parse_partial(ensure_string(merged))
-        with open(file_name + "_parsed.txt", 'w') as f:
+        with open(base_filename + "_parsed.txt", 'w') as f:
             for p in parsed[0]:
                 pprint.pprint(p, f)
 
@@ -140,9 +138,9 @@ if __name__ == '__main__':
     for i in range(6):
         try:
             file_to_download = None
-            current_photo_name_sufix = '_{}.jpg'.format(i)
+            current_photo_name_sufix = '_{}'.format(i)
             for f in file_list:
-                if f['File'] == file_name + current_photo_name_sufix:
+                if f['File'] == args.experiment_file + current_photo_name_sufix:
                     file_to_download = f
                     break
             print("Selecting " + str(file_to_download))
@@ -150,8 +148,8 @@ if __name__ == '__main__':
 
             chunks = downloader.download(file_to_download)
             print("Download file")
-            RemoteFileTools.save_chunks(args.experiment_file + current_photo_name_sufix + '.raw', chunks)
-            RemoteFileTools.save_photo(args.experiment_file + current_photo_name_sufix, chunks)
+            RemoteFileTools.save_chunks(base_filename + current_photo_name_sufix + '.raw', chunks)
+            RemoteFileTools.save_photo(base_filename + current_photo_name_sufix + '.jpg', chunks)
         except:
             print("Photo failed")
     print("End...")
