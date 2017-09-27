@@ -48,6 +48,7 @@ if __name__ == '__main__':
 
     cfg = Config()
     frame_decoder = response_frames.FrameDecoder(response_frames.frame_factories)
+    sender = Sender(args.target_dw, args.port_dw)
 
 
     def receive():
@@ -57,10 +58,18 @@ if __name__ == '__main__':
         rcv.disconnect()
         return frame_decoder.decode(data)
 
+
+    def receive_raw():
+        rcv = Receiver(args.target_gr, args.port_gr)
+        rcv.connect()
+        data = rcv.decode_kiss(rcv.receive())        
+        rcv.disconnect()
+        return data
+
+
     def send(frame):
-        sender = Sender(args.target_dw, args.port_dw)
         sender.connect()
-        sender.send(frame)        
+        sender.send(frame)
         sender.disconnect()
 
     def send_receive(frame):
@@ -68,19 +77,16 @@ if __name__ == '__main__':
         return receive()
 
     def get_file(file_dict):
-        sender = Sender(args.target_dw, args.port_dw)
-        sender.connect()
         receiver = Receiver(args.target_gr, args.port_gr)
         receiver.connect()
         downloader = RemoteFile(sender, receiver)
         data = downloader.download(file_dict)
-        sender.disconnect()
         receiver.disconnect()
 
         return data
 
 
-    shell = InteractiveShellEmbed(config=cfg, user_ns={'receive': receive, 'send' : send, 'send_receive' : send_receive, 'parse_file_list' : RemoteFileTools.parse_file_list, 'get_file' : get_file, 'RemoteFileTools' : RemoteFileTools, 'RemoteFile' : RemoteFile},
+    shell = InteractiveShellEmbed(config=cfg, user_ns={'receive_raw' : receive_raw, 'receive': receive, 'send' : send, 'send_receive' : send_receive, 'parse_file_list' : RemoteFileTools.parse_file_list, 'get_file' : get_file, 'RemoteFileTools' : RemoteFileTools, 'RemoteFile' : RemoteFile},
                                   banner2='COMM Terminal')
     shell.prompts = MyPrompt(shell)
     shell.run_code('from telecommand import *')

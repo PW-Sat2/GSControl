@@ -9,6 +9,7 @@ try:
     import response_frames
 except ImportError:
     sys.path.append(os.path.join(os.path.dirname(__file__), '../PWSat2OBC/integration_tests'))
+    sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
     from utils import ensure_string, ensure_byte_list
     import response_frames
 
@@ -22,6 +23,8 @@ class Receiver:
     def connect(self):
         self.sock.connect(self.server_address)
 
+    def timeout(self, timeout):
+        self.sock.settimeout(timeout)
 
     def receive(self):
         buff = self.sock.recv(1)
@@ -33,6 +36,20 @@ class Receiver:
                 break
    
         return buff
+
+    def receive_no_wait(self):
+        try:
+            buff = self.sock.recv(1)
+
+            while True:
+                data = self.sock.recv(1)
+                buff += data
+                if data.find('\xC0') is not -1:
+                    break
+       
+            return buff
+        except:
+            return None
 
 
     def decode_kiss(self, frame):

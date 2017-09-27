@@ -4,6 +4,9 @@ import sys
 import socket
 import re
 import struct
+import json
+
+from datetime import timedelta, datetime, date, time
 
 from struct import pack
 
@@ -16,9 +19,6 @@ from telecommand import *
 from emulator.beacon_parser.full_beacon_parser import FullBeaconParser
 from emulator.beacon_parser.parser import BitReader, BeaconStorage
 
-from conversion.comm_conversion import *
-from conversion.controller_a_conversions import *
-from conversion.controller_b_conversions import *
 
 from utils import ensure_string, ensure_byte_list
 import response_frames
@@ -47,21 +47,35 @@ class ParseBeacon:
         return result
 
     @staticmethod
+    def convert_values(o):
+        if isinstance(o, timedelta):
+            return o.total_seconds()
+        
+        if isinstance(o, date):
+            return o.strftime("%Y-%m-%d")
+
+        if isinstance(o, time):
+            return o.strftime("%H:%M:%S")
+
+        try:
+            return {
+                'raw': o.raw,
+                'converted': o.converted,
+                'unit': getattr(o, 'unit') if hasattr(o, 'unit') else None
+            }
+        except AttributeError:
+            return o
+
+
+    @staticmethod
     def convert(beacon):
-        comm = beacon['10: Comm']
-        for key, value in comm.items():
-            comm[key] = comm_formulas[key](comm[key])
-        beacon['10: Comm'] = comm
-
-        controller_a = beacon['13: Controller A']
-        for key, value in controller_a.items():
-            controller_a[key] = controller_a_formulas[key](controller_a[key])
-        beacon['13: Controller A'] = controller_a
-
-        controller_b = beacon['14: Controller B']
-        for key, value in controller_b.items():
-            controller_b[key] = controller_b_formulas[key](controller_b[key])
-        beacon['14: Controller B'] = controller_b
+        for k, v in beacon.items():
+            for k2, v2 in beacon[k].items():
+                beacon[k][k2] = ParseBeacon.convert_values(v2)
 
         return beacon
+
+    @staticmethod
+    def convert_json(beacon):
+        return json.dumps(beacon, default=ParseBeacon.convert_values, sort_keys=True, indent=4)
     

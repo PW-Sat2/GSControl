@@ -4,13 +4,13 @@ from math import ceil
 import struct
 from utils import ensure_string
 
-from response_frames import operation
+from response_frames import common
 from telecommand import *
 
 class RemoteFileTools:
     @staticmethod
     def parse_file_list(frame):
-        if isinstance(frame, operation.OperationSuccessFrame):
+        if isinstance(frame, common.FileListSuccessFrame):
             res = str(bytearray(frame.payload())[1:-1])
             rg = re.findall('\x00(.*?)\x00([\s\S]{2})\x00', res)  
             file_list = [{'File' : x[0], 'Size' : struct.unpack('<H', x[1])[0], 'Chunks' : int(ceil(struct.unpack('<H', x[1])[0]/230.0))} for x in rg]
@@ -73,7 +73,7 @@ class RemoteFile:
             self.sender.send(DownloadFile(file_to_download['File'], correlation_id, [remaining[0]]))
             recv = self.receiver.receive_frame()
 
-            if isinstance(recv, operation.OperationSuccessFrame):
+            if isinstance(recv, common.FileSendSuccessFrame):
                 if (recv.correlation_id == correlation_id):
                     file_chunks[recv.seq()] = recv.response
                     try:

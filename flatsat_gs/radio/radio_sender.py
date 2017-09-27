@@ -8,10 +8,13 @@ import kiss
 try:
     from utils import ensure_string, ensure_byte_list
     import response_frames
+    from uplink_test import UDPKISS
 except ImportError:
     sys.path.append(os.path.join(os.path.dirname(__file__), '../PWSat2OBC/integration_tests'))
+    sys.path.append(os.path.join(os.path.dirname(__file__), '../../../GS-Modem/uplink'))
     from utils import ensure_string, ensure_byte_list
     import response_frames
+    from uplink_test import UDPKISS
 
 
 class Sender:
@@ -23,7 +26,7 @@ class Sender:
         self.aprs_frame.destination = aprs.Callsign(destination_callsign)
 
     def connect(self):
-        self.ki = kiss.TCPKISS(host=self.target, port=self.port)
+        self.ki = UDPKISS(host=self.target, port=self.port)
         self.ki.start()
 
     def send(self, frame):
