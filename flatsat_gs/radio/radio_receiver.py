@@ -16,21 +16,20 @@ except ImportError:
 
 class Receiver:
     def __init__(self, target, port):
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)        
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.server_address = (target, port)
 
-
     def connect(self):
-        self.sock.connect(self.server_address)
+        self.sock.bind(self.server_address)
 
     def timeout(self, timeout):
         self.sock.settimeout(timeout)
 
     def receive(self):
-        buff = self.sock.recv(1)
+        buff = ""
 
         while True:
-            data = self.sock.recv(1)
+            data = self.sock.recv(1024)
             buff += data
             if data.find('\xC0') is not -1:
                 break
@@ -39,10 +38,10 @@ class Receiver:
 
     def receive_no_wait(self):
         try:
-            buff = self.sock.recv(1)
+            buff = ""
 
             while True:
-                data = self.sock.recv(1)
+                data = self.sock.recv(1024)
                 buff += data
                 if data.find('\xC0') is not -1:
                     break
@@ -72,7 +71,7 @@ class Receiver:
 
 
     def disconnect(self):
-        self.sock.shutdown(socket.SHUT_RDWR)
+        # self.sock.shutdown(socket.SHUT_RDWR)
         self.sock.close()
 
 

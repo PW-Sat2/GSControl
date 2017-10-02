@@ -4,6 +4,7 @@ import sys
 import re
 import aprs
 import kiss
+from udpkiss import UDPKISS
 
 try:
     from utils import ensure_string, ensure_byte_list
