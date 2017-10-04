@@ -4,39 +4,43 @@ import sys
 import re
 import aprs
 import kiss
-from udpkiss import UDPKISS
+import time
+import zmq
+import pmt
+import array
 
 try:
     from utils import ensure_string, ensure_byte_list
     import response_frames
-    from uplink_test import UDPKISS
 except ImportError:
     sys.path.append(os.path.join(os.path.dirname(__file__), '../PWSat2OBC/integration_tests'))
-    sys.path.append(os.path.join(os.path.dirname(__file__), '../../../GS-Modem/uplink'))
     from utils import ensure_string, ensure_byte_list
     import response_frames
-    from uplink_test import UDPKISS
 
 
 class Sender:
     def __init__(self, target, port, source_callsign='SP3SAT', destination_callsign='PWSAT2-0'):
-        self.target = target
-        self.port = port
+        self.context = zmq.Context()
+        self.sock = self.context.socket(zmq.PUB)
+        self.sock.bind("tcp://%s:%d" % (target, port))
+        time.sleep(1)
+        
         self.aprs_frame = aprs.Frame()
         self.aprs_frame.source = aprs.Callsign(source_callsign)
         self.aprs_frame.destination = aprs.Callsign(destination_callsign)
 
     def connect(self):
-        self.ki = UDPKISS(host=self.target, port=self.port)
-        self.ki.start()
+        pass
 
     def send(self, frame):
         payload = frame.build()
         self.aprs_frame.text = ensure_string(payload)
-        self.ki.write(self.aprs_frame.encode_kiss())
-
+        buff = array.array('B', self.aprs_frame.encode_kiss())
+        msg = pmt.serialize_str(pmt.cons(pmt.PMT_NIL, pmt.init_u8vector(len(buff), buff)))
+        self.sock.send(msg)
+        
     def disconnect(self):
-        self.ki.stop()
+        pass
 
 
 if __name__ == '__main__':

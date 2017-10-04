@@ -3,6 +3,10 @@ import os
 import sys
 import re
 import socket
+import time
+import zmq
+import pmt
+import array
 
 try:
     from utils import ensure_string, ensure_byte_list
@@ -16,45 +20,39 @@ except ImportError:
 
 class Receiver:
     def __init__(self, target, port):
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.server_address = (target, port)
+        self.context = zmq.Context()
+        self.sock = self.context.socket(zmq.SUB)
+        self.sock.connect("tcp://%s:%d" %(target, port))
+        self.sock.setsockopt(zmq.SUBSCRIBE, "")
+        self.timeout(-1)
 
     def connect(self):
-        self.sock.bind(self.server_address)
+        pass
 
-    def timeout(self, timeout):
-        self.sock.settimeout(timeout)
+    def timeout(self, timeout_in_ms=-1):
+        self.set_timeout = timeout_in_ms
+        self.sock.setsockopt(zmq.RCVTIMEO, self.set_timeout)
 
     def receive(self):
-        buff = ""
-
-        while True:
-            data = self.sock.recv(1024)
-            buff += data
-            if data.find('\xC0') is not -1:
-                break
-   
-        return buff
+        while self.receive_no_wait() is not None:
+            pass
+        x = pmt.u8vector_elements(pmt.cdr(pmt.deserialize_str(self.sock.recv())))
+        val = ''.join(map(chr, x))
+        return val
 
     def receive_no_wait(self):
+        self.sock.setsockopt(zmq.RCVTIMEO, 0)
+        val = None
         try:
-            buff = ""
-
-            while True:
-                data = self.sock.recv(1024)
-                buff += data
-                if data.find('\xC0') is not -1:
-                    break
-       
-            return buff
-        except:
-            return None
-
-
+            val = pmt.u8vector_elements(pmt.cdr(pmt.deserialize_str(self.sock.recv())))
+        except zmq.Again:
+            pass
+        finally:
+            self.sock.setsockopt(zmq.RCVTIMEO, self.set_timeout)
+            return val
+            
     def decode_kiss(self, frame):
-        frame = frame[18:-1]
-        frame = frame.replace('\xDB\xDC', '\xC0')
-        frame = frame.replace('\xDB\xDD', '\xDB')
+        frame = frame[16:-2]
         
         return ensure_byte_list(frame)
 
@@ -71,8 +69,7 @@ class Receiver:
 
 
     def disconnect(self):
-        # self.sock.shutdown(socket.SHUT_RDWR)
-        self.sock.close()
+        pass
 
 
 if __name__ == '__main__':

@@ -4,6 +4,7 @@ import sys
 import re
 import aprs
 import kiss
+import time
 
 if __name__ == '__main__':
     sys.path.append(os.path.join(os.path.dirname(__file__), '../PWSat2OBC/integration_tests'))
@@ -29,14 +30,14 @@ if __name__ == '__main__':
 
     parser.add_argument('-c', '--config', required=True,
                         help="Config file (in CMake-generated integration tests format, only MOCK_COM required)")
-    parser.add_argument('-t', '--target_gr', required=True,
+    parser.add_argument('-t', '--downlink-host', required=False,
                         help="GNURadio host", default='localhost')                 
-    parser.add_argument('-p', '--port_gr', required=True,
-                        help="GNURadio port", default=52001, type=int)
-    parser.add_argument('-u', '--target_dw', required=True,
-                        help="DireWolf host", default='localhost')                 
-    parser.add_argument('-v', '--port_dw', required=True,
-                        help="DireWolf port", default=8001, type=int)
+    parser.add_argument('-p', '--downlink-port', required=False,
+                        help="GNURadio port", default=7001, type=int)
+    parser.add_argument('-u', '--uplink-host', required=False,
+                        help="Uplink host", default='*')
+    parser.add_argument('-v', '--uplink-port', required=False,
+                        help="Uplink port", default=7000, type=int)
 
     args = parser.parse_args()
     imp.load_source('config', args.config)
@@ -48,46 +49,37 @@ if __name__ == '__main__':
 
     cfg = Config()
     frame_decoder = response_frames.FrameDecoder(response_frames.frame_factories)
-    sender = Sender(args.target_dw, args.port_dw)
-
+    
+    sender = Sender(args.uplink_host, args.uplink_port)
+    rcv = Receiver(args.downlink_host, args.downlink_port)
 
     def receive():
-        rcv = Receiver(args.target_gr, args.port_gr)
-        rcv.connect()
         data = rcv.decode_kiss(rcv.receive())        
-        rcv.disconnect()
         return frame_decoder.decode(data)
 
-
     def receive_raw():
-        rcv = Receiver(args.target_gr, args.port_gr)
-        rcv.connect()
-        data = rcv.decode_kiss(rcv.receive())        
-        rcv.disconnect()
-        return data
-
+        return rcv.decode_kiss(rcv.receive())
+    
+    def set_timeout(timeout_in_ms=-1):
+        rcv.timeout(timeout_in_ms)
 
     def send(frame):
-        sender.connect()
         sender.send(frame)
-        sender.disconnect()
 
     def send_receive(frame):
         send(frame)
         return receive()
 
     def get_file(file_dict):
-        receiver = Receiver(args.target_gr, args.port_gr)
-        receiver.connect()
-        downloader = RemoteFile(sender, receiver)
+        downloader = RemoteFile(sender, rcv)
         data = downloader.download(file_dict)
-        receiver.disconnect()
 
         return data
 
 
-    shell = InteractiveShellEmbed(config=cfg, user_ns={'receive_raw' : receive_raw, 'receive': receive, 'send' : send, 'send_receive' : send_receive, 'parse_file_list' : RemoteFileTools.parse_file_list, 'get_file' : get_file, 'RemoteFileTools' : RemoteFileTools, 'RemoteFile' : RemoteFile},
+    shell = InteractiveShellEmbed(config=cfg, user_ns={'receive_raw' : receive_raw, 'receive': receive, 'set_timeout': set_timeout, 'send' : send, 'send_receive' : send_receive, 'parse_file_list' : RemoteFileTools.parse_file_list, 'get_file' : get_file, 'RemoteFileTools' : RemoteFileTools, 'RemoteFile' : RemoteFile},
                                   banner2='COMM Terminal')
     shell.prompts = MyPrompt(shell)
-    shell.run_code('from telecommand import *')
+    shell.run_code('from tools.parse_beacon import ParseBeacon')
+    shell.run_code('import telecommand as tc')
     shell()
