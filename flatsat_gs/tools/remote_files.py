@@ -11,9 +11,21 @@ class RemoteFileTools:
     @staticmethod
     def parse_file_list(frame):
         if isinstance(frame, common.FileListSuccessFrame):
-            res = str(bytearray(frame.payload())[1:-1])
-            rg = re.findall('\x00(.*?)\x00([\s\S]{2})\x00', res)  
-            file_list = [{'File' : x[0], 'Size' : struct.unpack('<H', x[1])[0], 'Chunks' : int(ceil(struct.unpack('<H', x[1])[0]/230.0))} for x in rg]
+            res = bytearray(frame.payload())[2:]
+
+            file_list = []
+            
+            while True:
+                now = res.find('\x00')
+                if now == -1:
+                    return file_list
+                
+                name = str(res[:now])
+                size = struct.unpack('<I', res[now+1:now+5])[0]
+                chunks = int(ceil(size/230.))
+
+                file_list.append({'File': name, 'Size': size, 'Chunks': chunks})
+                res = res[now+5:]
         else:
             file_list = None
 
