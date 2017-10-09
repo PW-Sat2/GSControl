@@ -92,4 +92,5 @@ if __name__ == '__main__':
     shell.prompts = MyPrompt(shell)
     shell.run_code('from tools.parse_beacon import ParseBeacon')
     shell.run_code('import telecommand as tc')
+    shell.run_code('import time')
     shell()
