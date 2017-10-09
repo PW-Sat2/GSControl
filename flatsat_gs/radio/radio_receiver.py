@@ -19,7 +19,7 @@ except ImportError:
 
 
 class Receiver:
-    def __init__(self, target, port):
+    def __init__(self, target="localhost", port=7001):
         self.context = zmq.Context()
         self.sock = self.context.socket(zmq.SUB)
         self.sock.connect("tcp://%s:%d" %(target, port))
@@ -27,6 +27,7 @@ class Receiver:
         self.timeout(-1)
 
     def connect(self):
+        print "Connect not used. Remove!"
         pass
 
     def timeout(self, timeout_in_ms=-1):
@@ -69,7 +70,7 @@ class Receiver:
 
 
     def disconnect(self):
-        pass
+        print "Disconnect not used. Remove!"
 
 
 if __name__ == '__main__':
