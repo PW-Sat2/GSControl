@@ -143,6 +143,8 @@ if __name__ == '__main__':
     cams = [CameraLocation.Wing, CameraLocation.Nadir]
     resolutions = [PhotoResolution.p128, PhotoResolution.p240, PhotoResolution.p480]
 
-    for cam in cams:
-        for resolution in resolutions:
-            test(cam, resolution, 5, datetime.timedelta(0), results_file)
+    for i in range(5):
+        for cam in cams:
+            for resolution in resolutions:
+                r = test(cam, resolution, 5, datetime.timedelta(0), results_file)
+                pprint.pprint(r)
