@@ -138,13 +138,15 @@ if __name__ == '__main__':
     logger.log('Photo Experiment')
 
     ### TESTS ###
-    # 1.
-
     cams = [CameraLocation.Wing, CameraLocation.Nadir]
     resolutions = [PhotoResolution.p128, PhotoResolution.p240, PhotoResolution.p480]
 
     for i in range(5):
+        logger.log('Iteration {}'.format(i))
         for cam in cams:
             for resolution in resolutions:
+                logger.log('Requesting cam: {}, res: {}, qty: {}, delay: {}, filename: {}'.format(str(cam), str(resolution), qty, 0, results_file))
                 r = test(cam, resolution, 5, datetime.timedelta(0), results_file)
                 pprint.pprint(r)
+
+    logger.log('Finish Photo Experiment')
