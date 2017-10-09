@@ -26,9 +26,6 @@ import time
 import telecommand as tc
 
 # Experiment settings
-correlation_id = 2
-delay = datetime.timedelta(0)
-file_name_base = 'photo_test_20171009_1306'
 
 def get_beacon():
     try:
@@ -38,8 +35,9 @@ def get_beacon():
     except zmq.Again:
         return None
 
-def take_picture(sender, receiver, camera, resolution, qty, delay, filename_base):
+def take_pictures(sender, receiver, camera, resolution, qty, delay, filename_base):
     busy = True
+    file_list = None
     while busy:
         print("Requesting photo {}, {}, {}, {}, {}".format(str(camera), str(resolution), qty, delay, filename_base))
         try:
@@ -53,11 +51,11 @@ def take_picture(sender, receiver, camera, resolution, qty, delay, filename_base
         except zmq.Again:
             print "Timeout"
 
-    time.sleep(5)
+    time.sleep(10)
 
     busy = True
     while busy:
-        print("Waiting for photo file")
+        print("Waiting for photo file...")
         try:
             sender.send(ListFiles(13, '/'))
             recv = receiver.receive_frame()
@@ -67,7 +65,7 @@ def take_picture(sender, receiver, camera, resolution, qty, delay, filename_base
             if isinstance(recv, common.FileListSuccessFrame):
                 file_list = RemoteFileTools.parse_file_list(recv)
                 logger.log(file_list)
-                print("File list taken, analyzing")
+                print("File list taken, analyzing...")
 
                 for f in file_list:
                     if f['File'] == "{}_{}".format(filename_base, qty-1):
@@ -77,25 +75,52 @@ def take_picture(sender, receiver, camera, resolution, qty, delay, filename_base
             time.sleep(10)
 
         except zmq.Again:
-            print "Timeout"
+            print "Timeout!"
+
+    return file_list
+
+
+def test_size(qty, file_list, filename_base):
+
+    # prepare list of files [photos] to be evaluated
+    to_check = [filename_base + str("_") + str(i) for i in range(qty)]
+    # list of dicts of files to be downloaded
+    to_check_dicts = []
+
+    for td in to_check:
+        try:
+            to_check_dicts.append(filter(lambda filename: filename['File'] == td, file_list))
+        except:
+            print("Could not find {}".format(td))
+
+    # qty in reality
+    real_qty = len(to_check_dicts)
+
+    failed_photos = []
+    failed_photos.append(filter(lambda photosize: photosize['Size'] == 7, to_check_dicts))
+    failed_qty = len(failed_photos)
+
+    return {'real qty': real_qty, 'failed qty': failed_qty, 'failed photos': failed_photos}
 
 
 if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser()
-
     parser.add_argument('-f', '--file', required=True,
                         help="Log file path")
-
+    parser.add_argument()
     args = parser.parse_args()
 
     sender = Sender()
     receiver = Receiver()
     receiver.timeout(10000)
+
     logger = SimpleLogger(args.file)
     logger.log('Start of the script')
 
     # 0. Save experiment settings to log file
     logger.log('Photo Experiment')
 
-    take_picture(sender, receiver, CameraLocation.Wing, PhotoResolution.p128, 0, delay, 'script')
+    file_list = take_pictures(sender, receiver, CameraLocation.Wing, PhotoResolution.p128, 5, datetime.timedelta(0), 'photo_test_20171009_1915')
+    ret = test_size(5, file_list, 'photo_test_20171009_1915')
+    print(ret)
