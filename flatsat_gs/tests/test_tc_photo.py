@@ -108,7 +108,6 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-f', '--file', required=True,
                         help="Log file path")
-    parser.add_argument()
     args = parser.parse_args()
 
     sender = Sender()
