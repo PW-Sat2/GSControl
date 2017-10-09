@@ -109,12 +109,14 @@ def test_size(qty, file_list, filename_base):
     return {'real qty': real_qty, 'failed qty': failed_qty, 'failed photos': failed_photos}
 
 
-def test(camera, resolution, qty, time):
+def test(camera, resolution, qty, time, results_file):
     name = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(5))
     file_list = take_pictures(camera, resolution, qty, datetime.timedelta(0), name)
     ret = test_size(qty, file_list, name)
     t = time.time()
-    return {'time': datetime.datetime.fromtimestamp(t), 'camera' : camera, 'resolution': resolution, 'time': time, 'results': ret}
+    data = {'time': datetime.datetime.fromtimestamp(t), 'camera' : camera, 'resolution': resolution, 'time': time, 'results': ret}
+    pprint.pprint(data, results_file)
+    return data
 
 
 if __name__ == '__main__':
@@ -138,10 +140,10 @@ if __name__ == '__main__':
 
     ### TESTS ###
     # 1.
-    # Wing
-    result = test(CameraLocation.Wing, PhotoResolution.p128, 5, datetime.timedelta(0))
-    pprint.pprint(result, results_file)
 
-    # Nadir
-    result = test(CameraLocation.Nadir, PhotoResolution.p128, 5, datetime.timedelta(0))
-    pprint.pprint(result, results_file)
+    cams = [CameraLocation.Wing, CameraLocation.Nadir]
+    resolutions = [PhotoResolution.p128, PhotoResolution.p240, PhotoResolution.p480]
+
+    for cam in cams:
+        for resolution in resolutions:
+            test(cam, resolution, 5, datetime.timedelta(0), results_file)
