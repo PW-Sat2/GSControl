@@ -113,7 +113,8 @@ def test(camera, resolution, qty, time):
     name = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(5))
     file_list = take_pictures(camera, resolution, qty, datetime.timedelta(0), name)
     ret = test_size(qty, file_list, name)
-    return {'time': datetime.datetime.fromtimestamp(time.time()), 'camera' : camera, 'resolution': resolution, 'time': time, 'results': ret}
+    t = time.time()
+    return {'time': datetime.datetime.fromtimestamp(t), 'camera' : camera, 'resolution': resolution, 'time': time, 'results': ret}
 
 
 if __name__ == '__main__':
