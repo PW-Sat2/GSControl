@@ -39,7 +39,8 @@ def get_beacon():
         return None
 
 def take_picture(sender, receiver, camera, resolution, qty, delay, filename_base):
-    while True:
+    busy = True
+    while busy:
         print("Requesting photo {}, {}, {}, {}, {}".format(str(camera), str(resolution), qty, delay, filename_base))
         try:
             sender.send(tc.photo.TakePhotoTelecommand(10, camera, resolution, qty, delay, "filename_base"))
@@ -47,14 +48,15 @@ def take_picture(sender, receiver, camera, resolution, qty, delay, filename_base
             print(recv)
             if isinstance(recv, common.PhotoSuccessFrame):
                 logger.log(recv.payload())
-                break
-            print("PhotoSuccessFrame received")
+                busy = False
+                print("PhotoSuccessFrame received")
         except zmq.Again:
             print "Timeout"
 
     time.sleep(5)
 
-    while True:
+    busy = True
+    while busy:
         print("Waiting for photo file")
         try:
             sender.send(ListFiles(13, '/'))
@@ -67,13 +69,10 @@ def take_picture(sender, receiver, camera, resolution, qty, delay, filename_base
                 logger.log(file_list)
                 print("File list taken, analyzing")
 
-                file_to_be_present = None
                 for f in file_list:
                     if f['File'] == "{}_{}".format(filename_base, qty-1):
-                        file_to_be_present = f
+                        busy = False
                         break
-                if file_to_be_present != None:
-                    break
 
             time.sleep(10)
 
