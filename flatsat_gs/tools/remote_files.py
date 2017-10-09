@@ -6,6 +6,7 @@ from utils import ensure_string
 
 from response_frames import common
 from telecommand import *
+import time
 
 class RemoteFileTools:
     @staticmethod
@@ -73,7 +74,51 @@ class RemoteFile:
         self.sender = sender
         self.receiver = receiver
 
-    def download(self, file_to_download, correlation_id = None):
+
+    def download(self, file_to_download, correlation_id = None, max_chunks_at_once = 20):
+        if correlation_id is None:
+            correlation_id = random.randrange(0, 255, 1)
+
+        chunks_qty = file_to_download['Chunks']
+        file_chunks = [x for x in range(0, chunks_qty)]
+        remaining = [x for x in range(0, chunks_qty)]
+
+        while len(remaining) > 0:
+            if max_chunks_at_once > len(remaining):
+                request_qty = len(remaining)
+            else:
+                request_qty = max_chunks_at_once
+            try:
+                self.sender.send(DownloadFile(file_to_download['File'], correlation_id, [remaining[i] for i in range(request_qty)]))
+            except:
+                print("Exception in sender")
+            rcv_counter = 0
+            
+            while rcv_counter < request_qty:
+                try:
+                    recv = self.receiver.receive_frame()
+                except:
+                    print("Exception in receive!")
+                rcv_counter += 1
+                if isinstance(recv, common.FileSendSuccessFrame):
+                    if (recv.correlation_id == correlation_id):
+                        file_chunks[recv.seq()] = recv.response
+                        try:
+                            remaining.remove(recv.seq())
+                            pass
+
+                        except:
+                            pass
+
+                        print("Got {}/{}".format(recv.seq() + 1, chunks_qty))
+                    else:
+                        print("Wrong correlation id: {}/{}".format(recv.correlation_id, correlation_id))
+            else:
+                print("Not response frame or error response frame")
+        return file_chunks
+        
+        
+    def download_legacy(self, file_to_download, correlation_id = None):
         if correlation_id is None:
             correlation_id = random.randrange(0, 255, 1)
 
