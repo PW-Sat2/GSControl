@@ -109,11 +109,11 @@ def test_size(qty, file_list, filename_base):
     return {'real qty': real_qty, 'failed qty': failed_qty, 'failed photos': failed_photos}
 
 
-    def test(camera, resolution, qty, time):
-        name = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(5))
-        file_list = take_pictures(camera, resolution, qty, datetime.timedelta(0), name)
-        ret = test_size(qty, file_list, name)
-        print camera, "; ", resolution, "; ", time, "; ", ret
+def test(camera, resolution, qty, time):
+    name = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(5))
+    file_list = take_pictures(camera, resolution, qty, datetime.timedelta(0), name)
+    ret = test_size(qty, file_list, name)
+    print camera, "; ", resolution, "; ", time, "; ", ret
 
 
 if __name__ == '__main__':
