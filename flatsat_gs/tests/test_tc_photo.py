@@ -28,7 +28,7 @@ import telecommand as tc
 # Experiment settings
 correlation_id = 2
 delay = datetime.timedelta(0)
-file_name_base = 'photo_test_20171009_1300'
+file_name_base = 'photo_test_20171009_1302'
 
 def get_beacon():
     try:
@@ -41,35 +41,44 @@ def get_beacon():
 def take_picture(sender, receiver, camera, resolution, qty, delay, filename_base):
     while True:
         print("Requesting photo {}, {}, {}, {}, {}".format(str(camera), str(resolution), qty, delay, filename_base))
-        sender.send(tc.photo.TakePhotoTelecommand(10, camera, resolution, qty, delay, "filename_base"))
-        recv = receiver.receive_frame()
-        print(recv)
-        if isinstance(recv, common.PhotoSuccessFrame):
-            logger.log(recv.payload())
-            break
-        print("PhotoSuccessFrame received")
+        try:
+            sender.send(tc.photo.TakePhotoTelecommand(10, camera, resolution, qty, delay, "filename_base"))
+            recv = receiver.receive_frame()
+            print(recv)
+            if isinstance(recv, common.PhotoSuccessFrame):
+                logger.log(recv.payload())
+                break
+            print("PhotoSuccessFrame received")
+        except zmq.Again:
+            print "Timeout"
 
     time.sleep(5)
 
     while True:
         print("Waiting for photo file")
-        sender.send(ListFiles(13, '/'))
-        recv = receiver.receive_frame()
-        print(recv)
+        try:
+            sender.send(ListFiles(13, '/'))
+            recv = receiver.receive_frame()
+            print(recv)
 
-        file_list = []
-        if isinstance(recv, common.FileListSuccessFrame):
-            file_list = RemoteFileTools.parse_file_list(recv)
-            logger.log(file_list)
-            print("File list taken, analyzing")
+            file_list = []
+            if isinstance(recv, common.FileListSuccessFrame):
+                file_list = RemoteFileTools.parse_file_list(recv)
+                logger.log(file_list)
+                print("File list taken, analyzing")
 
-            file_to_be_present = None
-            for f in file_list:
-                if f['File'] == "{}_{}".format(filename_base, qty-1):
-                    file_to_be_present = f
+                file_to_be_present = None
+                for f in file_list:
+                    if f['File'] == "{}_{}".format(filename_base, qty-1):
+                        file_to_be_present = f
+                        break
+                if file_to_be_present != None:
                     break
-            if file_to_be_present != None:
-                break
+
+            time.sleep(10)
+
+        except zmq.Again:
+            print "Timeout"
 
 
 if __name__ == '__main__':
