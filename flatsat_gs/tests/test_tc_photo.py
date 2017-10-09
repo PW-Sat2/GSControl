@@ -41,7 +41,7 @@ def take_pictures(sender, receiver, camera, resolution, qty, delay, filename_bas
     while busy:
         print("Requesting photo {}, {}, {}, {}, {}".format(str(camera), str(resolution), qty, delay, filename_base))
         try:
-            sender.send(tc.photo.TakePhotoTelecommand(10, camera, resolution, qty, delay, "filename_base"))
+            sender.send(tc.photo.TakePhotoTelecommand(10, camera, resolution, qty, delay, filename_base))
             recv = receiver.receive_frame()
             print(recv)
             if isinstance(recv, common.PhotoSuccessFrame):
@@ -97,7 +97,11 @@ def test_size(qty, file_list, filename_base):
     real_qty = len(to_check_dicts)
 
     failed_photos = []
-    failed_photos.append(filter(lambda photosize: photosize['Size'] == 7, to_check_dicts))
+    try:
+        failed_photos.append(filter(lambda photosize: photosize['Size'] == 7, to_check_dicts))
+    except:
+        print("Could not find any failed photos...")
+
     failed_qty = len(failed_photos)
 
     return {'real qty': real_qty, 'failed qty': failed_qty, 'failed photos': failed_photos}
