@@ -2,6 +2,8 @@ import imp
 import os
 import sys
 import zmq
+import string
+import random
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../build/integration_tests'))
 sys.path.append(os.path.join(os.path.dirname(__file__), '../PWSat2OBC/integration_tests'))
@@ -35,7 +37,7 @@ def get_beacon():
     except zmq.Again:
         return None
 
-def take_pictures(sender, receiver, camera, resolution, qty, delay, filename_base):
+def take_pictures(camera, resolution, qty, delay, filename_base):
     busy = True
     file_list = None
     while busy:
@@ -107,6 +109,13 @@ def test_size(qty, file_list, filename_base):
     return {'real qty': real_qty, 'failed qty': failed_qty, 'failed photos': failed_photos}
 
 
+    def test(camera, resolution, qty, time):
+        name = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(5))
+        file_list = take_pictures(camera, resolution, qty, datetime.timedelta(0), name)
+        ret = test_size(qty, file_list, name)
+        print camera, "; ", resolution, "; ", time, "; ", ret
+
+
 if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser()
@@ -124,6 +133,6 @@ if __name__ == '__main__':
     # 0. Save experiment settings to log file
     logger.log('Photo Experiment')
 
-    file_list = take_pictures(sender, receiver, CameraLocation.Wing, PhotoResolution.p128, 5, datetime.timedelta(0), 'photo_test_20171009_1915')
-    ret = test_size(5, file_list, 'photo_test_20171009_1915')
-    print(ret)
+    ### TESTS ###
+    # 1. 
+    test(CameraLocation.Wing, PhotoResolution.p128, 5, datetime.timedelta(0))
