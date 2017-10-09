@@ -23,6 +23,7 @@ from tools.tools import SimpleLogger
 import datetime
 import pprint
 import time
+import telecommand as tc
 
 # Experiment settings
 correlation_id = 2
