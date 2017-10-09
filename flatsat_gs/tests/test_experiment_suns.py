@@ -23,6 +23,17 @@ import datetime
 import pprint
 import time
 
+# Experiment settings
+correlation_id = 2
+gain = 1
+itime = 100
+samples_count = 10
+short_delay = datetime.timedelta(seconds=2)
+session_count = 10
+long_delay = datetime.timedelta(minutes=5)
+file_name = 'suns_test_case'
+
+
 def get_beacon():
     try:
         sender.send(SendBeacon())
@@ -47,11 +58,14 @@ if __name__ == '__main__':
     receiver.timeout(10000)
     logger = SimpleLogger(args.file)
     logger.log('Start of the script')
-    
-    '''
 
+    # 0. Save experiment settings to log file
+    logger.log('SunS Experiment parameters:')
+    logger.log('gain: {}, itime: {}, samples_count: {}, short_delay: {}, session_count: {}, long_delay: {}, file_name: {}'.format(gain, itime, samples_count, short_delay, session_count, long_delay, file_name))
+    
     # 1. receive beacon to see the state of sat before experiment
     print("#1. receive beacon to see the state of sat before experiment")
+    logger.log("#1. receive beacon to see the state of sat before experiment")
     while True:
         recv = get_beacon()
         print(recv)
@@ -65,16 +79,7 @@ if __name__ == '__main__':
 
     # 2. send telecommand to turn on experiment
     print("#2. send telecommand to turn on experiment")
-    '''
-    correlation_id = 2
-    gain = 1
-    itime = 100
-    samples_count = 10
-    short_delay = datetime.timedelta(seconds=2)
-    session_count = 10
-    long_delay = datetime.timedelta(minutes=5)
-    file_name = 'suns_test_case'
-    '''     
+    logger.log("#2. send telecommand to turn on experiment")
 
     while True:
         sender.send(PerformSunSExperiment(correlation_id, gain, itime, samples_count, short_delay, session_count, long_delay, file_name))
@@ -109,7 +114,7 @@ if __name__ == '__main__':
             logger.log(recv.payload())
 
     time.sleep(60)
-    '''
+
     # 4. List files
     while True:
         print("#4. list files")
@@ -124,7 +129,6 @@ if __name__ == '__main__':
             print("Finishing #4")
             break
 
-    '''
     # 5. Download and save file - primary
     file_to_download = None
     for f in file_list:
@@ -151,7 +155,7 @@ if __name__ == '__main__':
         print hexlify(part)
 
 
-    # 6. Download and save file - primary
+    # 6. Download and save file - secondary
     file_to_download = None
     for f in file_list:
         if f['File'] == file_name + "_sec":
@@ -159,9 +163,9 @@ if __name__ == '__main__':
             break
     print("Selecting " + str(file_to_download))
     logger.log(file_to_download)
-    '''
+
     downloader = RemoteFile(sender, receiver)
-    '''
+
     chunks = downloader.download(file_to_download)
     merged = RemoteFileTools.merge_chunks(chunks)
     print("Download file")
@@ -177,11 +181,11 @@ if __name__ == '__main__':
         part = parsed[1][0:min(10, len(parsed[1]))]
         print hexlify(part)
     print("End...")
-    '''
+    
     
     # 7. Dowload telemetry files
     file_to_download = None
-  12  for f in file_list:
+      for f in file_list:
         if f['File'] == "telemetry.current":
             file_to_download = f
             break
