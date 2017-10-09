@@ -1,6 +1,7 @@
 import imp
 import os
 import sys
+import zmq
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../build/integration_tests'))
 sys.path.append(os.path.join(os.path.dirname(__file__), '../PWSat2OBC/integration_tests'))
@@ -22,6 +23,14 @@ import datetime
 import pprint
 import time
 
+def get_beacon():
+    try:
+        sender.send(SendBeacon())
+        recv = receiver.receive_frame()
+        return recv
+    except zmq.Again:
+        return None
+
 if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser()
@@ -30,29 +39,21 @@ if __name__ == '__main__':
                         help="Log file path")
     parser.add_argument('-e', '--experiment_file', required=True,
                         help="Log file path")
-    parser.add_argument('-t', '--target_gr', required=True,
-                        help="GNURadio host", default='localhost')                 
-    parser.add_argument('-p', '--port_gr', required=True,
-                        help="GNURadio port", default=52001, type=int)
-    parser.add_argument('-u', '--target_dw', required=True,
-                        help="DireWolf host", default='localhost')                 
-    parser.add_argument('-v', '--port_dw', required=True,
-                        help="DireWolf port", default=8001, type=int)
 
     args = parser.parse_args()
 
-    sender = Sender(args.target_dw, args.port_dw)
-    sender.connect()
-    receiver = Receiver(args.target_gr, args.port_gr)
-    receiver.connect()
+    sender = Sender()
+    receiver = Receiver()
+    receiver.timeout(10000)
     logger = SimpleLogger(args.file)
     logger.log('Start of the script')
+    
+    '''
 
     # 1. receive beacon to see the state of sat before experiment
     print("#1. receive beacon to see the state of sat before experiment")
     while True:
-        sender.send(SendBeacon())
-        recv = receiver.receive_frame()
+        recv = get_beacon()
         print(recv)
 
         if isinstance(recv, comm.BeaconFrame):
@@ -64,14 +65,16 @@ if __name__ == '__main__':
 
     # 2. send telecommand to turn on experiment
     print("#2. send telecommand to turn on experiment")
+    '''
     correlation_id = 2
-    gain = 0
-    itime = 10
-    samples_count = 254
-    short_delay = datetime.timedelta(seconds=1)
+    gain = 1
+    itime = 100
+    samples_count = 10
+    short_delay = datetime.timedelta(seconds=2)
     session_count = 10
-    long_delay = datetime.timedelta(minutes=1)
-    file_name = 'suns_long_7'
+    long_delay = datetime.timedelta(minutes=5)
+    file_name = 'suns_test_case'
+    '''     
 
     while True:
         sender.send(PerformSunSExperiment(correlation_id, gain, itime, samples_count, short_delay, session_count, long_delay, file_name))
@@ -84,8 +87,9 @@ if __name__ == '__main__':
     count_beacons = 0
     while True:
         print("#3. receive, save and parse incomming frames")
-        recv = receiver.receive_frame()
+        recv = get_beacon()
         print(recv)
+        time.sleep(5)
 
         if isinstance(recv, comm.BeaconFrame):
             beacon = ParseBeacon.parse(recv)
@@ -93,17 +97,19 @@ if __name__ == '__main__':
             logger.log(beacon)
             count_beacons += 1
 
-            if (count_beacons > 2) and (str(beacon['09: Experiments']['0540: Current experiment code']) == 'None'):
+            if (count_beacons > 2) and (str(beacon['09: Experiments']['0484: Current experiment code']) == 'None'):
                 print("Finishing #3.")
                 break
             else:
                 print(count_beacons)
-                print(str(beacon['09: Experiments']['0540: Current experiment code']))
-                print(type(beacon['09: Experiments']['0540: Current experiment code']))
+                print(str(beacon['09: Experiments']['0484: Current experiment code']))
+                print(type(beacon['09: Experiments']['0484: Current experiment code']))
 
         if isinstance(recv, common.ExperimentSuccessFrame):
             logger.log(recv.payload())
 
+    time.sleep(60)
+    '''
     # 4. List files
     while True:
         print("#4. list files")
@@ -118,6 +124,7 @@ if __name__ == '__main__':
             print("Finishing #4")
             break
 
+    '''
     # 5. Download and save file - primary
     file_to_download = None
     for f in file_list:
@@ -152,8 +159,9 @@ if __name__ == '__main__':
             break
     print("Selecting " + str(file_to_download))
     logger.log(file_to_download)
-
+    '''
     downloader = RemoteFile(sender, receiver)
+    '''
     chunks = downloader.download(file_to_download)
     merged = RemoteFileTools.merge_chunks(chunks)
     print("Download file")
@@ -169,3 +177,18 @@ if __name__ == '__main__':
         part = parsed[1][0:min(10, len(parsed[1]))]
         print hexlify(part)
     print("End...")
+    '''
+    
+    # 7. Dowload telemetry files
+    file_to_download = None
+  12  for f in file_list:
+        if f['File'] == "telemetry.current":
+            file_to_download = f
+            break
+    print("Selecting " + str(file_to_download))
+    logger.log(file_to_download)
+    chunks = downloader.download(file_to_download)
+    merged = RemoteFileTools.merge_chunks(chunks)
+    print("Download file")
+    RemoteFileTools.save_chunks(args.experiment_file + '_telemetry.current.raw', merged)  
+    print("Done")  
