@@ -19,10 +19,11 @@ except ImportError:
 
 
 class Sender:
-    def __init__(self, target, port, source_callsign='SP3SAT', destination_callsign='PWSAT2-0'):
+    def __init__(self, target="*", port=7000, source_callsign='SP3SAT', destination_callsign='PWSAT2-0'):
         self.context = zmq.Context()
         self.sock = self.context.socket(zmq.PUB)
-        self.sock.bind("tcp://%s:%d" % (target, port))
+        #self.sock.bind("tcp://%s:%d" % (target, port))
+        self.sock.connect("tcp://localhost:7000")
         time.sleep(1)
         
         self.aprs_frame = aprs.Frame()
