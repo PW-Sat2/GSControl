@@ -28,7 +28,7 @@ import telecommand as tc
 # Experiment settings
 correlation_id = 2
 delay = datetime.timedelta(0)
-file_name_base = 'photo_test_20171009_1302'
+file_name_base = 'photo_test_20171009_1306'
 
 def get_beacon():
     try:
