@@ -113,7 +113,7 @@ def test(camera, resolution, qty, time, results_file):
     name = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(5))
     file_list = take_pictures(camera, resolution, qty, datetime.timedelta(0), name)
     ret = test_size(qty, file_list, name)
-    data = {'time': datetime.datetime.now().isoformat(), 'camera' : camera, 'resolution': resolution, 'time': time, 'results': ret}
+    data = {'time': datetime.datetime.now().isoformat(), 'camera' : str(camera), 'resolution': str(resolution), 'time': str(time), 'results': ret}
     pprint.pprint(data, results_file)
     return data
 
