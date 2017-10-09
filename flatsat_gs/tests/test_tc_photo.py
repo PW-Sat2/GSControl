@@ -113,7 +113,7 @@ def test(camera, resolution, qty, time):
     name = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(5))
     file_list = take_pictures(camera, resolution, qty, datetime.timedelta(0), name)
     ret = test_size(qty, file_list, name)
-    print camera, "; ", resolution, "; ", time, "; ", ret
+    return {'time': datetime.datetime.fromtimestamp(time.time()), 'camera' : camera, 'resolution': resolution, 'time': time, 'results': ret}
 
 
 if __name__ == '__main__':
@@ -127,12 +127,20 @@ if __name__ == '__main__':
     receiver = Receiver()
     receiver.timeout(10000)
 
-    logger = SimpleLogger(args.file)
+    logger = SimpleLogger(args.file + '.log')
+    results_file = open(args.file + '_results.log', 'a')
+
     logger.log('Start of the script')
 
     # 0. Save experiment settings to log file
     logger.log('Photo Experiment')
 
     ### TESTS ###
-    # 1. 
-    test(CameraLocation.Wing, PhotoResolution.p128, 5, datetime.timedelta(0))
+    # 1.
+    # Wing
+    result = test(CameraLocation.Wing, PhotoResolution.p128, 5, datetime.timedelta(0))
+    pprint.pprint(result, results_file)
+
+    # Nadir
+    result = test(CameraLocation.Nadir, PhotoResolution.p128, 5, datetime.timedelta(0))
+    pprint.pprint(result, results_file)
