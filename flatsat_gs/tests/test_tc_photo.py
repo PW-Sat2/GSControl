@@ -28,7 +28,7 @@ import telecommand as tc
 # Experiment settings
 correlation_id = 2
 delay = datetime.timedelta(0)
-file_name_base = 'photo_test_20171009_1306'
+file_name_base = 'ph20171009_1817'
 
 def get_beacon():
     try:
@@ -43,7 +43,7 @@ def take_picture(sender, receiver, camera, resolution, qty, delay, filename_base
     while busy:
         print("Requesting photo {}, {}, {}, {}, {}".format(str(camera), str(resolution), qty, delay, filename_base))
         try:
-            sender.send(tc.photo.TakePhotoTelecommand(10, camera, resolution, qty, delay, "filename_base"))
+            sender.send(tc.photo.TakePhotoTelecommand(10, camera, resolution, qty, delay, '/' + filename_base))
             recv = receiver.receive_frame()
             print(recv)
             if isinstance(recv, common.PhotoSuccessFrame):
@@ -98,4 +98,4 @@ if __name__ == '__main__':
     # 0. Save experiment settings to log file
     logger.log('Photo Experiment')
 
-    take_picture(sender, receiver, CameraLocation.Wing, PhotoResolution.p128, 0, delay, 'script')
+    take_picture(sender, receiver, CameraLocation.Wing, PhotoResolution.p128, 1, delay, file_name_base)
