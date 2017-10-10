@@ -149,4 +149,10 @@ if __name__ == '__main__':
                 r = test(cam, resolution, 5, datetime.timedelta(0), results_file)
                 pprint.pprint(r)
 
+
+    logger.log('Test photos in time')
+        for cam in cams:
+            r = test(cam, PhotoResolution.p128, 5, datetime.timedelta(hours=3), results_file)
+            pprint.pprint(r)
+
     logger.log('Finish Photo Experiment')
