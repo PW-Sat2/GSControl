@@ -50,10 +50,10 @@ def take_pictures(camera, resolution, qty, delay, filename_base):
                 logger.log(recv.payload())
                 busy = False
                 print("PhotoSuccessFrame received")
-        except zmq.Again:
-            print "Timeout"
+        except:
+            print "Timeout or other exception"
 
-    time.sleep(10)
+    time.sleep(20)
 
     busy = True
     while busy:
@@ -76,8 +76,8 @@ def take_pictures(camera, resolution, qty, delay, filename_base):
 
             time.sleep(20)
 
-        except zmq.Again:
-            print "Timeout!"
+        except:
+            print "Timeout or other exception!"
 
     return file_list
 
