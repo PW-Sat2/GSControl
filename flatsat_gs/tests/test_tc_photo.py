@@ -74,7 +74,7 @@ def take_pictures(camera, resolution, qty, delay, filename_base):
                         busy = False
                         break
 
-            time.sleep(10)
+            time.sleep(20)
 
         except zmq.Again:
             print "Timeout!"
@@ -151,8 +151,8 @@ if __name__ == '__main__':
 
 
     logger.log('Test photos in time')
-        for cam in cams:
-            r = test(cam, PhotoResolution.p128, 5, datetime.timedelta(hours=3), results_file)
-            pprint.pprint(r)
+    for cam in cams:
+        r = test(cam, PhotoResolution.p128, 5, datetime.timedelta(hours=3), results_file)
+        pprint.pprint(r)
 
     logger.log('Finish Photo Experiment')
