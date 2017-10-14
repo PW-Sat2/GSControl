@@ -31,10 +31,10 @@ if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('-t', '--target_gr', required=True,
+    parser.add_argument('-t', '--target_gr', required=False,
                         help="GNURadio host", default='localhost')                 
-    parser.add_argument('-p', '--port_gr', required=True,
-                        help="GNURadio port", default=52002, type=int)
+    parser.add_argument('-p', '--port_gr', required=False,
+                        help="GNURadio port", default=7001, type=int)
 
     args = parser.parse_args()
 
