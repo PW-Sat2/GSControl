@@ -64,10 +64,10 @@ if __name__ == '__main__':
 
     parser.add_argument('-c', '--config', required=True,
                         help="Config file (in CMake-generated integration tests format, only MOCK_COM required)")
-    parser.add_argument('-t', '--target', required=True,
-                        help="DireWolf host", default='localhost')                 
-    parser.add_argument('-p', '--port', required=True,
-                        help="DireWolf port", default=52001, type=int)
+    parser.add_argument('-t', '--target', required=False,
+                        help="Target", default='*')                 
+    parser.add_argument('-p', '--port', required=False,
+                        help="Port", default=7000, type=int)
 
     args = parser.parse_args()
     imp.load_source('config', args.config)
