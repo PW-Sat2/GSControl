@@ -34,10 +34,33 @@ class CommMockToZmq(object):
 
         frame = 'S' + chr(len(packet)) + packet
         self.socket_mock.sendall(frame)
-        time.sleep(len(packet)/1200.+0.1)
         assert (self.get(3) == 'ACK')
 
         self.socket_mock.close()
+
+
+    @staticmethod
+    def encode_callsign(call):
+        return ''.join([chr(ord(i) << 1) for i in call])
+
+    @staticmethod
+    def build_kiss_header():
+        return ''.join([
+            CommMockToZmq.encode_callsign('PWSAT2'),
+            chr(96),
+            CommMockToZmq.encode_callsign('PWSAT2'),
+            chr(97),
+            chr(3),
+            chr(0xF0)
+        ])
+
+    @staticmethod
+    def build_kiss(text):
+        return ''.join([
+            CommMockToZmq.build_kiss_header(),
+            text,
+            '\x00\x00'
+        ])
 
     def mock_downlink(self):
         self.socket_mock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -67,13 +90,14 @@ class CommMockToZmq(object):
                 while True:
                     pmt_frame = self.socket_uplink.recv(flags=zmq.NOBLOCK)
                     frame = pmt.u8vector_elements(pmt.cdr(pmt.deserialize_str(pmt_frame)))
-                    self.mock_uplink(''.join(map(chr, frame)))
+                    just_content = frame[16:]
+                    self.mock_uplink(''.join(map(chr, just_content)))
             except zmq.ZMQError:
                 pass
 
             downlink_frames = self.mock_downlink()
             for i in downlink_frames:
-                table = map(ord, i)
+                table = map(ord, self.build_kiss(i))
                 msg = pmt.serialize_str(pmt.cons(pmt.PMT_NIL, pmt.init_u8vector(len(table), table)))
                 self.socket_downlink.send(msg)
 
