@@ -95,11 +95,15 @@ class CommMockToZmq(object):
             except zmq.ZMQError:
                 pass
 
-            downlink_frames = self.mock_downlink()
-            for i in downlink_frames:
-                table = map(ord, self.build_kiss(i))
-                msg = pmt.serialize_str(pmt.cons(pmt.PMT_NIL, pmt.init_u8vector(len(table), table)))
-                self.socket_downlink.send(msg)
+            try:
+                downlink_frames = self.mock_downlink()
+                for i in downlink_frames:
+                    table = map(ord, self.build_kiss(i))
+                    msg = pmt.serialize_str(pmt.cons(pmt.PMT_NIL, pmt.init_u8vector(len(table), table)))
+                    self.socket_downlink.send(msg)
+            except socket.error:
+                print("Exception in socket!")
+                
 
 
 
