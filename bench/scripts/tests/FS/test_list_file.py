@@ -13,6 +13,6 @@ time.sleep(1)
 
 
 # Request file list
-file_list = tmtc.send(ListFiles())
+file_list = tmtc.send(ListFiles('/'))
 
 pprint.pprint(file_list)
