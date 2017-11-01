@@ -16,7 +16,7 @@ from response_frames.period_message import PeriodicMessageFrame
 
 
 class Tmtc:
-    def __init__(self):
+    def __init__(self, timeout=70):
         self.sender = Sender()
         self.receiver = Receiver()
 
@@ -25,13 +25,13 @@ class Tmtc:
         self.correlation_id = 0
 
         thread.start_new_thread(self._receive_thread, ())
-        thread.start_new_thread(self._beacon_thread, ())
+        self.wait_for_first_beacon(timeout)
 
-    def _beacon_thread(self):
-        from tc.comm import SendBeacon
-        while True:
-            self.send(SendBeacon())
-            time.sleep(10)
+    def wait_for_first_beacon(timeout):
+        end_time = time.time() + timeout
+        while self.beacon() == None:
+            if end_time < time.time():
+                raise self.TimeoutException()
 
     def _receive_thread(self):
         while True:
@@ -88,6 +88,9 @@ class Tmtc:
         pass
 
     class FrameGetFail(BaseException):
+        pass
+
+    class TimeoutException(BaseException):
         pass
 
     def get_correct_frame(self, id, response_type):

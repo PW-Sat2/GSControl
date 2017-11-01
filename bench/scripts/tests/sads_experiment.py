@@ -12,17 +12,10 @@ checker = Check(tmtc)
 
 time.sleep(1)
 
-tmtc.send(SendBeacon())
-time.sleep(5)
 checker.check(TM.Experiments.CurrentExperimentCode, 'None', 0)
 
-
 tmtc.send(PerformSADSExperiment())
-tmtc.send(SendBeacon())
-time.sleep(5)
 checker.check(TM.Experiments.CurrentExperimentCode, 'SADS', 300)
 
 tmtc.send(AbortExperiment())
-tmtc.send(SendBeacon())
-time.sleep(5)
 checker.check(TM.Experiments.CurrentExperimentCode, 'None', 200)
