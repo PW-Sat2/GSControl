@@ -27,7 +27,7 @@ class Tmtc:
         thread.start_new_thread(self._receive_thread, ())
         self.wait_for_first_beacon(timeout)
 
-    def wait_for_first_beacon(timeout):
+    def wait_for_first_beacon(self, timeout):
         end_time = time.time() + timeout
         while self.beacon() == None:
             if end_time < time.time():
