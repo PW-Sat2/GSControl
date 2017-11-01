@@ -28,8 +28,10 @@ class Tmtc:
         self.wait_for_first_beacon(timeout)
 
     def wait_for_first_beacon(self, timeout):
+        # TODO: show to user that code is stucked at this wait
         end_time = time.time() + timeout
         while self.beacon() == None:
+            time.sleep(1)
             if end_time < time.time():
                 raise self.TimeoutException()
 
