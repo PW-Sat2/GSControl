@@ -7,8 +7,8 @@ class TM:
 
     class Experiments:
         CurrentExperimentCode = ['09: Experiments', '0490: Current experiment code']
-        CurrentExperimentStartupResult = ['09: Experiments', '0494: Experiment Startup Result']   
-        LastExperimentIterationStatus = ['09: Experiments', '0502: Last Experiment Iteration Status'] 
+        CurrentExperimentStartupResult = ['09: Experiments', '0494: Experiment Startup Result']
+        LastExperimentIterationStatus = ['09: Experiments', '0502: Last Experiment Iteration Status']
 
 
 class Check(object):
