@@ -10,13 +10,13 @@ from tc.experiments import AbortExperiment, PerformSADSExperiment
 tmtc = Tmtc()
 checker = Check(tmtc)
 
-time.sleep(15)
+time.sleep(1)
 
-checker.check(TM.Experiments.CurrentExperimentCode, False, 0)
+checker.check(TM.Experiments.CurrentExperimentCode, None, 0)
 
 
 tmtc.send(PerformSADSExperiment())
 checker.check(TM.Experiments.CurrentExperimentCode, 6, 200)
 
 tmtc.send(AbortExperiment())
-checker.check(TM.Experiments.CurrentExperimentCode, False, 200)
+checker.check(TM.Experiments.CurrentExperimentCode, None, 200)
