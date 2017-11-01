@@ -35,7 +35,7 @@ if __name__ == '__main__':
     parser.add_argument('-p', '--downlink-port', required=False,
                         help="GNURadio port", default=7001, type=int)
     parser.add_argument('-u', '--uplink-host', required=False,
-                        help="Uplink host", default='*')
+                        help="Uplink host", default='localhost')
     parser.add_argument('-v', '--uplink-port', required=False,
                         help="Uplink port", default=7000, type=int)
 
