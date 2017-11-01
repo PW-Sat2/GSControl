@@ -4,7 +4,7 @@ sys.path.append('../../..')
 import tmtc
 from tm import TM, Check
 from tmtc import Tmtc
-from tc.fs import ListFiles
+from tc.fs import ListFiles, GetFileInfo
 
 tmtc = Tmtc()
 checker = Check(tmtc)
