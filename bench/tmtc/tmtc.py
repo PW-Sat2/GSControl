@@ -148,17 +148,6 @@ class Tmtc:
     def send(self, tc):
         return tc.send(self)
 
-
-
-    # def file_list(self, path):
-    #     frames = self.send_tc_with_multi_response(tc.fs.ListFiles, response_frames.file_system.FileListSuccessFrame, path)
-    #     from tools.remote_files import RemoteFileTools
-    #
-    #     files = []
-    #     for f in frames:
-    #         files.extend(RemoteFileTools.parse_file_list(f))
-    #     return files
-    #
     # def file_remove(self, path):
     #     response = self.send_tc_with_response(tc.fs.RemoveFile, response_frames.common.FileRemoveSuccessFrame, path)
     #     file_removed = ''.join(map(chr, response.payload()[2:]))
