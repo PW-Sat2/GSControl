@@ -1,5 +1,5 @@
 import sys, time, pprint
-sys.path.append('../..')
+sys.path.append('../../..')
 
 import tmtc
 from tm import TM, Check
@@ -12,10 +12,13 @@ checker = Check(tmtc)
 
 time.sleep(1)
 
+# Be sure that no experiment is currently running
 checker.check(TM.Experiments.CurrentExperimentCode, 'None', 0)
 
+# Request SADS experiment and check whether is running
 tmtc.send(PerformSADSExperiment())
-checker.check(TM.Experiments.CurrentExperimentCode, 'SADS', 300)
+checker.check(TM.Experiments.CurrentExperimentCode, 'SADS', 180)
 
+# Abort SADS experiment and check whether operation is successful
 tmtc.send(AbortExperiment())
-checker.check(TM.Experiments.CurrentExperimentCode, 'None', 200)
+checker.check(TM.Experiments.CurrentExperimentCode, 'None', 180)
