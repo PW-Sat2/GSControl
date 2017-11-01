@@ -13,3 +13,18 @@ class ListFiles(object):
         for f in frames:
             files.extend(RemoteFileTools.parse_file_list(f))
         return files
+
+
+class GetFileInfo(object):
+    def __init__(self, path, filename):
+        self.filename = filename
+        self.path = path
+        self.lf = ListFiles(path)
+
+    def send(self, tmtc):
+    	file_list = self.lf.send(tmtc)
+    	
+    	try:
+    		return (item for item in file_list if item["File"] == self.filename).next()
+    	except StopIteration:
+        	return None
