@@ -96,7 +96,7 @@ class Tmtc:
         pass
 
     def get_correct_frame(self, id, response_type, timeout=5):
-        response = self.rx_queue.get(timeout)
+        response = self.rx_queue.get(timeout=timeout)
         if isinstance(response, response_type):
             if id == response.correlation_id:
                 print "OK %d" % id
