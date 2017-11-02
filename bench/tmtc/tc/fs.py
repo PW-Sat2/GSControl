@@ -44,19 +44,20 @@ class RemoveFile(object):
 
 
 class DownloadFile(object):
-    def __init__(self, path, chunks):
+    def __init__(self, path, chunks, max_chunks_at_once=20):
         self.path = path
         self.chunks = chunks
+        self.max_chunks_at_once = max_chunks_at_once
 
     def send(self, tmtc):
         file_chunks = [x for x in range(0, self.chunks)]
         remaining = [x for x in range(0, self.chunks)]
 
         while len(remaining) > 0:
-            if max_chunks_at_once > len(remaining):
+            if self.max_chunks_at_once > len(remaining):
                 request_qty = len(remaining)
             else:
-                request_qty = max_chunks_at_once
+                request_qty = self.max_chunks_at_once
 
             collected_frames = chunks_request_now = [remaining[i] for i in range(request_qty)]
             tmtc.send_tc_with_multi_response(telecommand.fs.DownloadFile, response_frames.file_system.FileSendSuccessFrame, self.path, chunks_request_now)
