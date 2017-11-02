@@ -16,7 +16,7 @@ from response_frames.period_message import PeriodicMessageFrame
 
 
 class Tmtc:
-    def __init__(self):
+    def __init__(self, timeout=70):
         self.sender = Sender()
         self.receiver = Receiver()
 
@@ -25,13 +25,15 @@ class Tmtc:
         self.correlation_id = 0
 
         thread.start_new_thread(self._receive_thread, ())
-        thread.start_new_thread(self._beacon_thread, ())
+        self.wait_for_first_beacon(timeout)
 
-    def _beacon_thread(self):
-        from tc.comm import SendBeacon
-        while True:
-            self.send(SendBeacon())
-            time.sleep(10)
+    def wait_for_first_beacon(self, timeout):
+        # TODO: show to user that code is stucked at this wait
+        end_time = time.time() + timeout
+        while self.beacon() == None:
+            time.sleep(1)
+            if end_time < time.time():
+                raise self.TimeoutException()
 
     def _receive_thread(self):
         while True:
@@ -90,8 +92,11 @@ class Tmtc:
     class FrameGetFail(BaseException):
         pass
 
-    def get_correct_frame(self, id, response_type):
-        response = self.rx_queue.get(timeout=5)
+    class TimeoutException(BaseException):
+        pass
+
+    def get_correct_frame(self, id, response_type, timeout=5):
+        response = self.rx_queue.get(timeout=timeout)
         if isinstance(response, response_type):
             if id == response.correlation_id:
                 print "OK %d" % id
@@ -103,14 +108,15 @@ class Tmtc:
             print "Incorrect response type: ", response
             raise TypeError()
 
-    def send_tc_with_response(self, type, response_type, *args):
+    def send_tc_with_response(self, type, response_type, *args, **kwargs):
         id = self.get_correlation_id()
         frame = type(id, *args)
+        timeout = kwargs.pop('timeout', 5)
 
         for _ in xrange(3):
             try:
                 self.send_raw(frame)
-                f = self.get_correct_frame(id, response_type)
+                f = self.get_correct_frame(id, response_type, timeout)
                 return f
             except TypeError:
                 print "Wrong type Exception"
@@ -125,16 +131,17 @@ class Tmtc:
                 print "Repeat! %d" % _
         raise self.FrameGetFail()
 
-    def send_tc_with_multi_response(self, type, response_type, *args):
+    def send_tc_with_multi_response(self, type, response_type, *args, **kwargs):
         id = self.get_correlation_id()
         frame = type(id, *args)
+        timeout = kwargs.pop('timeout', 5)
 
         self.send_raw(frame)
 
         responses = []
         while True:
             try:
-                response = self.get_correct_frame(id, response_type)
+                response = self.get_correct_frame(id, response_type, timeout)
                 responses.append(response)
             except Empty:
                 print "Timeout!"
@@ -144,22 +151,6 @@ class Tmtc:
         return tc.send(self)
 
 
-
-    # def file_list(self, path):
-    #     frames = self.send_tc_with_multi_response(tc.fs.ListFiles, response_frames.file_system.FileListSuccessFrame, path)
-    #     from tools.remote_files import RemoteFileTools
-    #
-    #     files = []
-    #     for f in frames:
-    #         files.extend(RemoteFileTools.parse_file_list(f))
-    #     return files
-    #
-    # def file_remove(self, path):
-    #     response = self.send_tc_with_response(tc.fs.RemoveFile, response_frames.common.FileRemoveSuccessFrame, path)
-    #     file_removed = ''.join(map(chr, response.payload()[2:]))
-    #     if file_removed != path:
-    #         raise Exception("Incorrect path returned" + file_removed)
-    #     print "File %s removed!" % file_removed
     #
     # def disable_overheat_submode(self, side):
     #     mapping = {"A": 0, "B": 1}

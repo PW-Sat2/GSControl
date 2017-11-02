@@ -5,6 +5,11 @@ class TM:
         class TX:
             IdleState = ['11: Comm', '0665: Transmitter Idle State']
 
+    class Experiments:
+        CurrentExperimentCode = ['09: Experiments', '0490: Current experiment code']
+        CurrentExperimentStartupResult = ['09: Experiments', '0494: Experiment Startup Result']
+        LastExperimentIterationStatus = ['09: Experiments', '0502: Last Experiment Iteration Status']
+
 
 class Check(object):
     def __init__(self, tmtc):
