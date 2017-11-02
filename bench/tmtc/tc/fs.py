@@ -25,10 +25,10 @@ class GetFileInfo(object):
     def send(self, tmtc):
         file_list = self.lf.send(tmtc)
         
-        try:
-            return (item for item in file_list if item["File"] == self.filename).next()
-        except StopIteration:
-            return None
+        for file in file_list:
+            if file["File"] == self.filename:
+            	return file
+        return None
 
 
 class RemoveFile(object):
