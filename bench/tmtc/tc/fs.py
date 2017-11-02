@@ -59,8 +59,8 @@ class DownloadFile(object):
             else:
                 request_qty = self.max_chunks_at_once
 
-            collected_frames = chunks_request_now = [remaining[i] for i in range(request_qty)]
-            tmtc.send_tc_with_multi_response(telecommand.fs.DownloadFile, response_frames.common.FileSendSuccessFrame, self.path, chunks_request_now)
+            chunks_request_now = [remaining[i] for i in range(request_qty)]
+            collected_frames = tmtc.send_tc_with_multi_response(telecommand.fs.DownloadFile, response_frames.common.FileSendSuccessFrame, self.path, chunks_request_now)
 
             for frame in collected_frames:
                 file_chunks[frame.seq()] = frame.response
