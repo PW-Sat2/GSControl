@@ -6,7 +6,7 @@ from tm import TM, Check
 from tmtc import Tmtc
 from tc.experiments import AbortExperiment, PerformSADSExperiment
 from tc.comm import SendBeacon
-from tc.fs import GetFileInfo, RemoveFile, RemoveFileIfExists
+from tc.fs import GetFileInfo, RemoveFile, RemoveFileIfExists, DownloadFile
 from tools.remote_files import RemoteFileTools
 
 tmtc = Tmtc()
