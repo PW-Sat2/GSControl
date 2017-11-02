@@ -36,7 +36,7 @@ class RemoveFile(object):
         self.path = path
 
     def send(self, tmtc):
-        response = tmtc.send_tc_with_response(telecommand.fs.RemoveFile, response_frames.common.FileRemoveSuccessFrame, self.path)
+        response = tmtc.send_tc_with_response(telecommand.fs.RemoveFile, response_frames.common.FileRemoveSuccessFrame, self.path, timeout=50)
         file_removed = ''.join(map(chr, response.payload()[2:]))
         if file_removed != self.path:
             raise Exception("Incorrect path returned" + file_removed)

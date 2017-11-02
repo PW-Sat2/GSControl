@@ -95,8 +95,8 @@ class Tmtc:
     class TimeoutException(BaseException):
         pass
 
-    def get_correct_frame(self, id, response_type):
-        response = self.rx_queue.get(timeout=5)
+    def get_correct_frame(self, id, response_type, timeout=5):
+        response = self.rx_queue.get(timeout)
         if isinstance(response, response_type):
             if id == response.correlation_id:
                 print "OK %d" % id
@@ -108,14 +108,15 @@ class Tmtc:
             print "Incorrect response type: ", response
             raise TypeError()
 
-    def send_tc_with_response(self, type, response_type, *args):
+    def send_tc_with_response(self, type, response_type, *args, **kwargs):
         id = self.get_correlation_id()
         frame = type(id, *args)
+        timeout = kwargs.pop('timeout', 5)
 
         for _ in xrange(3):
             try:
                 self.send_raw(frame)
-                f = self.get_correct_frame(id, response_type)
+                f = self.get_correct_frame(id, response_type, timeout)
                 return f
             except TypeError:
                 print "Wrong type Exception"
@@ -130,16 +131,17 @@ class Tmtc:
                 print "Repeat! %d" % _
         raise self.FrameGetFail()
 
-    def send_tc_with_multi_response(self, type, response_type, *args):
+    def send_tc_with_multi_response(self, type, response_type, *args, **kwargs):
         id = self.get_correlation_id()
         frame = type(id, *args)
+        timeout = kwargs.pop('timeout', 5)
 
         self.send_raw(frame)
 
         responses = []
         while True:
             try:
-                response = self.get_correct_frame(id, response_type)
+                response = self.get_correct_frame(id, response_type, timeout)
                 responses.append(response)
             except Empty:
                 print "Timeout!"
