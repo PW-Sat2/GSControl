@@ -148,12 +148,7 @@ class Tmtc:
     def send(self, tc):
         return tc.send(self)
 
-    # def file_remove(self, path):
-    #     response = self.send_tc_with_response(tc.fs.RemoveFile, response_frames.common.FileRemoveSuccessFrame, path)
-    #     file_removed = ''.join(map(chr, response.payload()[2:]))
-    #     if file_removed != path:
-    #         raise Exception("Incorrect path returned" + file_removed)
-    #     print "File %s removed!" % file_removed
+
     #
     # def disable_overheat_submode(self, side):
     #     mapping = {"A": 0, "B": 1}
