@@ -71,3 +71,22 @@ class DownloadFile(object):
                 print("Got {}/{}".format(frame.seq() + 1, self.chunks))
         
         return file_chunks
+
+
+class RemoveFileIfExists(object):
+	def __init__(self, path, filename):
+		self.path = path
+		self.filename = filename
+		self.fi = GetFileInfo(self.path, self.filename)
+		self.rm = RemoveFile(self.path + self.filename)
+
+	def send(self, tmtc):
+		file_info = self.fi.send(tmtc)
+		if file_info == None:
+			print("File not present")
+			return False
+		else:
+			self.rm.send(tmtc)
+			print("File removed")
+			return True
+
