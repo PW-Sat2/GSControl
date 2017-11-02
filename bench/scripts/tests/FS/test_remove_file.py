@@ -21,3 +21,6 @@ tmtc.send(RemoveFile('telemetry.current'))
 # Request info about particular file - should be None
 chosen_file = tmtc.send(GetFileInfo('/', 'telemetry.current'))
 pprint.pprint(chosen_file)
+
+# Remve non-existing file
+tmtc.send(RemoveFile('aabbcc'))
