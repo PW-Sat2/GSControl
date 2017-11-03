@@ -28,27 +28,35 @@ checker.check(TM.Experiments.CurrentExperimentCode, 'SADS', 300)
 # Wait till the experiment is finished
 checker.check(TM.Experiments.CurrentExperimentCode, 'None', 1000)
 
+# Wait till all files are saved
+time.sleep(180)
 
 # Get 'sads.exp'
 # Request info about particular file
 chosen_file = tmtc.send(GetFileInfo('/', 'sads.exp'))
 pprint.pprint(chosen_file)
 
-# Download file
-chunks = tmtc.send(DownloadFile(chosen_file["File"], chosen_file["Chunks"]))
+if chosen_file != None:
+	# Download file
+	chunks = tmtc.send(DownloadFile(chosen_file["File"], chosen_file["Chunks"]))
 
-# Save file
-RemoteFileTools.save_chunks('sads.exp.raw', chunks)
+	# Save file
+	RemoteFileTools.save_chunks('sads.exp.raw', chunks)
+else:
+	print("File sads.exp does not exist")
 
 # Get 'sads.photo_wing'
 # Request info about particular file
 chosen_file = tmtc.send(GetFileInfo('/', 'sads.photo_wing'))
 pprint.pprint(chosen_file)
 
-# Download file
-chunks = tmtc.send(DownloadFile(chosen_file["File"], chosen_file["Chunks"]))
+if chosen_file != None:
+	# Download file
+	chunks = tmtc.send(DownloadFile(chosen_file["File"], chosen_file["Chunks"]))
 
-# Save file
-RemoteFileTools.save_chunks('sads.photo_wing.raw', chunks)
-# Save photo
-RemoteFileTools.save_photo('sads.photo_wing.jpg', chunks)
+	# Save file
+	RemoteFileTools.save_chunks('sads.photo_wing.raw', chunks)
+	# Save photo
+	RemoteFileTools.save_photo('sads.photo_wing.jpg', chunks)
+else:
+	print("File sads.photo_wing does not exist")
