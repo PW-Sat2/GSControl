@@ -8,7 +8,7 @@ from tc.experiments import AbortExperiment, PerformSADSExperiment
 from tc.comm import SendBeacon
 from tc.fs import GetFileInfo, RemoveFile, RemoveFileIfExists, DownloadFile
 from tools.remote_files import RemoteFileTools
-import tools.PrintLog as PrintLog
+import tools.tools.PrintLog as PrintLog
 
 tmtc = Tmtc()
 checker = Check(tmtc)

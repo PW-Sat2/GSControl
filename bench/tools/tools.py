@@ -3,7 +3,7 @@ import datetime
 import pprint
 
 def PrintLog(text):
-	print('[' + str(datetime.datetime.now().date()) ' ' + str(datetime.datetime.now().time()) + ']' + text)
+	print '[', datetime.datetime.now().date(), datetime.datetime.now().time(), '] ', text
 
 
 class SimpleLogger:
