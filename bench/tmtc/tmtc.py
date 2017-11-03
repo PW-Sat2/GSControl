@@ -13,6 +13,7 @@ from radio.receiver import Receiver
 
 from devices.comm import BeaconFrame
 from response_frames.period_message import PeriodicMessageFrame
+from tools.tools import PrintLog as PrintLog
 
 
 class Tmtc:
@@ -99,13 +100,13 @@ class Tmtc:
         response = self.rx_queue.get(timeout=timeout)
         if isinstance(response, response_type):
             if id == response.correlation_id:
-                print "OK %d" % id
+                PrintLog("OK {}".format(id))
                 return response
             else:
-                print "Correlation id mismatch %d != %d" % (response.correlation_id, id)
+                PrintLog("Correlation id mismatch {} != {}".format(response.correlation_id, id))
                 raise self.CorrelationMismatchException()
         else:
-            print "Incorrect response type: ", response
+            print PrintLog("Incorrect response type: {}".format(response))
             raise TypeError()
 
     def send_tc_with_response(self, type, response_type, *args, **kwargs):
@@ -119,16 +120,16 @@ class Tmtc:
                 f = self.get_correct_frame(id, response_type, timeout)
                 return f
             except TypeError:
-                print "Wrong type Exception"
+                PrintLog("Wrong type Exception")
                 self.flush()
-                print "Repeat! %d" % _
+                PrintLog("Repeat! {}".format(_))
             except self.CorrelationMismatchException:
-                print "Bad correlation ID Exception"
+                PrintLog("Bad correlation ID Exception")
                 self.flush()
-                print "Repeat! %d" % _
+                PrintLog("Repeat! {}".fromat(_))
             except Empty:
-                print "Empty queue Exception"
-                print "Repeat! %d" % _
+                PrintLog("Empty queue Exception")
+                PrintLog("Repeat! {}".format(_))
         raise self.FrameGetFail()
 
     def send_tc_with_multi_response(self, type, response_type, *args, **kwargs):
@@ -144,7 +145,7 @@ class Tmtc:
                 response = self.get_correct_frame(id, response_type, timeout)
                 responses.append(response)
             except Empty:
-                print "Timeout!"
+                PrintLog("Timeout!")
                 return responses
 
     def send(self, tc):
