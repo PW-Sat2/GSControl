@@ -1,5 +1,10 @@
 import time
+import datetime
 import pprint
+
+def PrintLog(text):
+	print('[' + str(datetime.datetime.now().date()) ' ' + str(datetime.datetime.now().time()) + ']' + text)
+
 
 class SimpleLogger:
     def __init__(self, path):
