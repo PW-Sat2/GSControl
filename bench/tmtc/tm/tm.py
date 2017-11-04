@@ -1,5 +1,6 @@
 import time
 
+
 class TM:
     class COMM:
         class TX:
@@ -15,11 +16,12 @@ class Check(object):
     def __init__(self, tmtc):
         self.tmtc = tmtc
 
-    def check(self, name, value, timeout = 0):
+    def check(self, name, value, timeout=0):
         timeout += 50  # OBC update 30 second + 10 second TX interval + 5 second RX
         while timeout > 0:
             try:
                 assert(self.tmtc.beacon_value(name) == value)
+                print name, "==", value
                 return
             except AssertionError:
                 # print "Retry"

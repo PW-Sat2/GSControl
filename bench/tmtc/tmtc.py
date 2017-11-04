@@ -1,12 +1,6 @@
-import sys
-import os
 import thread
 import time
 from Queue import Queue, Empty
-from enum import Enum
-
-sys.path.append('..')
-sys.path.append('../integration_tests')
 
 from radio.sender import Sender
 from radio.receiver import Receiver
@@ -31,8 +25,10 @@ class Tmtc:
     def wait_for_first_beacon(self, timeout):
         # TODO: show to user that code is stucked at this wait
         end_time = time.time() + timeout
-        while self.beacon() == None:
-            time.sleep(1)
+        while self.beacon() is None:
+            from tc.comm import SendBeacon
+            self.send(SendBeacon())
+            time.sleep(5)
             if end_time < time.time():
                 raise self.TimeoutException()
 
