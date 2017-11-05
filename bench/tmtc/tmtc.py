@@ -48,17 +48,6 @@ class Tmtc:
             except IndexError:
                 pass
 
-    def get(self, timeout=None):
-        # .get() cannot be killed by Ctrl+C - workaround
-        if timeout is not None:
-            return self.rx_queue.get(timeout=timeout)
-        else:
-            # infinite timeout, but can be killed
-            try:
-                return self.rx_queue.get(timeout=100)
-            except Empty:
-                pass
-
     def flush(self):
         try:
             self.rx_queue.get(block=False)

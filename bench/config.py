@@ -12,9 +12,3 @@ config = dict(
     output_path="",
     asrun_name=""
 )
-
-session_name = time.strftime("%Y-%m-%d_%H:%M:%S_") + sys.argv[1]
-config['session_name'] = session_name
-config['output_path'] = os.path.abspath(os.path.join(os.path.dirname(__file__), 'outputs', config['session_name']))
-
-os.makedirs(config['output_path'])

@@ -1,5 +1,6 @@
 import time
 from tools.checks import check_equal
+from tools.tools import PrintLog
 
 class TM:
     class COMM:
@@ -16,15 +17,21 @@ class Check(object):
     def __init__(self, tmtc):
         self.tmtc = tmtc
 
+    def get(self, name):
+        value_actual = self.tmtc.beacon_value(name)
+        PrintLog("{}: {}".format(name, value_actual))
+
     def check(self, name, value, timeout=0):
         timeout += 50  # OBC update 30 second + 10 second TX interval + 5 second RX
         while timeout > 0:
             try:
-                check_equal(name, self.tmtc.beacon_value(name), value)
+                value_actual = self.tmtc.beacon_value(name)
+                check_equal(name, value_actual, value)
+                PrintLog("{}: {} == {}".format(name, value_actual, value))
                 return
             except AssertionError:
                 # print "Retry"
                 time.sleep(1)
                 timeout -= 1
-        print "Failed check of ", type(name), ":", self.tmtc.beacon_value(name), " != ", value
+        PrintLog("{}: {} != {}".format(name, value_actual, value))
         raise AssertionError()
