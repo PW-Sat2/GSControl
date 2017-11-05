@@ -1,16 +1,16 @@
-import pprint
-
 from bench_init import *
+from tools.tools import PrintLog
 
 
-# Request file list
-file_list = send(tc.fs.ListFiles('/'))
-pprint.pprint(file_list)
+def run():
+    # Request file list
+    file_list = send(tc.fs.ListFiles('/'))
+    PrintLog("Files present: ", file_list)
 
-# Request info about particular file
-chosen_file = send(tc.fs.GetFileInfo('/', 'telemetry.current'))
-pprint.pprint(chosen_file)
+    # Request info about particular file
+    chosen_file = send(tc.fs.GetFileInfo('/', 'telemetry.current'))
+    PrintLog(chosen_file)
 
-# Request info about non-existing file
-non_existing = send(tc.fs.GetFileInfo('/', 'aaabbbccc'))
-pprint.pprint(non_existing)
+    # Request info about non-existing file
+    non_existing = send(tc.fs.GetFileInfo('/', 'aaabbbccc'))
+    PrintLog(non_existing)

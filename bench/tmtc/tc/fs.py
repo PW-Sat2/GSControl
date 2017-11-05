@@ -3,6 +3,9 @@ import response_frames.file_system
 from tools.remote_files import RemoteFileTools
 from utils import ensure_string
 
+from tools.tools import PrintLog
+from tools.checks import check_equal
+
 
 class ListFiles(object):
     def __init__(self, path):
@@ -27,7 +30,7 @@ class GetFileInfo(object):
         
         for file in file_list:
             if file["File"] == self.filename:
-            	return file
+                return file
         return None
 
 
@@ -40,7 +43,7 @@ class RemoveFile(object):
         file_removed = ''.join(map(chr, response.payload()[2:]))
         if file_removed != self.path:
             raise Exception("Incorrect path returned" + file_removed)
-        print "File %s removed!" % file_removed
+        PrintLog("File %s removed!" % file_removed)
 
 
 class DownloadFile(object):
@@ -61,32 +64,30 @@ class DownloadFile(object):
 
             chunks_request_now = [remaining[i] for i in range(request_qty)]
             collected_frames = tmtc.send_tc_with_multi_response(telecommand.fs.DownloadFile, response_frames.common.FileSendSuccessFrame, self.path, chunks_request_now)
+            # check_equal('Collected frames', len(collected_frames), request_qty)
 
             for frame in collected_frames:
                 file_chunks[frame.seq()] = frame.response
-                try:
-                    remaining.remove(frame.seq())
-                except:
-                    pass
-                print("Got {}/{}".format(frame.seq() + 1, self.chunks))
+                remaining.remove(frame.seq())
+                PrintLog("Got {}/{}".format(frame.seq() + 1, self.chunks))
         
         return file_chunks
 
 
 class RemoveFileIfExists(object):
-	def __init__(self, path, filename):
-		self.path = path
-		self.filename = filename
-		self.fi = GetFileInfo(self.path, self.filename)
-		self.rm = RemoveFile(self.path + self.filename)
+    def __init__(self, path, filename):
+        self.path = path
+        self.filename = filename
+        self.fi = GetFileInfo(self.path, self.filename)
+        self.rm = RemoveFile(self.path + self.filename)
 
-	def send(self, tmtc):
-		file_info = self.fi.send(tmtc)
-		if file_info == None:
-			print("File not present")
-			return False
-		else:
-			self.rm.send(tmtc)
-			print("File removed")
-			return True
+    def send(self, tmtc):
+        file_info = self.fi.send(tmtc)
+        if file_info is None:
+            PrintLog("File not present")
+            return False
+        else:
+            self.rm.send(tmtc)
+            PrintLog("File removed")
+            return True
 
