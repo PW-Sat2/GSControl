@@ -11,7 +11,14 @@ class JlinkSWOLogger(object):
         self.thread = Process(target=self._run)
         self.process = subprocess.Popen(['JLinkSWOViewer', '-device', 'EFM32GG280F1024', '-itmmask', '0x1FFFF'],
                                         stdout=subprocess.PIPE, universal_newlines=True)
-        MainLog("Starting SWO logger".format())
+        MainLog("Waiting for SWO startup...")
+
+        while True:
+            line = self.process.stdout.readline()
+            self.logger.log(line)
+            if line.find("Receiving SWO data") != -1:
+                break
+        MainLog("SWO logger started")
 
     def _run(self):
         while True:

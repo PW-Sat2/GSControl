@@ -17,22 +17,29 @@ MainLog("Starting session:", config['session_name'])
 loggers = []
 loggers_map = {'swo': JlinkSWOLogger, 'uart': UARTLogger, 'saleae': SaleaeLogger}
 
+MainLog("Starting loggers {}...".format(config['LOGGERS']))
 for i in config['LOGGERS']:
     name = i.split(' ')[0]
     args = i.split(' ')[1:]
     logger_type = loggers_map[name]
     loggers.append(logger_type(*args))
+    print "Loggers: ", loggers
 
 for logger in loggers:
     logger.start()
+MainLog("Loggers {} started.".format(loggers))
 
 
-def cleanup():
-    for log in loggers:
+def cleanup(enabled_loggers):
+    from tools.tools import MainLog
+    MainLog("Stopping loggers {}".format(enabled_loggers))
+    for log in enabled_loggers:
         log.stop()
+    MainLog("Loggers stopped.")
+    from config import config
     MainLog("Closing session:", config['session_name'])
 
-atexit.register(cleanup)
+atexit.register(cleanup, loggers)
 
 
 class Bench(tmtc.tmtc.Tmtc, tmtc.tm.tm.Check):
