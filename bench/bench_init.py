@@ -26,19 +26,20 @@ def make_test(method):
 
         test_name = method.__name__
 
-        MainLog("Starting test {}".format(test_name))
-
-        asrun = os.path.join(config['output_path'], test_name)
-
+        folder_name = os.path.join(config['output_path'], test_name + "_")
         suffix = 0
-        while os.path.isfile(asrun + '_' + str(suffix) + ".log"):
+        while os.path.isdir(folder_name + str(suffix)):
             suffix += 1
-        config['asrun_name'] = test_name + '_' + str(suffix) + ".log"
+        folder_name += str(suffix)
+        os.makedirs(folder_name)
+        test_name += "_" + str(suffix)
+        config['test_name'] = test_name
 
+        MainLog("Starting test {}".format(test_name))
         result = method(*args, **kw)
-
-        config['asrun_name'] = "repl.log"
         MainLog("Finishing test {}".format(test_name))
+
+        config['test_name'] = ""
 
         return result
     return make_test_decorator

@@ -24,7 +24,7 @@ class SimpleLogger:
 def PrintLog(*text, **kwargs):
     line = ' '.join([str(i) for i in text])
     print SimpleLogger.format(line)
-    name = config['asrun_name']
+    name = os.path.join(config['test_name'], 'log.log')
     if kwargs.pop('main', False):
         name = "main.log"
     SimpleLogger(name).log(line)
@@ -38,5 +38,5 @@ def handle_exception(etype, evalue, tb):
     PrintLog('Uncaught exception!')
     PrintLog('{0}: {1}'.format(etype, evalue))
     PrintLog(''.join(traceback.format_exception(etype, evalue, tb)))
-    MainLog("Test {} failed!".format(config['asrun_name']))
-    config['asrun_name'] = "repl.log"
+    MainLog("Test {} failed!".format(config['test_name']))
+    config['test_name'] = ""

@@ -67,7 +67,6 @@ class MyPrompt(Prompts):
                 (Token.Prompt, '> ')]
 
 
-config['asrun_name'] = "repl.log"
 shell = InteractiveShellEmbed(user_ns={},
                               banner2='Bench Terminal')
 shell.prompts = MyPrompt(shell)

@@ -41,7 +41,7 @@ def download_file(obc_filename, ground_filename=None, max_chunks_at_once=20):
     for i in file_chunks:
         data_string += ensure_string(i)
 
-    with open(os.path.join(config['output_path'], ground_filename), 'wb') as f:
+    with open(os.path.join(config['output_path'], config['test_name'], ground_filename), 'wb') as f:
         f.write(data_string)
         PrintLog("Saved file {} to {}".format(obc_filename, ground_filename))
 
