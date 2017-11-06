@@ -1,16 +1,15 @@
-import imp
 import os
 import sys
 import zmq
+import time
 
 
 if __name__ == '__main__':
-    sys.path.append(os.path.join(os.path.dirname(__file__), '../PWSat2OBC/integration_tests'))
+    sys.path.append(os.path.join(os.path.dirname(__file__), '../integration_tests'))
     sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
     from receiver import Receiver
     from sender import Sender
-    from tools.remote_files import *
 
     from IPython.terminal.embed import InteractiveShellEmbed
     from IPython.terminal.prompts import Prompts
@@ -59,16 +58,18 @@ if __name__ == '__main__':
 
     def get_beacon():
         from tools.parse_beacon import ParseBeacon
+        from telecommand.comm import SendBeacon
         return ParseBeacon.parse(send_receive(SendBeacon()))
 
-    def get_file(file_dict):
-        downloader = RemoteFile(sender, rcv)
-        data = downloader.download(file_dict)
 
-        return data
-
-
-    shell = InteractiveShellEmbed(user_ns={'receive_raw' : receive_raw, 'receive': receive, 'set_timeout': set_timeout, 'send' : send, 'send_receive' : send_receive, 'parse_file_list' : RemoteFileTools.parse_file_list, 'get_file' : get_file, 'RemoteFileTools' : RemoteFileTools, 'RemoteFile' : RemoteFile, 'sender': sender, 'receiver': rcv, 'get_beacon': get_beacon},
+    shell = InteractiveShellEmbed(user_ns={'receive_raw': receive_raw,
+                                           'receive': receive,
+                                           'set_timeout': set_timeout,
+                                           'send': send,
+                                           'send_receive': send_receive,
+                                           'sender': sender,
+                                           'receiver': rcv,
+                                           'get_beacon': get_beacon},
                                   banner2='COMM Terminal')
     shell.prompts = MyPrompt(shell)
     shell.run_code('from tools.parse_beacon import ParseBeacon')

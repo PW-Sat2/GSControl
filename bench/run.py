@@ -5,15 +5,18 @@ import time
 import atexit
 from argparse import ArgumentParser
 
+from IPython.terminal.embed import InteractiveShellEmbed
+from IPython.terminal.prompts import Prompts
+from pygments.token import Token
+
 from config import config
-from tools.tools import MainLog, PrintLog
+from tools.tools import MainLog, handle_exception
 from tools.loggers import *
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), 'integration_tests')))
 
 parser = ArgumentParser()
 parser.add_argument("session_name", nargs=1, help='Name of test session')
-parser.add_argument("scripts", nargs="*", help='Scripts to run, as path to file', default=[])
 cmd_line_args = parser.parse_args()
 
 
@@ -23,7 +26,6 @@ os.makedirs(config['output_path'])
 
 
 MainLog("Starting session:", config['session_name'])
-MainLog("Scripts to run: ", cmd_line_args.scripts)
 
 
 loggers = []
@@ -54,58 +56,25 @@ def cleanup(enabled_loggers):
 atexit.register(cleanup, loggers)
 
 
-def exception_hook(exctype, value, tb):
-    PrintLog('Uncaught exception!')
-    PrintLog('{0}: {1}'.format(exctype, value))
-    PrintLog(''.join(traceback.format_tb(tb)))
-    MainLog("Test {} failed!".format(config['asrun_name']))
-
-sys.excepthook = exception_hook
+def custom_exc(shell, etype, evalue, tb, tb_offset=None):
+    handle_exception(etype, evalue, tb)
+    shell.showtraceback((etype, evalue, tb), tb_offset=tb_offset)
 
 
-def run_test(name):
-    try:
-        MainLog("Starting test {}".format(name))
-
-        module_dir, module_file = os.path.split(name)
-        module_name, module_ext = os.path.splitext(module_file)
-
-        asrun = os.path.join(config['output_path'], module_name)
-
-        suffix = 0
-        while os.path.isfile(asrun + '_' + str(suffix)):
-            suffix += 1
-        config['asrun_name'] = module_name + '_' + str(suffix)
-
-        path = os.path.join(os.getcwd(), module_dir)
-        sys.path.append(path)
-        module_obj = __import__(module_name)
-
-        module_obj.run()
-
-        sys.path.pop()
-
-    finally:
-        config['asrun_name'] = "repl.log"
-        MainLog("Finishing test {}".format(name))
-
-for i in cmd_line_args.scripts:
-    run_test(i)
-
-if len(cmd_line_args.scripts) == 0:
-    from IPython.terminal.embed import InteractiveShellEmbed
-    from IPython.terminal.prompts import Prompts
-    from pygments.token import Token
-
-    class MyPrompt(Prompts):
-        def in_prompt_tokens(self, cli=None):
-            return [(Token.Prompt, 'Bench'),
-                    (Token.Prompt, '> ')]
+class MyPrompt(Prompts):
+    def in_prompt_tokens(self, cli=None):
+        return [(Token.Prompt, 'Bench'),
+                (Token.Prompt, '> ')]
 
 
-    config['asrun_name'] = "repl.log"
-    shell = InteractiveShellEmbed(user_ns={'run_test': run_test},
-                                  banner2='TMTC Terminal')
-    shell.prompts = MyPrompt(shell)
-    shell.run_code('from bench_init import *')
-    shell()
+config['asrun_name'] = "repl.log"
+shell = InteractiveShellEmbed(user_ns={},
+                              banner2='Bench Terminal')
+shell.prompts = MyPrompt(shell)
+shell.run_code('import scripts')
+shell.run_code('from bench_init import *')
+shell.set_custom_exc((Exception,), custom_exc)
+
+
+# sys.excepthook = exception_hook
+shell()

@@ -1,9 +1,9 @@
 import time
 import os
-import datetime
-import pprint
+import traceback
 
 from config import config
+
 
 class SimpleLogger:
     def __init__(self, path):
@@ -32,3 +32,11 @@ def PrintLog(*text, **kwargs):
 
 def MainLog(*text):
     PrintLog(*text, main=True)
+
+
+def handle_exception(etype, evalue, tb):
+    PrintLog('Uncaught exception!')
+    PrintLog('{0}: {1}'.format(etype, evalue))
+    PrintLog(''.join(traceback.format_exception(etype, evalue, tb)))
+    MainLog("Test {} failed!".format(config['asrun_name']))
+    config['asrun_name'] = "repl.log"

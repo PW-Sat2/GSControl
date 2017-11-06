@@ -13,7 +13,7 @@ from utils import ensure_string
 
 from radio.receiver import *
 from radio.sender import *
-from tools.remote_files import *
+from tools.photo import *
 from tools.parse_beacon import *
 
 from telecommand import *

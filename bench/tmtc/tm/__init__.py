@@ -1,1 +1,1 @@
-from tm import *
+from tm import TM
