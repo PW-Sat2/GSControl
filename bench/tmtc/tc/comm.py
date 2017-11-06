@@ -21,5 +21,6 @@ class SetBitrate(object):
 
 
 class SendBeacon(object):
-    def send(self, tmtc):
+    @staticmethod
+    def send(tmtc):
         return tmtc.send_raw(comm.SendBeacon())

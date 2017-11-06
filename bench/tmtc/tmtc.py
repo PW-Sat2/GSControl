@@ -1,19 +1,13 @@
-import sys
-import os
 import thread
 import time
 from Queue import Queue, Empty
-from enum import Enum
-
-sys.path.append('..')
-sys.path.append('../integration_tests')
 
 from radio.sender import Sender
 from radio.receiver import Receiver
 
 from devices.comm import BeaconFrame
 from response_frames.period_message import PeriodicMessageFrame
-from tools.tools import PrintLog as PrintLog
+from tools.tools import PrintLog as PrintLog, MainLog
 
 
 class Tmtc:
@@ -29,12 +23,15 @@ class Tmtc:
         self.wait_for_first_beacon(timeout)
 
     def wait_for_first_beacon(self, timeout):
-        # TODO: show to user that code is stucked at this wait
+        MainLog("Waiting for first beacon...")
         end_time = time.time() + timeout
-        while self.beacon() == None:
-            time.sleep(1)
+        while self.beacon() is None:
+            from tc.comm import SendBeacon
+            self.send(SendBeacon())
+            time.sleep(5)
             if end_time < time.time():
                 raise self.TimeoutException()
+        MainLog("First beacon received")
 
     def _receive_thread(self):
         while True:
@@ -49,17 +46,6 @@ class Tmtc:
                     # definitely requested by operator
                     self.rx_queue.put(frame)
             except IndexError:
-                pass
-
-    def get(self, timeout=None):
-        # .get() cannot be killed by Ctrl+C - workaround
-        if timeout is not None:
-            return self.rx_queue.get(timeout=timeout)
-        else:
-            # infinite timeout, but can be killed
-            try:
-                return self.rx_queue.get(timeout=100)
-            except Empty:
                 pass
 
     def flush(self):
@@ -96,90 +82,57 @@ class Tmtc:
     class TimeoutException(BaseException):
         pass
 
-    def get_correct_frame(self, id, response_type, timeout=5):
+    def get_correct_frame(self, correlation_id, response_type, timeout=5):
         response = self.rx_queue.get(timeout=timeout)
         if isinstance(response, response_type):
-            if id == response.correlation_id:
-                PrintLog("OK {}".format(id))
+            if correlation_id == response.correlation_id:
                 return response
             else:
-                PrintLog("Correlation id mismatch {} != {}".format(response.correlation_id, id))
+                PrintLog("Correlation id mismatch {} != {}".format(response.correlation_id, correlation_id))
                 raise self.CorrelationMismatchException()
         else:
-            print PrintLog("Incorrect response type: {}".format(response))
+            PrintLog("Incorrect response type: {}".format(response))
             raise TypeError()
 
-    def send_tc_with_response(self, type, response_type, *args, **kwargs):
-        id = self.get_correlation_id()
-        frame = type(id, *args)
+    def send_tc_with_response(self, tc_type, response_type, *args, **kwargs):
+        correlation_id = self.get_correlation_id()
+        frame = tc_type(correlation_id, *args)
         timeout = kwargs.pop('timeout', 5)
 
         for _ in xrange(3):
             try:
                 self.send_raw(frame)
-                f = self.get_correct_frame(id, response_type, timeout)
+                f = self.get_correct_frame(correlation_id, response_type, timeout)
+                PrintLog("TC[{}] {}".format(correlation_id, tc_type.__name__))
                 return f
             except TypeError:
                 PrintLog("Wrong type Exception")
                 self.flush()
-                PrintLog("Repeat! {}".format(_))
             except self.CorrelationMismatchException:
                 PrintLog("Bad correlation ID Exception")
                 self.flush()
-                PrintLog("Repeat! {}".fromat(_))
             except Empty:
-                PrintLog("Empty queue Exception")
-                PrintLog("Repeat! {}".format(_))
+                PrintLog("No response from S/C!")
+            PrintLog("Repeat! {}".format(_))
         raise self.FrameGetFail()
 
-    def send_tc_with_multi_response(self, type, response_type, *args, **kwargs):
-        id = self.get_correlation_id()
-        frame = type(id, *args)
+    def send_tc_with_multi_response(self, tc_type, response_type, *args, **kwargs):
+        correlation_id = self.get_correlation_id()
+        frame = tc_type(correlation_id, *args)
         timeout = kwargs.pop('timeout', 5)
 
         self.send_raw(frame)
 
         responses = []
+        PrintLog("TC[{}] {}".format(correlation_id, tc_type.__name__))
         while True:
             try:
-                response = self.get_correct_frame(id, response_type, timeout)
+                response = self.get_correct_frame(correlation_id, response_type, timeout)
                 responses.append(response)
+                PrintLog("TC[{}]-response{}: {}".format(correlation_id, len(responses), tc_type.__name__))
             except Empty:
-                PrintLog("Timeout!")
+                PrintLog("TC[{}] Timeout, got {} response frames".format(correlation_id, len(responses)))
                 return responses
 
     def send(self, tc):
         return tc.send(self)
-
-
-    #
-    # def disable_overheat_submode(self, side):
-    #     mapping = {"A": 0, "B": 1}
-    #     return self.send_tc_with_response(tc.eps.DisableOverheatSubmode, response_frames.disable_overheat_submode.DisableOverheatSubmodeSuccessFrame, mapping[side])
-    #
-    # def abort_experiment(self):
-    #     return self.send_tc_with_response(tc.experiments.AbortExperiment,
-    #                                       response_frames.common.ExperimentSuccessFrame)
-
-
-
-if __name__ == "__main__":
-    from IPython.terminal.embed import InteractiveShellEmbed
-    from IPython.terminal.prompts import Prompts
-    from pygments.token import Token
-
-    class MyPrompt(Prompts):
-        def in_prompt_tokens(self, cli=None):
-            return [(Token.Prompt, 'TMTC'),
-                    (Token.Prompt, '> ')]
-
-    tmtc = Tmtc()
-
-    shell = InteractiveShellEmbed(user_ns={'tmtc': tmtc},
-                                  banner2='TMTC Terminal')
-    shell.prompts = MyPrompt(shell)
-    shell.run_code('import tc')
-    shell.run_code('import time')
-    shell()
-
-

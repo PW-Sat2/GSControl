@@ -2,13 +2,14 @@ import io
 from multiprocessing import Process
 from time import sleep
 
-import bench.tools.tools
+from tools.tools import SimpleLogger, MainLog
 from serial import Serial
 
 
 class UARTLogger(object):
-    def __init__(self, port, baudrate, filename, eol='\n'):
-        self.logger = bench.tools.tools.SimpleLogger(filename)
+    def __init__(self, name, port, baudrate, eol='\n'):
+        self.logger = SimpleLogger('uart_' + name)
+        MainLog("Starting UART logger {}: {}@{}".format(name, port, baudrate))
         self.serial = Serial(port=port, baudrate=baudrate)
 
         self.ser_io = io.TextIOWrapper(io.BufferedRWPair(self.serial, self.serial, 1),

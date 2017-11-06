@@ -23,6 +23,7 @@ from emulator.beacon_parser.parser import BitReader, BeaconStorage
 from utils import ensure_string, ensure_byte_list
 import response_frames
 
+
 class ParseBeacon:
     @staticmethod
     def parse(frame):
@@ -66,7 +67,6 @@ class ParseBeacon:
         except AttributeError:
             return o
 
-
     @staticmethod
     def convert(beacon):
         for k, v in beacon.items():
@@ -78,4 +78,3 @@ class ParseBeacon:
     @staticmethod
     def convert_json(beacon):
         return json.dumps(beacon, default=ParseBeacon.convert_values, sort_keys=True, indent=4)
-    
