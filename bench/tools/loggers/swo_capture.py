@@ -2,12 +2,12 @@ import subprocess
 import time
 from multiprocessing import Process
 
-from tools.tools import SimpleLogger, MainLog
+from tools.log import SimpleLogger, MainLog
 
 
 class JlinkSWOLogger(object):
     def __init__(self):
-        self.logger = SimpleLogger('swo.log')
+        self.logger = SimpleLogger('swo.log', in_test=True)
         self.thread = Process(target=self._run)
         self.process = subprocess.Popen(['JLinkSWOViewer', '-device', 'EFM32GG280F1024', '-itmmask', '0x1FFFF'],
                                         stdout=subprocess.PIPE, universal_newlines=True)

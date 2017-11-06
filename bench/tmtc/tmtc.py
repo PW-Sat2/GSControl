@@ -7,7 +7,7 @@ from radio.receiver import Receiver
 
 from devices.comm import BeaconFrame
 from response_frames.period_message import PeriodicMessageFrame
-from tools.tools import PrintLog as PrintLog, MainLog
+from tools.log import PrintLog as PrintLog, MainLog
 
 
 class Tmtc:

@@ -2,7 +2,7 @@ import time
 import inspect
 import nose.tools
 
-from tools.tools import PrintLog
+from tools.log import PrintLog
 
 
 class TM(object):

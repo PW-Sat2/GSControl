@@ -4,7 +4,7 @@ from multiprocessing import Process
 
 import saleae
 from config import config
-from tools.tools import MainLog
+from tools.log import MainLog
 
 
 class SaleaeLogger(object):

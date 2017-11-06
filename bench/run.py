@@ -10,7 +10,8 @@ from IPython.terminal.prompts import Prompts
 from pygments.token import Token
 
 from config import config
-from tools.tools import MainLog, handle_exception
+from tools.log import MainLog
+from tools.tools import handle_exception
 from tools.loggers import *
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), 'integration_tests')))
@@ -45,7 +46,7 @@ MainLog("Loggers {} started.".format(loggers))
 
 
 def cleanup(enabled_loggers):
-    from tools.tools import MainLog
+    from tools.log import MainLog
     MainLog("Stopping loggers {}".format(enabled_loggers))
     for log in enabled_loggers:
         log.stop()
