@@ -7,7 +7,10 @@ from radio.receiver import Receiver
 
 from devices.comm import BeaconFrame
 from response_frames.period_message import PeriodicMessageFrame
-from tools.log import PrintLog as PrintLog, MainLog
+from tools.log import PrintLog, MainLog, SimpleLogger
+
+from tools.parse_beacon import ParseBeacon
+from pprint import pformat
 
 
 class Tmtc:
@@ -17,6 +20,9 @@ class Tmtc:
 
         self.rx_queue = Queue()
         self.last_beacon = None
+        self.parsed_beacon = {}
+        self.beacon_logger = SimpleLogger('beacon.log', in_test=True)
+
         self.correlation_id = 0
 
         thread.start_new_thread(self._receive_thread, ())
@@ -38,7 +44,7 @@ class Tmtc:
             try:
                 frame = self.receiver.receive_frame()
                 if isinstance(frame, BeaconFrame):
-                    self.last_beacon = frame
+                    self.update_beacon(frame)
                 elif isinstance(frame, PeriodicMessageFrame):
                     # periodic - nothing for now
                     pass
@@ -54,12 +60,18 @@ class Tmtc:
         except Empty:
             return
 
+    def update_beacon(self, frame):
+        self.last_beacon = frame
+
+        self.parsed_beacon = ParseBeacon.parse(self.beacon())
+        self.beacon_logger.log(pformat(self.parsed_beacon))
+
     def beacon(self):
         return self.last_beacon
 
     def beacon_value(self, element):
-        from tools.parse_beacon import ParseBeacon
-        return ParseBeacon.parse(self.beacon())\
+
+        return self.parsed_beacon\
             .get(element[0])\
             .get(element[1]).converted
 
