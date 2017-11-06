@@ -15,6 +15,85 @@ class TM(object):
         CurrentExperimentStartupResult = ['09: Experiments', '0494: Experiment Startup Result']
         LastExperimentIterationStatus = ['09: Experiments', '0502: Last Experiment Iteration Status']
 
+    class EPS(object):
+        class ControllerA(object):
+            class MPPT(object):
+                class X(object):
+                    SOL_VOLT = ['14: Controller A', '0793: MPPT_X.SOL_VOLT']
+                    SOL_CURR = ['14: Controller A', '0805: MPPT_X.SOL_CURR']
+                    SOL_OUT_VOLT = ['14: Controller A', '0817: MPPT_X.SOL_OUT_VOLT']
+                    Temperature = ['14: Controller A', '0829: MPPT_X.Temperature']
+                    State = ['14: Controller A', '0841: MPPT_X.State']
+
+                class Y_Plus(object):
+                    SOL_VOLT = ['14: Controller A', '0844: MPPT_Y+.SOL_VOLT']
+                    SOL_CURR = ['14: Controller A', '0856: MPPT_Y+.SOL_CURR']
+                    SOL_OUT_VOLT = ['14: Controller A', '0868: MPPT_Y+.SOL_OUT_VOLT']
+                    Temperature = ['14: Controller A', '0880: MPPT_Y+.Temperature']
+                    State = ['14: Controller A', '0892: MPPT_Y+.State']
+
+                class Y_Minus(object):
+                    SOL_VOLT = ['14: Controller A', '0895: MPPT_Y-.SOL_VOLT']
+                    SOL_CURR = ['14: Controller A', '0907: MPPT_Y-.SOL_CURR']
+                    SOL_OUT_VOLT = ['14: Controller A', '0919: MPPT_Y-.SOL_OUT_VOLT']
+                    Temperature = ['14: Controller A', '0931: MPPT_Y-.Temperature']
+                    State = ['14: Controller A', '0943: MPPT_Y-.State']
+
+            class Distribution(object):
+                VOLT_3V3 = ['14: Controller A', '0946: DISTR.VOLT_3V3']
+                CURR_3V3 = ['14: Controller A', '0956: DISTR.CURR_3V3']
+                VOLT_5V = ['14: Controller A', '0966: DISTR.VOLT_5V']
+                CURR_5V = ['14: Controller A', '0976: DISTR.CURR_5V']
+                VOLT_VBAT = ['14: Controller A', '0986: DISTR.VOLT_VBAT']
+                CURR_VBAT = ['14: Controller A', '0996: DISTR.CURR_VBAT']
+                LCL_STATE = ['14: Controller A', '1006: DISTR.LCL_STATE']
+                LCL_FLAGS = ['14: Controller A', '1013: DISTR.LCL_FLAGS']
+
+            class BatteryControler(object):
+                VOLT_A = ['14: Controller A', '1019: BATC.VOLT_A']
+                CHRG_CURR = ['14: Controller A', '1029: BATC.CHRG_CURR']
+                DCHRG_CURR = ['14: Controller A', '1039: BATC.DCHRG_CURR']
+                Temperature = ['14: Controller A', '1049: BATC.Temperature']
+                State = ['14: Controller A', '1059: BATC.State']
+
+            class BatteryPack(object):
+                Temperature_A = ['14: Controller A', '1062: BP.Temperature A']
+                Temperature_B = ['14: Controller A', '1075: BP.Temperature B']
+
+            class Temperature(object):
+                DCDC3V3 = ['14: Controller A', '1174: DCDC3V3.Temperature']
+                DCDC5V = ['14: Controller A', '1184: DCDC5V.Temperature']
+                Mcu = ['14: Controller A', '1144: Temperature']
+                Supply = ['14: Controller A', '1154: SUPP_TEMP']
+
+            class System(object):
+                Safety_Counter = ['14: Controller A', '1088: Safety Counter']
+                Power_Cycle_Count = ['14: Controller A', '1096: Power Cycle Count']
+                Uptime = ['14: Controller A', '1112: Uptime']
+
+            class ControllerB(object):
+                ControllerB_3V3d = ['14: Controller A', '1164: ControllerB.3V3d`']
+
+        class ControllerB(object):
+            class BatteryPack(object):
+                Temperature = ['15: Controller B', '1194: BP.Temperature']
+
+            class BatteryController(object):
+                VOLT_B = ['15: Controller B', '1204: BATC.VOLT_B']
+
+            class System(object):
+                Safety_Counter = ['15: Controller B', '1214: Safety Counter']
+                Power_Cycle_Count = ['15: Controller B', '1222: Power Cycle Count']
+                Uptime = ['15: Controller B', '1238: Uptime']
+
+            class ControllerA(object):
+                ControllerA_3V3d = ['15: Controller B', '1290: ControllerA.3V3d']
+
+            class Temperature(object):
+                Mcu = ['15: Controller B', '1270: Temperature']
+                Supply = ['15: Controller B', '1280: SUPP_TEMP']
+
+
     def __init__(self, tmtc):
         self.tmtc = tmtc
 
