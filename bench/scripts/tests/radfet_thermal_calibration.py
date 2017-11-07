@@ -2,10 +2,12 @@ from bench_init import *
 
 import time
 from tools.tools import RandomString, CSVLogger
+import progressbar
 
 
 @make_test
 def test_radfet_calibration(duration):
+    bar = progressbar.ProgressBar(redirect_stdout=True, max_value=duration)
     logger = CSVLogger('radfet_thermal')
 
     # Check if OBC Terminal is available
@@ -21,12 +23,18 @@ def test_radfet_calibration(duration):
 
     time.sleep(10)
 
-    for i in range(duration):
+    start_time = time.time()
+    stop_time = start_time + duration*60
+
+    print "Stop time: ", stop_time
+
+    while time.time() < stop_time:
         radfet_data = obc.payload_radfet_read()
         temps_data = obc.payload_temps()
         all_data = [radfet_data, temps_data]
         print(all_data)
         logger.write_row(all_data)
+        bar.update((stop_time-time.time())/60)
 
     print(obc.payload_radfet_off())
     print(obc.disable_lcl(5))
