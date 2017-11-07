@@ -17,11 +17,7 @@ def test_radfet_calibration(duration):
     print(obc.enable_lcl(5))
     time.sleep(5)
 
-    radfet_data = obc.payload_radfet_on()
-    temps_data = obc.payload_temps()
-    all_data = [radfet_data, temps_data]
-    print(all_data)
-    logger.write_header(all_data)
+    print(obc.payload_radfet_on())
 
     time.sleep(10)
 
@@ -32,10 +28,5 @@ def test_radfet_calibration(duration):
         print(all_data)
         logger.write_row(all_data)
 
-    radfet_data = obc.payload_radfet_off()
-    temps_data = obc.payload_temps()
-    all_data = [radfet_data, temps_data]
-    print(all_data)
-    logger.write_row(all_data)
-
+    print(obc.payload_radfet_off())
     print(obc.disable_lcl(5))
