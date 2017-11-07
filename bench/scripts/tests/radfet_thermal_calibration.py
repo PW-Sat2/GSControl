@@ -5,7 +5,7 @@ from tools.tools import RandomString
 
 
 @make_test
-def test_radfet_calibration():
+def test_radfet_calibration(duration):
     # Check if OBC Terminal is available
     print(obc.ping())
 
@@ -16,7 +16,7 @@ def test_radfet_calibration():
     print(obc.payload_radfet_on())
     time.sleep(10)
 
-    for i in range(10):
+    for i in range(duration):
         print(obc.payload_radfet_read())
 
     print(obc.payload_radfet_off())
