@@ -34,7 +34,11 @@ def test_radfet_calibration(duration):
         all_data = [radfet_data, temps_data]
         print(all_data)
         logger.write_row(all_data)
-        bar.update(round((time.time()-start_time)/60, 2))
+
+        try:
+            bar.update(round((time.time()-start_time)/60, 2))
+        except ValueError:
+            pass
 
     print(obc.payload_radfet_off())
     print(obc.disable_lcl(5))
