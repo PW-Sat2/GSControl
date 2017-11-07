@@ -12,6 +12,7 @@ def test_radfet_calibration():
     # Be sure that no experiment is currently running
     tm.assert_equal(tm.Experiments.CurrentExperimentCode, 'None')
 
+    print(obc.enable_lcl(5))
     print(obc.payload_radfet_on())
     time.sleep(10)
 
@@ -19,3 +20,4 @@ def test_radfet_calibration():
         print(obc.payload_radfet_read())
 
     print(obc.payload_radfet_off())
+    print(obc.disable_lcl(5))
