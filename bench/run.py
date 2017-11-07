@@ -16,11 +16,11 @@ from tools.loggers import *
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), 'integration_tests')))
 
 parser = ArgumentParser()
-parser.add_argument("session_name", nargs=1, help='Name of test session')
+parser.add_argument("session_name", type=str, default="", nargs='?', help='Name of test session')
 cmd_line_args = parser.parse_args()
 
 
-config['session_name'] = time.strftime("%Y-%m-%d_%H:%M:%S_") + cmd_line_args.session_name[0]
+config['session_name'] = time.strftime("%Y-%m-%d_%H:%M:%S_") + cmd_line_args.session_name
 config['output_path'] = os.path.abspath(os.path.join(os.path.dirname(__file__), 'outputs', config['session_name']))
 os.makedirs(config['output_path'])
 
