@@ -18,18 +18,21 @@ get = bench.get
 tm = bench
 tc = tmtc.tc
 
-from obc import OBC, SerialPortTerminal
+from config import config
 
-class DummyGPIO:
-    RESET = 0
+if config['OBC_COM'] is not "":
+    from obc import OBC, SerialPortTerminal
+    
+    class DummyGPIO:
+        RESET = 0
 
-    def high(self, _):
-        pass
+        def high(self, _):
+            pass
 
-    def low(self, _):
-        pass
+        def low(self, _):
+            pass
 
-obc = OBC(SerialPortTerminal(config.config['OBC_COM'], DummyGPIO()))
+    obc = OBC(SerialPortTerminal(config['OBC_COM'], DummyGPIO()))
 
 def make_test(method):
     def make_test_decorator(*args, **kw):

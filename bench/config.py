@@ -3,6 +3,7 @@ config = dict(
     GS_HOST="10.100.0.200",
     SOURCE_CALLSIGN="SP3SAT",
     DESTINATION_CALLSIGN="PWSAT2",
+    OBC_COM='/dev/ttyUSB1',
     LOGGERS=['swo', 'saleae'],
     session_name="",
     test_name="",
