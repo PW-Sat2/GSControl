@@ -22,7 +22,7 @@ def RandomString(length):
 
 class CSVLogger:
     def __init__(self, base_name):
-        self.output = open(base_name + "_" + str(time.time()), 'a')
+        self.path = base_name + "_" + str(time.time())
         self.header_exists = False
 
     def write_header(self, dicts):
@@ -34,6 +34,7 @@ class CSVLogger:
         self.output.write(header)
 
     def write_row(self, dicts):
+        self.output = open(self.path, 'a')
         if self.header_exists is False:
             self.write_header(dicts)
             self.header_exists = True
@@ -43,4 +44,5 @@ class CSVLogger:
             for key in d.itervalues():
                 row += str(key) + ";"
         row += "\n"
-        self.output.write(row)     
+        self.output.write(row)
+        self.output.close()
