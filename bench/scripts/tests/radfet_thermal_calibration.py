@@ -7,7 +7,7 @@ import progressbar
 
 @make_test
 def test_radfet_calibration(duration):
-    bar = progressbar.ProgressBar(redirect_stdout=True, max_value=duration)
+    bar = progressbar.ProgressBar(max_value=duration)
     logger = CSVLogger('radfet_thermal')
 
     # Check if OBC Terminal is available
