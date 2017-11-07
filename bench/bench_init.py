@@ -21,7 +21,7 @@ tc = tmtc.tc
 
 def make_test(method):
     def make_test_decorator(*args, **kw):
-        from tools.tools import MainLog
+        from tools.log import MainLog
         from config import config
 
         test_name = method.__name__
@@ -46,5 +46,5 @@ def make_test(method):
 
 import scripts
 
-from tools.tools import PrintLog, MainLog, SimpleLogger
+from tools.log import PrintLog, MainLog, SimpleLogger
 from tools.checks import *
