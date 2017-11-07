@@ -1,6 +1,6 @@
 from bench_init import *
 
-import time
+import time, datetime
 from tools.tools import RandomString, CSVLogger
 import progressbar
 
@@ -26,7 +26,7 @@ def test_radfet_calibration(duration):
     start_time = time.time()
     stop_time = start_time + duration*60
 
-    print "Stop time: ", stop_time
+    print "Stop time: ", datetime.datetime.fromtimestamp(stop_time)
 
     while time.time() < stop_time:
         radfet_data = obc.payload_radfet_read()
@@ -34,7 +34,7 @@ def test_radfet_calibration(duration):
         all_data = [radfet_data, temps_data]
         print(all_data)
         logger.write_row(all_data)
-        bar.update((stop_time-time.time())/60)
+        bar.update(round((time.time()-start_time)/60, 2))
 
     print(obc.payload_radfet_off())
     print(obc.disable_lcl(5))
