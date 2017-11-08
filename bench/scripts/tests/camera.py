@@ -12,6 +12,6 @@ def test_camera_telecommand(filename_base):
 
     # Request photos
     for photo_params in photos_params:
-        filename = filename_base + '_' + photo_params['Camera'] + '_' + photo_params['Resolution']
+        filename = filename_base + '_' + str(photo_params['Camera']) + '_' + str(photo_params['Resolution'])
         send(tc.camera.TakePhoto(photo_params['Camera'], photo_params['Resolution'], 1, tc.camera.timedelta(0), filename))
         print filename, " : ", scripts.photo.wait_for_photo(filename + "_0", 200)
