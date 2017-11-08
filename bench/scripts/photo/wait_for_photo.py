@@ -6,5 +6,6 @@ def wait_for_photo(filename, timeout):
     while scripts.fs.get_file_info(filename) is None:
     	if end_time < time.time():
     		return False
+    	time.sleep(10)
 
     return True

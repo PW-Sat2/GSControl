@@ -9,7 +9,7 @@ class ListFiles(object):
     def send(self, tmtc):
         frames = tmtc.send_tc_with_multi_response(telecommand.fs.ListFiles,
                                                   response_frames.file_system.FileListSuccessFrame,
-                                                  self.path)
+                                                  self.path, timeout=10)
         return frames
 
 
