@@ -1,0 +1,1 @@
+from wait_for_photo import wait_for_photo
