@@ -26,12 +26,12 @@ class Tmtc:
         self.correlation_id = 0
 
         thread.start_new_thread(self._receive_thread, ())
-        self.wait_for_first_beacon(timeout)
+        self.first_beacon_timeout = timeout
 
     def wait_for_first_beacon(self, timeout):
         MainLog("Waiting for first beacon...")
         end_time = time.time() + timeout
-        while self.beacon() is None:
+        while self.last_beacon is None:
             from tc.comm import SendBeacon
             self.send(SendBeacon())
             time.sleep(5)
@@ -67,6 +67,8 @@ class Tmtc:
         self.beacon_logger.log(pformat(self.parsed_beacon))
 
     def beacon(self):
+        if self.last_beacon is None:
+            self.wait_for_first_beacon(self.first_beacon_timeout)
         return self.last_beacon
 
     def beacon_value(self, element):
