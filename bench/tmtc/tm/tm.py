@@ -192,8 +192,8 @@ class TM(object):
                 TemperatureB = ['14: Controller A', '1075: BP.Temperature B']
 
             class Temperature(object):
-                3v3 = ['14: Controller A', '1174: DCDC3V3.Temperature']
-                5v = ['14: Controller A', '1184: DCDC5V.Temperature']
+                Supply3v3 = ['14: Controller A', '1174: DCDC3V3.Temperature']
+                Supply5v = ['14: Controller A', '1184: DCDC5V.Temperature']
                 MCU = ['14: Controller A', '1144: Temperature']
                 Supply = ['14: Controller A', '1154: SUPP_TEMP']
 
