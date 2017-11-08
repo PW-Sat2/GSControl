@@ -2,5 +2,5 @@ import all
 import fs
 import sads
 import comm
-import photo
+import camera
 
