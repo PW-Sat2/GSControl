@@ -6,9 +6,9 @@ import progressbar
 
 
 @make_test
-def test_radfet_calibration(duration):
+def test_radfet_calibration(stabilization_time, duration, filename='radfet_thermal'):
     bar = progressbar.ProgressBar(max_value=duration)
-    logger = CSVLogger('radfet_thermal')
+    logger = CSVLogger(filename)
 
     # Check if OBC Terminal is available
     print(obc.ping())
@@ -17,7 +17,9 @@ def test_radfet_calibration(duration):
     tm.assert_equal(tm.Experiments.CurrentExperimentCode, 'None')
 
     print(obc.enable_lcl(5))
-    time.sleep(5)
+
+    # stabilization time
+    time.sleep(stabilization_time)
 
     print(obc.payload_radfet_on())
 
