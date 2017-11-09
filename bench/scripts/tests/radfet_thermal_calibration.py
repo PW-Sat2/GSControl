@@ -17,13 +17,11 @@ def test_radfet_calibration(stabilization_time, duration):
     tm.assert_equal(tm.OBC.Experiments.Code, 'None')
 
     print(obc.enable_lcl(5))
-
-    # stabilization time
-    time.sleep(stabilization_time)
+    time.sleep(5)
 
     print(obc.payload_radfet_on())
-
-    time.sleep(10)
+    # stabilization time
+    time.sleep(stabilization_time)
 
     start_time = time.time()
     stop_time = start_time + duration*60
