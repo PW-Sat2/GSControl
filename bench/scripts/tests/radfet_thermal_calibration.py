@@ -7,7 +7,7 @@ import progressbar
 
 @make_test
 def test_radfet_calibration(stabilization_time, duration):
-    bar = progressbar.ProgressBar(max_value=duration)
+    bar = progressbar.ProgressBar(max_value=duration.total_seconds()/60)
     logger = CSVLogger('radfet_thermal.csv', in_test=True)
 
     # Check if OBC Terminal is available
@@ -21,10 +21,10 @@ def test_radfet_calibration(stabilization_time, duration):
 
     print(obc.payload_radfet_on())
     # stabilization time
-    time.sleep(stabilization_time)
+    time.sleep(stabilization_time.total_seconds())
 
     start_time = time.time()
-    stop_time = start_time + duration*60
+    stop_time = start_time + duration.total_seconds()
 
     print "Stop time: ", datetime.datetime.fromtimestamp(stop_time)
 
