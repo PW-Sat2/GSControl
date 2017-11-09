@@ -18,31 +18,3 @@ def handle_exception(etype, evalue, tb):
 def RandomString(length):
    letters = string.ascii_lowercase
    return ''.join(random.choice(letters) for i in range(length))
-
-
-class CSVLogger:
-    def __init__(self, base_name):
-        self.path = base_name + "_" + str(time.time())
-        self.header_exists = False
-
-    def write_header(self, dicts):
-        header = "timestamp;"
-        for d in dicts:
-            for key in d:
-                header += str(key) + ";"
-        header += "\n"
-        self.output.write(header)
-
-    def write_row(self, dicts):
-        self.output = open(self.path, 'a')
-        if self.header_exists is False:
-            self.write_header(dicts)
-            self.header_exists = True
-
-        row = str(time.time()) + ";"
-        for d in dicts:
-            for key in d.itervalues():
-                row += str(key) + ";"
-        row += "\n"
-        self.output.write(row)
-        self.output.close()
