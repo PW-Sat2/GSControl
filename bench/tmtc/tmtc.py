@@ -72,10 +72,30 @@ class Tmtc:
         return self.last_beacon
 
     def beacon_value(self, element):
+        try:
+            value = self.parsed_beacon\
+                .get(element[0])\
+                .get(element[1]).converted
+        except ValueError:
+            value = self.beacon_unconverted_value(element)
+
+        return value
+
+    def beacon_raw_value(self, element):
+        try:
+            value = self.parsed_beacon\
+                .get(element[0])\
+                .get(element[1]).raw
+        except ValueError:
+            value = self.beacon_unconverted_value(element)
+
+        return value
+
+    def beacon_unconverted_value(self, element):
 
         return self.parsed_beacon\
             .get(element[0])\
-            .get(element[1]).converted
+            .get(element[1])
 
     def send_raw(self, tc):
         self.sender.send(tc)
