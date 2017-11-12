@@ -6,33 +6,33 @@ import progressbar
 
 
 @make_test
-def test_radfet_calibration(stabilization_time, duration):
+def test_radfet_calibration(stabilization_time, duration, filename):
     bar = progressbar.ProgressBar(max_value=duration.total_seconds()/60)
-    logger = CSVLogger('radfet_thermal.csv', in_test=True)
+    logger = CSVLogger(filename, in_test=True)
 
     # Check if OBC Terminal is available
-    print(obc.ping())
+    PrintLog(obc.ping())
 
     # Be sure that no experiment is currently running
     tm.assert_equal(tm.OBC.Experiments.Code, 'None')
 
-    print(obc.enable_lcl(5))
+    PrintLog(obc.enable_lcl(5))
     time.sleep(5)
 
-    print(obc.payload_radfet_on())
+    PrintLog(obc.payload_radfet_on())
     # stabilization time
     time.sleep(stabilization_time.total_seconds())
 
     start_time = time.time()
     stop_time = start_time + duration.total_seconds()
 
-    print "Stop time: ", datetime.datetime.fromtimestamp(stop_time)
+    PrintLog("Stop time: " + str(datetime.datetime.fromtimestamp(stop_time)))
 
     while time.time() < stop_time:
         radfet_data = obc.payload_radfet_read()
         temps_data = obc.payload_temps()
         all_data = dict(radfet_data, **temps_data)
-        print(all_data)
+        PrintLog(all_data)
         logger.log(all_data)
 
         try:
@@ -40,5 +40,5 @@ def test_radfet_calibration(stabilization_time, duration):
         except ValueError:
             pass
 
-    print(obc.payload_radfet_off())
-    print(obc.disable_lcl(5))
+    PrintLog(obc.payload_radfet_off())
+    PrintLog(obc.disable_lcl(5))
