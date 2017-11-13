@@ -71,14 +71,14 @@ class Tmtc:
             self.wait_for_first_beacon(self.first_beacon_timeout)
         return self.last_beacon
 
-    def parsed_beacon(self):
+    def parsed_beacon_safe(self):
         if self.last_beacon is None:
             self.wait_for_first_beacon(self.first_beacon_timeout)
         return self.parsed_beacon
 
     def beacon_value(self, element):
         try:
-            value = self.parsed_beacon()\
+            value = self.parsed_beacon_safe()\
                 .get(element[0])\
                 .get(element[1]).converted
         except ValueError:
@@ -88,7 +88,7 @@ class Tmtc:
 
     def beacon_raw_value(self, element):
         try:
-            value = self.parsed_beacon()\
+            value = self.parsed_beacon_safe()\
                 .get(element[0])\
                 .get(element[1]).raw
         except ValueError:
@@ -98,7 +98,7 @@ class Tmtc:
 
     def beacon_unconverted_value(self, element):
 
-        return self.parsed_beacon()\
+        return self.parsed_beacon_safe()\
             .get(element[0])\
             .get(element[1])
 
