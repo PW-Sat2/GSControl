@@ -10,3 +10,4 @@ def handle_exception(etype, evalue, tb):
     PrintLog(''.join(traceback.format_exception(etype, evalue, tb)))
     MainLog("Test {} failed!".format(config['test_name']))
     config['test_name'] = ""
+    config['files_path'] = config['output_path']

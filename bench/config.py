@@ -6,5 +6,6 @@ config = dict(
     LOGGERS=['swo', 'saleae'],
     session_name="",
     test_name="",
-    output_path=""
+    output_path="",
+    files_path=""
 )

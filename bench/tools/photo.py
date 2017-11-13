@@ -4,7 +4,7 @@ import os
 def parse_photo(ground_filename):
     from config import config
 
-    with open(os.path.join(config['output_path'], config['test_name'], ground_filename), 'rb') as f:
+    with open(os.path.join(config['files_path'], ground_filename), 'rb') as f:
         data_string = f.read()
 
     data_string = data_string[4:]
@@ -16,5 +16,5 @@ def parse_photo(ground_filename):
         data_string = data_string[512:]
         data_string = data_string[0:]
 
-    with open(os.path.join(config['output_path'], config['test_name'], ground_filename + ".jpg"), 'wb') as f:
+    with open(os.path.join(config['files_path'], ground_filename + ".jpg"), 'wb') as f:
         f.write(result)
