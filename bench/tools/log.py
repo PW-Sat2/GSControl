@@ -2,6 +2,7 @@ import time
 import os
 import csv
 import io
+from functools import reduce
 
 from config import config
 
@@ -51,14 +52,17 @@ class CSVLogger(SimpleLogger):
         SimpleLogger.log(self, dict_to_write)  # print header
         return self._get_data(dict_to_write)   # print data
 
-    def _get_header(self, dict_to_write):
+    def _get_header(self, *dicts):
         self.format = self._get_data
-        # change to list of timestamp + all keys in dictionary
-        return self._get_csv(["timestamp"] + dict_to_write.keys())
+        # change to list of timestamp + sorted keys for every passed dictionary
+        all_keys = reduce(lambda x, y: x + y, [sorted(i.keys()) for i in dicts])
+        return self._get_csv(["timestamp"] + all_keys)
 
-    def _get_data(self, dict_to_write):
+    def _get_data(self, *dicts):
         # change to list of timestamp + all values
-        return self._get_csv([str(time.time())] + dict_to_write.values())
+        all_values = reduce(lambda x, y: x + y, [[d[key] for key in sorted(d.keys())] for d in dicts])
+
+        return self._get_csv([time.strftime('%H:%M:%S')] + all_values)
 
     @staticmethod
     def _get_csv(list_to_write):
