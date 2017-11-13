@@ -22,3 +22,4 @@ def test_all():
     try_test(scripts.tests.fs.test_fs_remove_file)
     try_test(scripts.tests.sads.test_sads_run_and_abort)
     try_test(scripts.tests.sads.test_sads_full_experiment)
+    try_test(scripts.tests.camera.test_camera_telecommand)

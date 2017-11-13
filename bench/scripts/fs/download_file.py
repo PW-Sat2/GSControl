@@ -1,7 +1,5 @@
 from utils import ensure_string
-
 from tools.photo import parse_photo
-
 from bench_init import *
 
 
