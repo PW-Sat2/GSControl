@@ -47,10 +47,10 @@ class CSVLogger(SimpleLogger):
         SimpleLogger.__init__(self, filename, in_test)
         self.format = self._first_iteration
 
-    def _first_iteration(self, dict_to_write):
+    def _first_iteration(self, *dicts):
         self.format = self._get_header
-        SimpleLogger.log(self, dict_to_write)  # print header
-        return self._get_data(dict_to_write)   # print data
+        SimpleLogger.log(self, *dicts)  # print header
+        return self._get_data(*dicts)   # print data
 
     def _get_header(self, *dicts):
         self.format = self._get_data
