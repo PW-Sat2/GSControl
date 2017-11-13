@@ -5,7 +5,7 @@ from tools.log import CSVLogger
 import progressbar
 
 class RadFET_Logger:
-    def _init_(self, filename_base):
+    def __init__(self, filename_base):
         self.logger = CSVLogger(filename_base + "_radfet", in_test=True)
 
     def log(self):
@@ -15,7 +15,7 @@ class RadFET_Logger:
 
 
 class SunS_Logger:
-    def _init_(self, filename_base):
+    def __init__(self, filename_base):
         self.logger = CSVLogger(filename_base + "_suns", in_test=True)
         self.suns_keys = ["status 1 ack", "status 2 presence", "status 3 adc_valid", "ALS_1_A_VL", "ALS_1_B_VL", "ALS_1_C_VL", "ALS_1_D_VL", "ALS_2_A_VL", "ALS_2_B_VL", "ALS_2_C_VL", "ALS_2_D_VL", "ALS_3_A_VL", "ALS_3_B_VL", "ALS_3_C_VL", "ALS_3_D_VL", "temp str", "rtd A", "rtd B", "rtd C", "rtd D", "gain", "itime", "ALS_1_A_IR", "ALS_1_B_IR", "ALS_1_C_IR", "ALS_1_D_IR", "ALS_2_A_IR", "ALS_2_B_IR", "ALS_2_C_IR", "ALS_2_D_IR", "ALS_3_A_IR", "ALS_3_B_IR", "ALS_3_C_IR", "ALS_3_D_IR"]
 
@@ -28,7 +28,7 @@ class SunS_Logger:
 
 
 class EPS_Logger:
-    def _init_(self, filename_base):
+    def __init__(self, filename_base):
         self.logger_a = CSVLogger(filename_base + "_eps_a", in_test=True)
         self.logger_b = CSVLogger(filename_base + "_eps_b", in_test=True)
         self.hk_a_keys = ["MPPT_X SOL_VOLT", "MPPT_X SOL_CURR", "MPPT_X SOL_OUT_VOLT", "MPPT_X TEMP", "MPPT_X STATE", "MPPT_Y_PLUS SOL_VOLT", "MPPT_Y_PLUS SOL_CURR", "MPPT_Y_PLUS SOL_OUT_VOLT", "MPPT_Y_PLUS TEMP", "MPPT_Y_PLUS STATE", "MPPT_Y_MINUS SOL_VOLT", "MPPT_Y_MINUS SOL_CURR", "MPPT_Y_MINUS SOL_OUT_VOLT", "MPPT_Y_MINUS TEMP", "MPPT_Y_MINUS STATE", "DISTR VOLT_3V3", "DISTR CURR_3V3", "DISTR VOLT_5V", "DISTR CURR_5V", "DISTR VOLT_VBAT", "DISTR CURR_VBAT", "DISTR LCL_STATE", "DISTR LCL_FLAGB", "BATC_A VOLT_A", "BATC_A CHRG_CURR", "BATC_A DCHRG_CURR", "BATC_A TEMP", "BATC_A STATE", "BP_A TEMP_A", "BP_A TEMP_B", "CTRLB VOLT_3V3d", "CTRLA SAFETY_CTR", "CTRLA PWR_CYCLES", "CTRLA UPTIME", "CTRLA TEMP", "CTRLA SUPP_TEMP", "DCDC3V3 TEMP", "DCDC5V TEMP"]
@@ -47,7 +47,7 @@ class EPS_Logger:
 
 
 class Gyro_Logger:
-    def _init_(self, filename_base):
+    def __init__(self, filename_base):
         self.logger = CSVLogger(filename_base + "_gyro", in_test=True)
         self.gyro_keys = ["X", "Y", "Z", "Temperature"]
         obc.gyro_init()
@@ -61,7 +61,7 @@ class Gyro_Logger:
 
 
 class Photo_Logger:
-    def _init_(self, filename_base):
+    def __init__(self, filename_base):
         self.filename_base = filename_base
         self.wing_filename = 'wing'
         self.nadir_filename = 'nadir'
