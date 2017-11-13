@@ -4,7 +4,7 @@ import time, datetime
 from tools.log import CSVLogger
 import progressbar
 
-class RadFET:
+class RadFET_Logger:
     def _init_(self, filename_base):
         self.logger = CSVLogger(filename_base + "_radfet", in_test=True)
 
@@ -14,7 +14,7 @@ class RadFET:
         self.logger.log({"timestamp": time.time()}, radfet_data, temps_data)
 
 
-class SunS:
+class SunS_Logger:
     def _init_(self, filename_base):
         self.logger = CSVLogger(filename_base + "_suns", in_test=True)
         self.suns_keys = ["status 1 ack", "status 2 presence", "status 3 adc_valid", "ALS_1_A_VL", "ALS_1_B_VL", "ALS_1_C_VL", "ALS_1_D_VL", "ALS_2_A_VL", "ALS_2_B_VL", "ALS_2_C_VL", "ALS_2_D_VL", "ALS_3_A_VL", "ALS_3_B_VL", "ALS_3_C_VL", "ALS_3_D_VL", "temp str", "rtd A", "rtd B", "rtd C", "rtd D", "gain", "itime", "ALS_1_A_IR", "ALS_1_B_IR", "ALS_1_C_IR", "ALS_1_D_IR", "ALS_2_A_IR", "ALS_2_B_IR", "ALS_2_C_IR", "ALS_2_D_IR", "ALS_3_A_IR", "ALS_3_B_IR", "ALS_3_C_IR", "ALS_3_D_IR"]
@@ -27,7 +27,7 @@ class SunS:
         self.logger.log({"timestamp": time.time()}, suns_data)
 
 
-class EPS:
+class EPS_Logger:
     def _init_(self, filename_base):
         self.logger_a = CSVLogger(filename_base + "_eps_a", in_test=True)
         self.logger_b = CSVLogger(filename_base + "_eps_b", in_test=True)
@@ -46,7 +46,7 @@ class EPS:
         self.logger_b.log({"timestamp": time.time()}, hk_b_dict)
 
 
-class Gyro:
+class Gyro_Logger:
     def _init_(self, filename_base):
         self.logger = CSVLogger(filename_base + "_gyro", in_test=True)
         self.gyro_keys = ["X", "Y", "Z", "Temperature"]
@@ -60,7 +60,7 @@ class Gyro:
         self.logger.log({"timestamp": time.time()}, gyro_data)
 
 
-class Photo:
+class Photo_Logger:
     def _init_(self, filename_base):
         self.filename_base = filename_base
         self.wing_filename = 'wing'
@@ -101,11 +101,11 @@ class Photo:
 def climatic_chamber_calibration(duration, filename_base, suns_gain, suns_itime):
     bar = progressbar.ProgressBar(max_value=duration.total_seconds()/60)
 
-    radfet = RadFET(filename_base)
-    suns = SunS(filename_base)
-    eps = EPS(filename_base)
-    gyro = Gyro(filename_base)
-    photo = Photo(filename_base)
+    radfet = RadFET_Logger(filename_base)
+    suns = SunS_Logger(filename_base)
+    eps = EPS_Logger(filename_base)
+    gyro = Gyro_Logger(filename_base)
+    photo = Photo_Logger(filename_base)
     
 
     PrintLog("Check if OBC Terminal is available")
