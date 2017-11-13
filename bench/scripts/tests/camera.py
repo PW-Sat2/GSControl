@@ -24,4 +24,4 @@ def test_camera_telecommand(filename_base, test_scenario):
             PrintLog("Photo " + filename + " failed!")
             failed = filename
 
-        assert(failed is None)
+    assert(failed is None)
