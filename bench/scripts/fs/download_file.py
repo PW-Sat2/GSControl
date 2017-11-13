@@ -1,5 +1,7 @@
 from utils import ensure_string
 from tools.photo import parse_photo
+import imghdr
+from config import config
 from bench_init import *
 
 
@@ -39,7 +41,7 @@ def download_file(obc_filename, ground_filename=None, max_chunks_at_once=20):
     for i in file_chunks:
         data_string += ensure_string(i)
 
-    with open(os.path.join(config['output_path'], config['test_name'], ground_filename), 'wb') as f:
+    with open(os.path.join(config['files_path'], ground_filename), 'wb') as f:
         f.write(data_string)
         PrintLog("Saved file {} to {}".format(obc_filename, ground_filename))
 
@@ -50,3 +52,6 @@ def download_photo(obc_filename, ground_filename=None, max_chunks_at_once=20):
 
     download_file(obc_filename, ground_filename, max_chunks_at_once)
     parse_photo(ground_filename)
+    
+    # check if downloaded file is correct JPEG image
+    assert(imghdr.what(os.path.join(config['files_path'], ground_filename)) == 'jpeg')

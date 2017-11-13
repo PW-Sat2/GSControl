@@ -10,7 +10,7 @@ def test_fs_download_file():
 
     # Download file
     scripts.fs.download_file('telemetry.current', 'downloaded.raw')
-    os.path.isfile(os.path.join(config['output_path'], config['test_name'], 'downloaded.raw'))
+    os.path.isfile(os.path.join(config['files_path'], 'downloaded.raw'))
 
 
 @make_test

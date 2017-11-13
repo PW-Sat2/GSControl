@@ -34,12 +34,14 @@ def make_test(method):
         os.makedirs(folder_name)
         test_name += "_" + str(suffix)
         config['test_name'] = test_name
+        config['files_path'] = os.path.join(config['output_path'], config['test_name'])
 
         MainLog("Starting test {}".format(test_name))
         result = method(*args, **kw)
         MainLog("Finishing test {}".format(test_name))
 
         config['test_name'] = ""
+        config['files_path'] = config['output_path']
 
         return result
     return make_test_decorator

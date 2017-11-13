@@ -23,6 +23,7 @@ cmd_line_args = parser.parse_args()
 
 config['session_name'] = time.strftime("%Y-%m-%d_%H:%M:%S") + (cmd_line_args.session_name and '_' + cmd_line_args.session_name)
 config['output_path'] = os.path.abspath(os.path.join(os.path.dirname(__file__), 'outputs', config['session_name']))
+config['files_path'] = config['output_path']
 os.makedirs(config['output_path'])
 
 
