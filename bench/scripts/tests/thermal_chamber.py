@@ -3,6 +3,7 @@ from bench_init import *
 import time, datetime
 from tools.log import CSVLogger
 import progressbar
+from tools.photo import parse_photo
 
 class RadFET_Logger:
     def __init__(self, filename_base):
@@ -14,6 +15,16 @@ class RadFET_Logger:
         self.logger.log({"timestamp": time.time()}, radfet_data, temps_data)
 
 
+class PLD_Logger:
+    def __init__(self, filename_base):
+        self.logger = CSVLogger(filename_base + "_pld_house", in_test=True)
+
+    def log(self):
+        temps_data = obc.payload_temps()
+        pld_house = obc.payload_housekeeping()
+        self.logger.log({"timestamp": time.time()}, temps_data, pld_house)
+
+
 class SunS_Logger:
     def __init__(self, filename_base):
         self.logger = CSVLogger(filename_base + "_suns", in_test=True)
@@ -22,9 +33,10 @@ class SunS_Logger:
     def log(self, gain, itime):
         suns_raw_data = obc.measure_suns(gain, itime)
         temps_data = obc.payload_temps()
+        suns_ref = obc.payload_suns()
 
         suns_data = dict(zip(self.suns_keys, suns_raw_data))
-        self.logger.log({"timestamp": time.time()}, suns_data)
+        self.logger.log({"timestamp": time.time()}, suns_data, suns_ref)
 
 
 class EPS_Logger:
@@ -52,7 +64,7 @@ class Gyro_Logger:
         self.gyro_keys = ["X", "Y", "Z", "Temperature"]
         obc.gyro_init()
 
-    def log(self, gain, itime):
+    def log(self):
         gyro_raw_data = obc.gyro_read()
         temps_data = obc.payload_temps()
 
@@ -81,6 +93,7 @@ class Photo_Logger:
             with open(self.filename_base + '_nadir_' + str(self.last_photo_time), 'wb') as f:
                 f.write(obc.read_file(self.nadir_filename + '_0'))
             obc.remove_file(self.nadir_filename + '_0')
+            parse_photo(self.filename_base + '_nadir_' + str(self.last_photo_time))
             self.last_photo_finished = True
         else:
             print("Nadir not ready")
@@ -91,6 +104,7 @@ class Photo_Logger:
             with open(self.filename_base + '_wing_' + str(self.last_photo_time), 'wb') as f:
                 f.write(obc.read_file(self.wing_filename + '_0'))
             obc.remove_file(self.wing_filename + '_0')
+            parse_photo(self.filename_base + '_wing_' + str(self.last_photo_time))
             self.last_photo_finished = True
         else:
             print("Wing not ready")
@@ -106,23 +120,21 @@ def climatic_chamber_calibration(duration, filename_base, suns_gain, suns_itime)
     eps = EPS_Logger(filename_base)
     gyro = Gyro_Logger(filename_base)
     photo = Photo_Logger(filename_base)
+    pld = PLD_Logger(filename_base)
     
-
-    PrintLog("Check if OBC Terminal is available")
-    PrintLog(obc.ping())
+    PrintLog("Check if OBC Terminal is available ", obc.ping())
 
     PrintLog("Be sure that no experiment is currently running")
     tm.assert_equal(tm.OBC.Experiments.Code, 'None')
 
-    PrintLog("enable PLD LCL")
-    PrintLog(obc.enable_lcl(5))
+    PrintLog("enable PLD LCL ", obc.enable_lcl(5))
+    time.sleep(5)
+    PrintLog("payload who ", obc.payload_whoami())
 
-    PrintLog("enable SunS LCL")
-    PrintLog(obc.enable_lcl(2))
+    PrintLog("enable SunS LCL", obc.enable_lcl(2))
     time.sleep(5)
 
-    PrintLog("enable radfet lcl")
-    PrintLog(obc.payload_radfet_on())
+    PrintLog("enable radfet lcl ", obc.payload_radfet_on())
 
     start_time = time.time()
     stop_time = start_time + duration.total_seconds()
@@ -135,6 +147,7 @@ def climatic_chamber_calibration(duration, filename_base, suns_gain, suns_itime)
         eps.log()
         gyro.log()
         radfet.log()
+        pld.log()
         photo.get_if_ready()
 
         try:
@@ -142,11 +155,8 @@ def climatic_chamber_calibration(duration, filename_base, suns_gain, suns_itime)
         except ValueError:
             pass
 
-    PrintLog("disable radfet LCL")
-    PrintLog(obc.payload_radfet_off())
+    PrintLog("disable radfet LCL ", obc.payload_radfet_off())
 
-    PrintLog("disable PLD LCL")
-    PrintLog(obc.disable_lcl(5))
+    PrintLog("disable PLD LCL", obc.disable_lcl(5))
 
-    PrintLog("disable SunS LCL")
-    PrintLog(obc.disable_lcl(2))
+    PrintLog("disable SunS LCL", obc.disable_lcl(2))
