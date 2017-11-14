@@ -4,6 +4,8 @@ import time, datetime
 from tools.log import CSVLogger
 import progressbar
 from tools.photo import parse_photo
+from config import config
+import os
 
 class RadFET_Logger:
     def __init__(self, filename_base):
@@ -90,7 +92,7 @@ class Photo_Logger:
         file_list = obc.list_files('/')
         if self.nadir_filename + '_0' in file_list:
             print("Nadir ready")
-            with open(self.filename_base + '_nadir_' + str(self.last_photo_time), 'wb') as f:
+            with open(os.path.join(config['files_path'], self.filename_base + '_nadir_' + str(self.last_photo_time)), 'wb') as f:
                 f.write(obc.read_file(self.nadir_filename + '_0'))
             obc.remove_file(self.nadir_filename + '_0')
             parse_photo(self.filename_base + '_nadir_' + str(self.last_photo_time))
@@ -101,7 +103,7 @@ class Photo_Logger:
 
         if self.wing_filename + '_0' in file_list:
             print("Wing ready")
-            with open(self.filename_base + '_wing_' + str(self.last_photo_time), 'wb') as f:
+            with open(os.path.join(config['files_path'], self.filename_base + '_wing_' + str(self.last_photo_time)), 'wb') as f:
                 f.write(obc.read_file(self.wing_filename + '_0'))
             obc.remove_file(self.wing_filename + '_0')
             parse_photo(self.filename_base + '_wing_' + str(self.last_photo_time))
