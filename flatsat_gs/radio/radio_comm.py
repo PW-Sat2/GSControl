@@ -24,7 +24,7 @@ if __name__ == '__main__':
     from traitlets.config.loader import Config
     import socket
     from utils import ensure_string, ensure_byte_list
-    
+    import telecommand as tc
 
     parser = argparse.ArgumentParser()
 
@@ -49,17 +49,17 @@ if __name__ == '__main__':
 
     cfg = Config()
     frame_decoder = response_frames.FrameDecoder(response_frames.frame_factories)
-    
+
     sender = Sender(args.uplink_host, args.uplink_port)
     rcv = Receiver(args.downlink_host, args.downlink_port)
 
     def receive():
-        data = rcv.decode_kiss(rcv.receive())        
+        data = rcv.decode_kiss(rcv.receive())
         return frame_decoder.decode(data)
 
     def receive_raw():
         return rcv.decode_kiss(rcv.receive())
-    
+
     def set_timeout(timeout_in_ms=-1):
         rcv.timeout(timeout_in_ms)
 
@@ -87,10 +87,79 @@ if __name__ == '__main__':
         return data
 
 
-    shell = InteractiveShellEmbed(config=cfg, user_ns={'receive_raw' : receive_raw, 'receive': receive, 'set_timeout': set_timeout, 'send' : send, 'send_receive' : send_receive, 'parse_file_list' : RemoteFileTools.parse_file_list, 'get_file' : get_file, 'RemoteFileTools' : RemoteFileTools, 'RemoteFile' : RemoteFile, 'sender': sender, 'receiver': rcv, 'get_beacon': get_beacon},
+
+    def parse_and_save(path, data, correlation_id):
+        part = []
+        for i in data:
+            if isinstance(i, rf.common.FileSendSuccessFrame):
+                for id in correlation_id:
+                    if i.correlation_id == id:
+                        part.append(i)
+        part_response = []
+        for i in part:
+            part_response.append(i.response)
+        RemoteFileTools.save_chunks(path, part_response)
+
+
+    def parse_and_save_photo(path, data, correlation_id):
+        part = []
+        for i in data:
+            if isinstance(i, rf.common.FileSendSuccessFrame):
+                for id in correlation_id:
+                    if i.correlation_id == id:
+                        part.append(i)
+        part_response = []
+        for i in part:
+            part_response.append(i.response)
+        RemoteFileTools.save_ohoto(path, part_response)
+
+
+    def save_beacons(path, data):
+        beacons = []
+        for i in data:
+            beacons.append(ParseBeacon.convert_json(ParseBeacon.parse(i)))
+        f = open(path, 'a')
+        for i in beacons:
+            f.write(i)
+        f.close()
+
+
+    def run(tasks):
+        import pprint
+        import datetime
+        from devices import camera
+
+        step_no = 0
+
+        for task in tasks:
+            step_no += 1
+            print "Step no. ", step_no
+            pprint.pprint(task)
+
+            if task[1] is "Send":
+                send(task[0])
+            elif task[1] is "SendReceive":
+                send_receive(task[0])
+
+
+            if task[2] is "NoWait":
+                print("NoWait")
+            else:
+                print("Waiting...")
+                try:
+                    while True:
+                        pass
+                except:
+                    pass
+
+
+
+    shell = InteractiveShellEmbed(config=cfg, user_ns={'save_beacons' : save_beacons, 'parse_and_save_photo' : parse_and_save_photo, 'parse_and_save' : parse_and_save, 'run' : run, 'receive_raw' : receive_raw, 'receive': receive, 'set_timeout': set_timeout, 'send' : send, 'send_receive' : send_receive, 'parse_file_list' : RemoteFileTools.parse_file_list, 'get_file' : get_file, 'RemoteFileTools' : RemoteFileTools, 'RemoteFile' : RemoteFile, 'sender': sender, 'receiver': rcv, 'get_beacon': get_beacon},
                                   banner2='COMM Terminal')
     shell.prompts = MyPrompt(shell)
     shell.run_code('from tools.parse_beacon import ParseBeacon')
     shell.run_code('import telecommand as tc')
     shell.run_code('import time')
+    shell.run_code('import pprint')
+    shell.run_code('import datetime')
     shell()
