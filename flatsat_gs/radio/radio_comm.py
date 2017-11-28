@@ -31,7 +31,7 @@ if __name__ == '__main__':
     parser.add_argument('-c', '--config', required=True,
                         help="Config file (in CMake-generated integration tests format, only MOCK_COM required)")
     parser.add_argument('-t', '--downlink-host', required=False,
-                        help="GNURadio host", default='localhost')                 
+                        help="GNURadio host", default='localhost')
     parser.add_argument('-p', '--downlink-port', required=False,
                         help="GNURadio port", default=7001, type=int)
     parser.add_argument('-u', '--uplink-host', required=False,
@@ -87,8 +87,8 @@ if __name__ == '__main__':
         return data
 
 
-
     def parse_and_save(path, data, correlation_id):
+        import response_frames as rf
         part = []
         for i in data:
             if isinstance(i, rf.common.FileSendSuccessFrame):
@@ -111,10 +111,16 @@ if __name__ == '__main__':
         part_response = []
         for i in part:
             part_response.append(i.response)
-        RemoteFileTools.save_ohoto(path, part_response)
+        RemoteFileTools.save_photo(path, part_response)
+
+
+    def parse_and_save_raw_and_photo(path, data, correlation_id):
+        parse_and_save_photo(path + '.jpg', data, correlation_id)
+        parse_and_save(path + '.raw', data, correlation_id)
 
 
     def save_beacons(path, data):
+        from tools.parse_beacon import ParseBeacon
         beacons = []
         for i in data:
             beacons.append(ParseBeacon.convert_json(ParseBeacon.parse(i)))
@@ -127,8 +133,6 @@ if __name__ == '__main__':
     def run(tasks):
         import pprint
         import datetime
-        from devices import camera
-
         step_no = 0
 
         for task in tasks:
@@ -146,15 +150,13 @@ if __name__ == '__main__':
                 print("NoWait")
             else:
                 print("Waiting...")
-                try:
-                    while True:
-                        pass
-                except:
-                    pass
+                user = ""
+                while user is not "n":
+                    user = raw_input()
 
 
 
-    shell = InteractiveShellEmbed(config=cfg, user_ns={'save_beacons' : save_beacons, 'parse_and_save_photo' : parse_and_save_photo, 'parse_and_save' : parse_and_save, 'run' : run, 'receive_raw' : receive_raw, 'receive': receive, 'set_timeout': set_timeout, 'send' : send, 'send_receive' : send_receive, 'parse_file_list' : RemoteFileTools.parse_file_list, 'get_file' : get_file, 'RemoteFileTools' : RemoteFileTools, 'RemoteFile' : RemoteFile, 'sender': sender, 'receiver': rcv, 'get_beacon': get_beacon},
+    shell = InteractiveShellEmbed(config=cfg, user_ns={'parse_and_save_raw_and_photo' : parse_and_save_raw_and_photo,  'save_beacons' : save_beacons, 'parse_and_save_photo' : parse_and_save_photo, 'parse_and_save' : parse_and_save, 'run' : run, 'receive_raw' : receive_raw, 'receive': receive, 'set_timeout': set_timeout, 'send' : send, 'send_receive' : send_receive, 'parse_file_list' : RemoteFileTools.parse_file_list, 'get_file' : get_file, 'RemoteFileTools' : RemoteFileTools, 'RemoteFile' : RemoteFile, 'sender': sender, 'receiver': rcv, 'get_beacon': get_beacon},
                                   banner2='COMM Terminal')
     shell.prompts = MyPrompt(shell)
     shell.run_code('from tools.parse_beacon import ParseBeacon')
@@ -162,4 +164,6 @@ if __name__ == '__main__':
     shell.run_code('import time')
     shell.run_code('import pprint')
     shell.run_code('import datetime')
+    shell.run_code('from devices import camera')
+    shell.run_code('from tools.remote_files import *')
     shell()
