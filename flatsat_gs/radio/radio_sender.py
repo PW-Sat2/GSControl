@@ -18,6 +18,14 @@ except ImportError:
     import response_frames
 
 
+class Wrap:
+    def __init__(self, byte_str):
+        self.byte_str = byte_str
+
+    def encode(self, *args):
+        return self.byte_str
+
+
 class Sender:
     def __init__(self, target="localhost", port=7000, source_callsign='SP3SAT', destination_callsign='PWSAT2-0'):
         self.context = zmq.Context()
@@ -34,7 +42,7 @@ class Sender:
 
     def send(self, frame):
         payload = frame.build()
-        self.aprs_frame.text = ensure_string(payload)
+        self.aprs_frame.text = Wrap(ensure_string(payload))
         buff = array.array('B', self.aprs_frame.encode_kiss())
         msg = pmt.serialize_str(pmt.cons(pmt.PMT_NIL, pmt.init_u8vector(len(buff), buff)))
         self.sock.send(msg)
