@@ -1,3 +1,5 @@
+colorama
+tabulate
 pyzmq
 aprs==6.0.0
 kiss==6.0.0

@@ -10,6 +10,7 @@ if __name__ == '__main__':
     from radio_receiver import *
     from radio_sender import *
     from tools.remote_files import *
+    from analyzer import *
     import response_frames
 
     import argparse
@@ -180,6 +181,10 @@ if __name__ == '__main__':
                 while user[:1] != "n":
                     user = raw_input()
 
+    def analyze(tasks):
+        analyzer = Analyzer(tasks, 1)
+        analyzer.run()
+
     shell = InteractiveShellEmbed(config=cfg, user_ns={'parse_and_save_raw_and_photo': parse_and_save_raw_and_photo,
                                                        'save_beacons': save_beacons,
                                                        'parse_and_save_photo': parse_and_save_photo,
@@ -190,7 +195,7 @@ if __name__ == '__main__':
                                                        'parse_file_list': RemoteFileTools.parse_file_list,
                                                        'get_file': get_file, 'RemoteFileTools': RemoteFileTools,
                                                        'RemoteFile': RemoteFile, 'sender': sender, 'receiver': rcv,
-                                                       'get_beacon': get_beacon},
+                                                       'get_beacon': get_beacon, 'analyze': analyze},
                                   banner2='COMM Terminal')
     shell.prompts = MyPrompt(shell)
     shell.run_code('from tools.parse_beacon import ParseBeacon')
