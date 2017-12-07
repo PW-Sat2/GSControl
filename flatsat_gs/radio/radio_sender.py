@@ -1,13 +1,11 @@
+import array
 import imp
 import os
 import sys
-import re
-import aprs
-import kiss
 import time
+
+import aprs
 import zmq
-import pmt
-import array
 
 try:
     from utils import ensure_string, ensure_byte_list
@@ -44,7 +42,7 @@ class Sender:
         payload = frame.build()
         self.aprs_frame.text = Wrap(ensure_string(payload))
         buff = array.array('B', self.aprs_frame.encode_kiss())
-        msg = pmt.serialize_str(pmt.cons(pmt.PMT_NIL, pmt.init_u8vector(len(buff), buff)))
+        msg = ensure_string(buff)
         self.sock.send(msg)
         
     def disconnect(self):
@@ -63,9 +61,7 @@ if __name__ == '__main__':
     from IPython.terminal.prompts import Prompts
     from pygments.token import Token
     from traitlets.config.loader import Config
-    import socket
-    from utils import ensure_string, ensure_byte_list
-    import response_frames
+    from utils import ensure_string
 
     parser = argparse.ArgumentParser()
 

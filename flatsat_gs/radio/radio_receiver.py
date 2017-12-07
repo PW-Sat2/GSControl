@@ -1,12 +1,8 @@
 import imp
 import os
 import sys
-import re
-import socket
-import time
+
 import zmq
-import pmt
-import array
 
 try:
     from utils import ensure_string, ensure_byte_list
@@ -22,7 +18,7 @@ class Receiver:
     def __init__(self, target="localhost", port=7001):
         self.context = zmq.Context()
         self.sock = self.context.socket(zmq.SUB)
-        self.sock.connect("tcp://%s:%d" %(target, port))
+        self.sock.connect("tcp://%s:%d" % (target, port))
         self.sock.setsockopt(zmq.SUBSCRIBE, "")
         self.timeout(-1)
 
@@ -37,26 +33,24 @@ class Receiver:
     def receive(self):
         while self.receive_no_wait() is not None:
             pass
-        x = pmt.u8vector_elements(pmt.cdr(pmt.deserialize_str(self.sock.recv())))
-        val = ''.join(map(chr, x))
-        return val
+
+        return self.sock.recv()
 
     def receive_no_wait(self):
         self.sock.setsockopt(zmq.RCVTIMEO, 0)
         val = None
         try:
-            val = pmt.u8vector_elements(pmt.cdr(pmt.deserialize_str(self.sock.recv())))
+            val = self.sock.recv()
         except zmq.Again:
             pass
         finally:
             self.sock.setsockopt(zmq.RCVTIMEO, self.set_timeout)
             return val
-            
+
     def decode_kiss(self, frame):
         frame = frame[16:-2]
-        
-        return ensure_byte_list(frame)
 
+        return ensure_byte_list(frame)
 
     def make_frame(self, frame):
         frame_decoder = response_frames.FrameDecoder(response_frames.frame_factories)
@@ -67,7 +61,6 @@ class Receiver:
         rcv = self.decode_kiss(rcv)
         rcv = self.make_frame(rcv)
         return rcv
-
 
     def disconnect(self):
         print "Disconnect not used. Remove!"
@@ -85,8 +78,7 @@ if __name__ == '__main__':
     from IPython.terminal.prompts import Prompts
     from pygments.token import Token
     from traitlets.config.loader import Config
-    import socket
-    from utils import ensure_string, ensure_byte_list
+    from utils import ensure_byte_list
     import response_frames
 
     parser = argparse.ArgumentParser()
@@ -94,17 +86,19 @@ if __name__ == '__main__':
     parser.add_argument('-c', '--config', required=True,
                         help="Config file (in CMake-generated integration tests format, only MOCK_COM required)")
     parser.add_argument('-t', '--target', required=True,
-                        help="GNURadio host", default='localhost')                 
+                        help="GNURadio host", default='localhost')
     parser.add_argument('-p', '--port', required=True,
                         help="GNURadio port", default=52001, type=int)
 
     args = parser.parse_args()
     imp.load_source('config', args.config)
 
+
     class MyPrompt(Prompts):
         def in_prompt_tokens(self, cli=None):
             return [(Token.Prompt, 'COMM'),
                     (Token.Prompt, '> ')]
+
 
     cfg = Config()
     frame_decoder = response_frames.FrameDecoder(response_frames.frame_factories)
@@ -113,9 +107,10 @@ if __name__ == '__main__':
     def receive():
         rcv = Receiver(args.target, args.port)
         rcv.connect()
-        data = rcv.decode_kiss(rcv.receive())        
+        data = rcv.decode_kiss(rcv.receive())
         rcv.disconnect()
         return frame_decoder.decode(data)
+
 
     shell = InteractiveShellEmbed(config=cfg, user_ns={'receive': receive},
                                   banner2='COMM Terminal')
