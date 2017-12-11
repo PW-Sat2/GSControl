@@ -89,3 +89,6 @@ ENV/
 .ropeproject
 .idea/
 *.csv
+
+# Bench folder
+bench/outputs
