@@ -1,6 +1,7 @@
-#import sys
-#import os
-#sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(__file__), 'utils'))
+
 import time
 from time import localtime, strftime
 from PowerSupply import PowerSupply
@@ -11,6 +12,7 @@ from ObcReset import ObcReset
 from pyquaternion import Quaternion
 import math
 import random
+import Transformations
 
 class Flatsat(object):
     def power_on(self):
@@ -75,7 +77,7 @@ class SolarPanelsSimulator(object):
             return to_calmp
         return 0
         
-    def random_tumbling(self, max_rotation_speed = 5, solar_panels_are_deployed = False):
+    def random_tumbling(self, max_rotation_speed = 5, solar_panels_are_deployed = False, sail_is_deployed = False):
         eps_power_supply = PowerSupply("EPS", config.get("EPS_POWER_SUPPLY_COM"), config.get("EPS_POWER_SUPPLY_SN"))
         eps_power_supply.set_outputs([12.0, 0], [12.0, 0], [6.0, 0])
         eps_power_supply.turn_on()
@@ -109,15 +111,23 @@ class SolarPanelsSimulator(object):
                 else:
                     panel_yp = self.clamp(rotated_x_y_z.vector[1])
                     panel_yn = self.clamp(-rotated_x_y_z.vector[1])
-    
+
+                euler_angles = Transformations.euler_from_quaternion([rotated_x_y_z[0], rotated_x_y_z[1], rotated_x_y_z[2], rotated_x_y_z[3]])
+
                 new_current_value_x = round((panel_xp + panel_xn) * self.MAX_MPPTX_SOLAR_CURRENT, 3)
                 new_current_value_yp = round(panel_yp * self.MAX_MPPTYP_SOLAR_CURRENT, 3)
                 new_current_value_yn = round(panel_yn * self.MAX_MPPTYN_SOLAR_CURRENT, 3)
-    
-                eps_power_supply.set_outputs([12.0, new_current_value_yn], [12.0, new_current_value_yp], [6.0, new_current_value_x])
 
+                if sail_is_deployed:
+                    if (euler_angles[0]<0.75 and euler_angles[1]<0.75):
+                        new_current_value_x = 0.0
+                        new_current_value_yp = 0.0
+                        new_current_value_yn = 0.0
+
+                eps_power_supply.set_outputs([12.0, new_current_value_yn], [12.0, new_current_value_yp], [6.0, new_current_value_x])
+                print([12.0, new_current_value_yn], [12.0, new_current_value_yp], [6.0, new_current_value_x])
                 time.sleep(1.0 / self.SAMPLES_PER_SECOND);
-    
+
             print "Waiting 36min..."
             eps_power_supply.set_outputs([12.0, 0], [12.0, 0], [6.0, 0])
             time.sleep(36 * 60)
