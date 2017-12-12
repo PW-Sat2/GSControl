@@ -13,6 +13,7 @@ from pyquaternion import Quaternion
 import math
 import random
 import Transformations
+import datetime
 
 class Flatsat(object):
     def power_on(self):
@@ -77,15 +78,21 @@ class SolarPanelsSimulator(object):
             return to_calmp
         return 0
         
-    def random_tumbling(self, max_rotation_speed = 5, solar_panels_are_deployed = False, sail_is_deployed = False):
+    def random_tumbling(self, min_rotation_speed = 0.1, max_rotation_speed = 5, solar_panels_are_deployed = False, sail_is_deployed = False):
         eps_power_supply = PowerSupply("EPS", config.get("EPS_POWER_SUPPLY_COM"), config.get("EPS_POWER_SUPPLY_SN"))
         eps_power_supply.set_outputs([12.0, 0], [12.0, 0], [6.0, 0])
         eps_power_supply.turn_on()
 
         while True:
-            rotation_x_speed = random.uniform(-max_rotation_speed, max_rotation_speed)
-            rotation_y_speed = random.uniform(-max_rotation_speed, max_rotation_speed)
-            rotation_z_speed = random.uniform(-max_rotation_speed, max_rotation_speed)
+            if random.uniform(0, 1) == 0:
+                rotation_x_speed = random.uniform(min_rotation_speed, max_rotation_speed)
+                rotation_y_speed = random.uniform(min_rotation_speed, max_rotation_speed)
+                rotation_z_speed = random.uniform(min_rotation_speed, max_rotation_speed)
+            else:
+                rotation_x_speed = random.uniform(-max_rotation_speed, -min_rotation_speed)
+                rotation_y_speed = random.uniform(-max_rotation_speed, -min_rotation_speed)
+                rotation_z_speed = random.uniform(-max_rotation_speed, -min_rotation_speed)
+
             print "New quaternion angles:", rotation_x_speed, rotation_y_speed, rotation_z_speed
 
             quaternion_x = Quaternion(axis = [1, 0, 0], angle = math.radians(rotation_x_speed / self.SAMPLES_PER_SECOND))
@@ -125,9 +132,10 @@ class SolarPanelsSimulator(object):
                         new_current_value_yn = 0.0
 
                 eps_power_supply.set_outputs([12.0, new_current_value_yn], [12.0, new_current_value_yp], [6.0, new_current_value_x])
+                print "Rotation velocity (x, y, z):", rotation_x_speed, rotation_y_speed, rotation_z_speed
                 print([12.0, new_current_value_yn], [12.0, new_current_value_yp], [6.0, new_current_value_x])
                 time.sleep(1.0 / self.SAMPLES_PER_SECOND);
 
-            print "Waiting 36min..."
+            print "[", datetime.datetime.now(), "] Waiting 36min..."
             eps_power_supply.set_outputs([12.0, 0], [12.0, 0], [6.0, 0])
             time.sleep(36 * 60)
