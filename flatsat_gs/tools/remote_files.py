@@ -4,14 +4,14 @@ from math import ceil
 import struct
 from utils import ensure_string
 
-from response_frames import common
+from response_frames import common, file_system
 from telecommand import *
 import time
 
 class RemoteFileTools:
     @staticmethod
     def parse_file_list(frame):
-        if isinstance(frame, common.FileListSuccessFrame):
+        if isinstance(frame, file_system.FileListSuccessFrame):
             res = bytearray(frame.payload())[2:]
 
             file_list = []

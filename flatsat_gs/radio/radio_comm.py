@@ -102,6 +102,8 @@ if __name__ == '__main__':
 
 
     def parse_and_save_photo(path, data, correlation_id):
+        import response_frames as rf
+
         part = []
         for i in data:
             if isinstance(i, rf.common.FileSendSuccessFrame):
