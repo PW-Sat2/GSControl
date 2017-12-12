@@ -5,3 +5,4 @@ import fs
 import sail
 import camera
 import power
+import eps
