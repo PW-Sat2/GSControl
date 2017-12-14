@@ -1,16 +1,15 @@
 import argparse
 import logging
-from pprint import pprint
+from datetime import datetime
 from urlparse import urlparse
 
-from datetime import datetime, timedelta
 from influxdb import InfluxDBClient
 
 import response_frames
 from data_point import generate_data_points
+from devices import BeaconFrame
 from radio.radio_receiver import Receiver
 from tools.parse_beacon import ParseBeacon
-from utils import ensure_byte_list
 
 
 class BeaconUploaderApp(object):
@@ -42,15 +41,15 @@ class BeaconUploaderApp(object):
         self._log.info("Pushing beacons from tcp://%s:%d to %s", self._args.downlink_host, self._args.downlink_port,
                        self._args.influx)
 
-        # data = self._receiver.decode_kiss(self._receiver.receive())
-        # print self._frame_decoder.decode(data)
+        while True:
+            data = self._receiver.decode_kiss(self._receiver.receive())
+            frame = self._frame_decoder.decode(data)
 
-        with open('C:/PW-Sat/obc-build/build/FlightModel/FlightModel/reports/telemetry', 'rb') as f:
-            raw_frame = f.read()
-            raw_frame = [0xCD] + ensure_byte_list(raw_frame)
-            beacon = self._frame_decoder.decode(raw_frame)
+            if not isinstance(frame, BeaconFrame):
+                continue
 
-            self._process_single_beacon(datetime.utcnow(), beacon)
+            self._log.info("Received beacon frame")
+            self._process_single_beacon(datetime.utcnow(), frame)
 
     def _process_single_beacon(self, timestamp, beacon):
         telemetry = ParseBeacon.parse(beacon)
@@ -58,17 +57,3 @@ class BeaconUploaderApp(object):
         points = generate_data_points(timestamp, telemetry)
 
         self._db.write_points(points)
-
-    def _build_key(self, group, field):
-        group = group[4:]
-        field = field[6:]
-        return group + "." + field
-
-    def _decode_value(self, o):
-        if isinstance(o, timedelta):
-            return o.total_seconds()
-
-        try:
-            return self._decode_value(o.converted)
-        except AttributeError:
-            return o
