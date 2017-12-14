@@ -50,11 +50,44 @@ def _error_counter_data_points(timestamp, telemetry):
             timestamp=timestamp,
             measurement='error_counters',
             tags={
-                # "source": "comm",
                 "counter": key
             },
             fields={
                 "value": error_counters[device]
+            }
+        ))
+
+    return points
+
+
+def _lcl_data_points(timestamp, telemetry):
+    points = []
+
+    lcls = {
+        "TKmain": 1 << 0,
+        "SunS": 1 << 1,
+        "CamNadir": 1 << 2,
+        "CamWing": 1 << 3,
+        "SENS": 1 << 4,
+        "Antenna": 1 << 5,
+        "IMTQ": 1 << 6,
+    }
+
+    state = telemetry['14: Controller A']['1006: DISTR.LCL_STATE']
+    flag_b = telemetry['14: Controller A']['1013: DISTR.LCL_FLAGS']
+
+    for lcl in lcls:
+        mask = lcls[lcl]
+
+        points.append(_data_point(
+            timestamp=timestamp,
+            measurement="lcl",
+            tags={
+                "lcl": lcl
+            },
+            fields={
+                "enabled": (state & mask) == mask,
+                "flag_b": (flag_b & mask) == mask
             }
         ))
 
@@ -75,7 +108,9 @@ def generate_data_points(timestamp, telemetry):
 
     error_counters = _error_counter_data_points(timestamp, telemetry)
 
-    points = telemetry_point + error_counters
+    lcl = _lcl_data_points(timestamp, telemetry)
+
+    points = telemetry_point + error_counters + lcl
 
     for p in points:
         p['tags'].update(tags)
