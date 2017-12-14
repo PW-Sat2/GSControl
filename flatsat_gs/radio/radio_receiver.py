@@ -3,6 +3,7 @@ import os
 import sys
 
 import zmq
+from zmq.utils.win32 import allow_interrupt
 
 try:
     from utils import ensure_string, ensure_byte_list
@@ -16,7 +17,7 @@ except ImportError:
 
 class Receiver:
     def __init__(self, target="localhost", port=7001):
-        self.context = zmq.Context()
+        self.context = zmq.Context.instance()
         self.sock = self.context.socket(zmq.SUB)
         self.sock.connect("tcp://%s:%d" % (target, port))
         self.sock.setsockopt(zmq.SUBSCRIBE, "")
@@ -34,7 +35,20 @@ class Receiver:
         while self.receive_no_wait() is not None:
             pass
 
-        return self.sock.recv()
+        with self.context.socket(zmq.PAIR) as abort_send, self.context.socket(zmq.PAIR) as abort_recv:
+            abort_send.bind('inproc://receiver/abort')
+            abort_recv.connect('inproc://receiver/abort')
+
+            def stop():
+                abort_send.send('QUIT')
+
+            with allow_interrupt(stop):
+                (read, _, _) = zmq.select([self.sock, abort_recv], [], [self.sock, abort_recv])
+
+                if read[0] == self.sock:
+                    return self.sock.recv()
+                else:
+                    return None
 
     def receive_no_wait(self):
         self.sock.setsockopt(zmq.RCVTIMEO, 0)

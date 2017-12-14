@@ -26,7 +26,7 @@ class Wrap:
 
 class Sender:
     def __init__(self, target="localhost", port=7000, source_callsign='SP3SAT', destination_callsign='PWSAT2-0'):
-        self.context = zmq.Context()
+        self.context = zmq.Context.instance()
         self.sock = self.context.socket(zmq.PUB)
         self.sock.connect("tcp://%s:%d" % (target, port))
         time.sleep(1)
