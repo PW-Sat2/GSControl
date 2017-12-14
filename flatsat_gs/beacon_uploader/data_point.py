@@ -34,7 +34,31 @@ def _telemetry_fields(telemetry):
             key = _build_key(group, field)
 
             fields[key] = _decode_value(telemetry[group][field])
+
     return fields
+
+
+def _error_counter_data_points(timestamp, telemetry):
+    points = []
+
+    error_counters = telemetry['04: Error Counters']
+
+    for device in error_counters:
+        key = device[6:]
+
+        points.append(_data_point(
+            timestamp=timestamp,
+            measurement='error_counters',
+            tags={
+                # "source": "comm",
+                "counter": key
+            },
+            fields={
+                "value": error_counters[device]
+            }
+        ))
+
+    return points
 
 
 def generate_data_points(timestamp, telemetry):
@@ -42,11 +66,18 @@ def generate_data_points(timestamp, telemetry):
         "source": "comm",
     }
 
-    point = _data_point(
+    telemetry_point = [_data_point(
         timestamp=timestamp,
         measurement="beacon",
         tags=tags,
         fields=_telemetry_fields(telemetry)
-    )
+    )]
 
-    return [point]
+    error_counters = _error_counter_data_points(timestamp, telemetry)
+
+    points = telemetry_point + error_counters
+
+    for p in points:
+        p['tags'].update(tags)
+
+    return points
