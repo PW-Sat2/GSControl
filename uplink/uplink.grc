@@ -73,12 +73,20 @@
       <value>True</value>
     </param>
     <param>
+      <key>sizing_mode</key>
+      <value>fixed</value>
+    </param>
+    <param>
       <key>thread_safe_setters</key>
       <value></value>
     </param>
     <param>
       <key>title</key>
       <value>AFSK 1200/2200 AX.25 uplink transmitter</value>
+    </param>
+    <param>
+      <key>placement</key>
+      <value>(0,0)</value>
     </param>
   </block>
   <block>
@@ -831,6 +839,49 @@
     </param>
   </block>
   <block>
+    <key>frame_source</key>
+    <param>
+      <key>addr</key>
+      <value>tcp://*:7000</value>
+    </param>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>affinity</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(207, 131)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>frame_source_0</value>
+    </param>
+    <param>
+      <key>maxoutbuf</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>minoutbuf</key>
+      <value>0</value>
+    </param>
+  </block>
+  <block>
     <key>kiss_hdlc_framer</key>
     <param>
       <key>alias</key>
@@ -944,7 +995,7 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>1</value>
+      <value>0</value>
     </param>
     <param>
       <key>auto_filter</key>
@@ -969,10 +1020,6 @@
     <param>
       <key>uri</key>
       <value>ip:pluto.local</value>
-    </param>
-    <param>
-      <key>interpolation</key>
-      <value>1</value>
     </param>
     <param>
       <key>frequency</key>
@@ -1284,6 +1331,10 @@
       <value></value>
     </param>
     <param>
+      <key>direction</key>
+      <value>Uplink</value>
+    </param>
+    <param>
       <key>_enabled</key>
       <value>True</value>
     </param>
@@ -1302,53 +1353,6 @@
     <param>
       <key>id</key>
       <value>save_frame_0</value>
-    </param>
-  </block>
-  <block>
-    <key>zeromq_sub_msg_source</key>
-    <param>
-      <key>address</key>
-      <value>tcp://localhost:7000</value>
-    </param>
-    <param>
-      <key>alias</key>
-      <value></value>
-    </param>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>affinity</key>
-      <value></value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(168, 128)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>zeromq_sub_msg_source_0</value>
-    </param>
-    <param>
-      <key>maxoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>minoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>timeout</key>
-      <value>100</value>
     </param>
   </block>
   <connection>
@@ -1412,6 +1416,18 @@
     <sink_key>0</sink_key>
   </connection>
   <connection>
+    <source_block_id>frame_source_0</source_block_id>
+    <sink_block_id>kiss_hdlc_framer_0</sink_block_id>
+    <source_key>out</source_key>
+    <sink_key>in</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>frame_source_0</source_block_id>
+    <sink_block_id>save_frame_0</sink_block_id>
+    <source_key>out</source_key>
+    <sink_key>in</sink_key>
+  </connection>
+  <connection>
     <source_block_id>kiss_hdlc_framer_0</source_block_id>
     <sink_block_id>blocks_pdu_to_tagged_stream_0</sink_block_id>
     <source_key>out</source_key>
@@ -1428,17 +1444,5 @@
     <sink_block_id>analog_nbfm_tx_0_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
-  </connection>
-  <connection>
-    <source_block_id>zeromq_sub_msg_source_0</source_block_id>
-    <sink_block_id>kiss_hdlc_framer_0</sink_block_id>
-    <source_key>out</source_key>
-    <sink_key>in</sink_key>
-  </connection>
-  <connection>
-    <source_block_id>zeromq_sub_msg_source_0</source_block_id>
-    <sink_block_id>save_frame_0</sink_block_id>
-    <source_key>out</source_key>
-    <sink_key>in</sink_key>
   </connection>
 </flow_graph>

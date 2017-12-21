@@ -73,12 +73,20 @@
       <value>True</value>
     </param>
     <param>
+      <key>sizing_mode</key>
+      <value>fixed</value>
+    </param>
+    <param>
       <key>thread_safe_setters</key>
       <value></value>
     </param>
     <param>
       <key>title</key>
       <value></value>
+    </param>
+    <param>
+      <key>placement</key>
+      <value>(0,0)</value>
     </param>
   </block>
   <block>
@@ -1154,6 +1162,41 @@
     </param>
   </block>
   <block>
+    <key>frame_sink</key>
+    <param>
+      <key>addr</key>
+      <value>tcp://*:7001</value>
+    </param>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>affinity</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>1</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(3022, 147)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>frame_sink_1</value>
+    </param>
+  </block>
+  <block>
     <key>freq_xlating_fir_filter_xxx</key>
     <param>
       <key>alias</key>
@@ -1260,7 +1303,7 @@
     </param>
     <param>
       <key>trim_fcs</key>
-      <value>False</value>
+      <value>True</value>
     </param>
   </block>
   <block>
@@ -3669,45 +3712,6 @@
       <value>save_frame_0</value>
     </param>
   </block>
-  <block>
-    <key>zeromq_pub_msg_sink</key>
-    <param>
-      <key>address</key>
-      <value>tcp://*:7001</value>
-    </param>
-    <param>
-      <key>alias</key>
-      <value></value>
-    </param>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>affinity</key>
-      <value></value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(3024, 192)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>zeromq_pub_msg_sink_0</value>
-    </param>
-    <param>
-      <key>timeout</key>
-      <value>100</value>
-    </param>
-  </block>
   <connection>
     <source_block_id>analog_agc_xx_0</source_block_id>
     <sink_block_id>digital_costas_loop_cc_0</sink_block_id>
@@ -3836,13 +3840,13 @@
   </connection>
   <connection>
     <source_block_id>kiss_hdlc_deframer_0</source_block_id>
-    <sink_block_id>save_frame_0</sink_block_id>
+    <sink_block_id>frame_sink_1</sink_block_id>
     <source_key>out</source_key>
     <sink_key>in</sink_key>
   </connection>
   <connection>
     <source_block_id>kiss_hdlc_deframer_0</source_block_id>
-    <sink_block_id>zeromq_pub_msg_sink_0</sink_block_id>
+    <sink_block_id>save_frame_0</sink_block_id>
     <source_key>out</source_key>
     <sink_key>in</sink_key>
   </connection>
