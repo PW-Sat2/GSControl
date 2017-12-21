@@ -1,9 +1,25 @@
 import unittest
 
-from datetime import datetime
+from datetime import datetime, timedelta
+
+from hypothesis import given
+import hypothesis.strategies as st
 
 from telemetry import determine_files_timespan, FileView, TelemetryView, MAX_TELEMETRY_IN_FILE, chunks_count, \
     TELEMETRY_INTERVAL, MAX_FILE_TIME_SPAN
+
+
+@st.composite
+def telemetry_file_data(draw, stamp=st.datetimes(), chunks=st.integers(min_value=1, max_value=MAX_TELEMETRY_IN_FILE)):
+    return draw(stamp), draw(chunks)
+
+
+@st.composite
+def estimation_data(draw, base=telemetry_file_data()):
+    (stamp, chunks) = draw(base)
+    next_stamp = draw(st.datetimes(min_value=stamp + timedelta(seconds=1)))
+
+    return stamp, chunks, next_stamp
 
 
 class TelemetryFilesCalculatorTest(unittest.TestCase):
@@ -89,11 +105,31 @@ class TelemetryFilesCalculatorTest(unittest.TestCase):
         self.assertEqual(chunks_count(512 * 1024), MAX_TELEMETRY_IN_FILE)
 
     def assertValidTelemetryView(self, view):
-        self.assertLess(view.current_file_view.first_entry, view.current_file_view.last_entry)
-        self.assertLess(view.previous_file_view.last_entry, view.current_file_view.first_entry)
-        self.assertLess(view.previous_file_view.first_entry, view.previous_file_view.last_entry)
-        self.assertEqual(view.previous_file_view.chunks, MAX_TELEMETRY_IN_FILE)
+        self.assertLessEqual(view.current_file_view.first_entry, view.current_file_view.last_entry, "Current: first < last")
+        self.assertLess(view.previous_file_view.last_entry, view.current_file_view.first_entry, "Current: first < last")
+        self.assertLess(view.previous_file_view.first_entry, view.previous_file_view.last_entry, "Previous last < current first")
+        self.assertEqual(view.previous_file_view.chunks, MAX_TELEMETRY_IN_FILE, "Previous is full")
 
-        self.assertEqual(view.current_file_view.first_entry - view.previous_file_view.last_entry, TELEMETRY_INTERVAL)
+        self.assertEqual(view.current_file_view.first_entry - view.previous_file_view.last_entry, TELEMETRY_INTERVAL, "30 seconds between last previous and first current")
 
-        self.assertEqual(view.previous_file_view.last_entry - view.previous_file_view.first_entry, MAX_FILE_TIME_SPAN)
+        self.assertEqual(view.previous_file_view.last_entry - view.previous_file_view.first_entry, MAX_FILE_TIME_SPAN, "previous spans over maximum time")
+
+    # @given(stamp=st.datetimes(), current_chunks=st.integers(min_value=1, max_value=MAX_TELEMETRY_IN_FILE))
+    @given(telemetry_file_data())
+    def test_construct_valid_telemetry_view_from_chunks_count_and_timestamp(self, args):
+        (stamp, current_chunks) = args
+
+        view = TelemetryView(stamp, current_chunks, MAX_TELEMETRY_IN_FILE)
+
+        self.assertValidTelemetryView(view)
+
+    @given(estimation_data())
+    def test_estimate_valid_telemetry_view(self, args):
+        stamp, current_chunks, next_stamp = args
+
+        view = TelemetryView(stamp, current_chunks, MAX_TELEMETRY_IN_FILE)
+
+        next_view = view.estimate_at(next_stamp)
+
+        self.assertValidTelemetryView(next_view)
+

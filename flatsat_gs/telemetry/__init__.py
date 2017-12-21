@@ -24,6 +24,9 @@ class FileView(object):
         self.last_entry = timestamp
         self.first_entry = timestamp - (chunks - 1) * TELEMETRY_INTERVAL
 
+        self.space_left = MAX_TELEMETRY_IN_FILE - self.chunks
+        self.estimated_file_end = self.last_entry + self.space_left * TELEMETRY_INTERVAL
+
     def __repr__(self):
         return '{} -> {}'.format(self.first_entry, self.last_entry)
 
@@ -46,6 +49,9 @@ class TelemetryView(object):
             return TelemetryView(asof, overflow, MAX_TELEMETRY_IN_FILE)
 
         return TelemetryView(asof, self.current_file_view.chunks + new_chunks, self.previous_file_view.chunks)
+
+    def __str__(self):
+        return '{}: (Current: {} Previous: {})'.format(self.timestamp, self.current_file_view, self.previous_file_view)
 
 
 def determine_files_timespan(file_list, file_list_time):
