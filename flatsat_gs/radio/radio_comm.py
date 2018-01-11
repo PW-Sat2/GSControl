@@ -152,7 +152,7 @@ if __name__ == '__main__':
                 (Token.String, "/"),
                 (Token.TotalSteps, str(len(tasks))),
                 (Token.String, ": "),
-                (Token.Action, action_type),
+                (Token.Action, action_type.__name__),
                 (Token.String, "("),
                 (Token.Telecommand, pprint.pformat(telecommand)),
                 (Token.String, ")... ")
@@ -160,10 +160,7 @@ if __name__ == '__main__':
 
             print_tokens(tokens, style=style)
 
-            if action_type is "Send":
-                send(task[0])
-            elif action_type is "SendReceive":
-                send_receive(task[0])
+            action_type(telecommand).do(__import__(__name__))
 
             if wait is "NoWait":
                 print_tokens([
