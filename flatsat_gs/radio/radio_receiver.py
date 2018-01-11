@@ -22,6 +22,11 @@ class Receiver:
         self.sock.connect("tcp://%s:%d" % (target, port))
         self.sock.setsockopt(zmq.SUBSCRIBE, "")
         self.timeout(-1)
+        self.abort_send = self.context.socket(zmq.PAIR)
+        self.abort_recv = self.context.socket(zmq.PAIR)
+
+        self.abort_send.bind('inproc://receiver/abort')
+        self.abort_recv.connect('inproc://receiver/abort')
 
     def connect(self):
         print "Connect not used. Remove!"
@@ -35,20 +40,20 @@ class Receiver:
         while self.receive_no_wait() is not None:
             pass
 
-        with self.context.socket(zmq.PAIR) as abort_send, self.context.socket(zmq.PAIR) as abort_recv:
-            abort_send.bind('inproc://receiver/abort')
-            abort_recv.connect('inproc://receiver/abort')
+        def stop():
+            self.abort_send.send('QUIT')
 
-            def stop():
-                abort_send.send('QUIT')
+        self._flush_socket(self.abort_recv, -1)
 
-            with allow_interrupt(stop):
-                (read, _, _) = zmq.select([self.sock, abort_recv], [], [self.sock, abort_recv])
+        with allow_interrupt(stop):
+            (read, _, _) = zmq.select([self.sock, self.abort_recv], [], [self.sock, self.abort_recv])
 
-                if read[0] == self.sock:
-                    return self.sock.recv()
-                else:
-                    return None
+            if read[0] == self.sock:
+                return self.sock.recv()
+            elif read[0] == self.abort_recv:
+                return None
+            else:
+                return None
 
     def receive_no_wait(self):
         self.sock.setsockopt(zmq.RCVTIMEO, 0)
@@ -62,7 +67,7 @@ class Receiver:
             return val
 
     def decode_kiss(self, frame):
-        frame = frame[16:-2]
+        frame = frame[16:]
 
         return ensure_byte_list(frame)
 
@@ -78,6 +83,17 @@ class Receiver:
 
     def disconnect(self):
         print "Disconnect not used. Remove!"
+
+    def _flush_socket(self, socket, timeout):
+        socket.setsockopt(zmq.RCVTIMEO, 0)
+
+        while True:
+            try:
+                socket.recv()
+            except zmq.Again:
+                break
+
+        socket.setsockopt(zmq.RCVTIMEO, timeout)
 
 
 if __name__ == '__main__':
