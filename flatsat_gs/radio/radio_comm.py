@@ -1,6 +1,5 @@
 import os
 import sys
-import aprs
 
 if __name__ == '__main__':
     sys.path.append(os.path.join(os.path.dirname(__file__), '../PWSat2OBC/integration_tests'))
@@ -121,26 +120,63 @@ if __name__ == '__main__':
             json.dump(beacons, f, default=ParseBeacon.convert_values, sort_keys=True, indent=4)
 
     def run(tasks):
+        """
+        Performs list of tasks.
+
+        Each task is defined as list: [<telecommand object>, "Send|SendReceive", "Wait|NoWait"]
+
+        When using "Wait" it is necessary to type 'n<ENTER>' to continue running tasks
+        """
         import pprint
-        import datetime
+        from prompt_toolkit.shortcuts import print_tokens
+        from prompt_toolkit.styles import style_from_dict
+        from pygments.token import Token
+
+        style = style_from_dict({
+            Token.CurrentStep: '#b58900',
+            Token.TotalSteps: '#6c71c4',
+            Token.Action: '#dc322f',
+            Token.Telecommand: '#268bd2',
+        })
+
         step_no = 0
 
         for task in tasks:
             step_no += 1
-            print "Step no. ", step_no
-            pprint.pprint(task)
 
-            if task[1] is "Send":
+            [telecommand, action_type, wait] = task
+
+            tokens = [
+                (Token.String, "Step "),
+                (Token.CurrentStep, str(step_no)),
+                (Token.String, "/"),
+                (Token.TotalSteps, str(len(tasks))),
+                (Token.String, ": "),
+                (Token.Action, action_type),
+                (Token.String, "("),
+                (Token.Telecommand, pprint.pformat(telecommand)),
+                (Token.String, ")... ")
+            ]
+
+            print_tokens(tokens, style=style)
+
+            if action_type is "Send":
                 send(task[0])
-            elif task[1] is "SendReceive":
+            elif action_type is "SendReceive":
                 send_receive(task[0])
 
-            if task[2] is "NoWait":
-                print("NoWait")
+            if wait is "NoWait":
+                print_tokens([
+                    (Token.String, "Done"),
+                    (Token.String, "\n")
+                ], style=style)
             else:
-                print("Waiting...")
+                print_tokens([
+                    (Token.String, "Wait (type 'n' and press <Enter>)")
+                ], style=style)
+
                 user = ""
-                while user is not "n":
+                while user[:1] != "n":
                     user = raw_input()
 
     shell = InteractiveShellEmbed(config=cfg, user_ns={'parse_and_save_raw_and_photo': parse_and_save_raw_and_photo,
