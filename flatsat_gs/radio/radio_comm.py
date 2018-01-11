@@ -141,10 +141,8 @@ if __name__ == '__main__':
 
         step_no = 0
 
-        for task in tasks:
+        for [telecommand, action_type, wait] in tasks:
             step_no += 1
-
-            [telecommand, action_type, wait] = task
 
             tokens = [
                 (Token.String, "Step "),

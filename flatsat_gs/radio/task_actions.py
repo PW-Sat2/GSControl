@@ -28,3 +28,14 @@ class Print(object):
             (Token.Msg, self.text),
             (Token, "\n"),
         ], style=style_from_dict({Token.Msg: 'reverse'}))
+
+
+class Sleep(object):
+    def __init__(self, arg):
+        self.seconds = arg
+
+    def do(self, comm):
+        from time import sleep
+        sleep(self.seconds)
+
+
