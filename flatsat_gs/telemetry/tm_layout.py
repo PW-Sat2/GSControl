@@ -4,12 +4,25 @@ import os
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 from datetime import datetime, timedelta
-
 from telemetry import TelemetryView, FileView, MAX_TELEMETRY_IN_FILE, MAX_FILE_TIME_SPAN
+import argparse
 
-timestamp = datetime.now() - timedelta(hours=1)
 
-base_view = TelemetryView(timestamp, 1000, MAX_TELEMETRY_IN_FILE)
+def parse_datetime(s):
+    try:
+        return datetime.strptime(s, "%Y-%m-%d %H:%M:%S")
+    except ValueError:
+        raise argparse.ArgumentTypeError("Not a valid date: '{0}'.".format(s))
+
+
+args_parser = argparse.ArgumentParser()
+args_parser.add_argument('time', type=parse_datetime, help='Timestamp (YYYY-MM-DD HH:MM:SS)')
+args_parser.add_argument('current', type=int, help='Number off chunks in telemetry.current')
+args_parser.add_argument('output', type=str, help="Path to output file (jpg)")
+
+args = args_parser.parse_args()
+
+base_view = TelemetryView(args.time, args.current, MAX_TELEMETRY_IN_FILE)
 
 from PIL import Image, ImageDraw, ImageFont
 
@@ -72,10 +85,10 @@ def draw_telemetry_file(start, height, draw, file_view, label):
     draw.text(text=date_format(file_view.last_entry), font=DateLabelFont, fill='black',
               xy=(last_entry_x, date_labels_y + 5))
 
-    (estimated_end_w, _) = draw.textsize(text=date_format(file_view.estimated_file_end), font=DateLabelFont)
+    (estimated_end_w, estimated_end_h) = draw.textsize(text=date_format(file_view.estimated_file_end), font=DateLabelFont)
 
     draw.text(text=date_format(file_view.estimated_file_end), font=DateLabelFont, fill='black',
-              xy=(img_w - SIDE_PADDING - estimated_end_w, rect_bottom + 5))
+              xy=(img_w - SIDE_PADDING - estimated_end_w, rect_top - 5 - estimated_end_h))
 
     now = datetime.now()
 
@@ -99,4 +112,4 @@ draw_telemetry_file(50 + int(0.5 * h), int(0.3 * h), draw, base_view.previous_fi
 
 del draw
 
-img.save('D:/tmp/tm.jpg', 'JPEG')
+img.save(args.output, 'JPEG')
