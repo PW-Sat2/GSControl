@@ -1,6 +1,8 @@
 import os
 import sys
 
+from datetime import datetime
+
 if __name__ == '__main__':
     sys.path.append(os.path.join(os.path.dirname(__file__), '../PWSat2OBC/integration_tests'))
     sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
@@ -123,7 +125,7 @@ if __name__ == '__main__':
         """
         Performs list of tasks.
 
-        Each task is defined as list: [<telecommand object>, "Send|SendReceive", "Wait|NoWait"]
+        Each task is defined as list: [<telecommand object>, Send|SendReceive, "Wait|NoWait"]
 
         When using "Wait" it is necessary to type 'n<ENTER>' to continue running tasks
         """
@@ -133,6 +135,7 @@ if __name__ == '__main__':
         from pygments.token import Token
 
         style = style_from_dict({
+            Token.Timestamp: '#fdf6e3',
             Token.CurrentStep: '#b58900',
             Token.TotalSteps: '#6c71c4',
             Token.Action: '#dc322f',
@@ -145,6 +148,9 @@ if __name__ == '__main__':
             step_no += 1
 
             tokens = [
+                (Token.String, "["),
+                (Token.Timestamp, datetime.now().strftime('%Y-%m-%d %H:%M:%S:%f')),
+                (Token.String, "] "),
                 (Token.String, "Step "),
                 (Token.CurrentStep, str(step_no)),
                 (Token.String, "/"),
