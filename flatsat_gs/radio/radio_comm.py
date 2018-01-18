@@ -17,6 +17,7 @@ if __name__ == '__main__':
     from pygments.token import Token
     from traitlets.config.loader import Config
     from utils import ensure_string, ensure_byte_list
+    from radio_frame_decoder import FallbackResponseDecorator
 
     parser = argparse.ArgumentParser()
 
@@ -34,61 +35,49 @@ if __name__ == '__main__':
     args = parser.parse_args()
     imp.load_source('config', args.config)
 
-
     class MyPrompt(Prompts):
         def in_prompt_tokens(self, cli=None):
             return [(Token.Prompt, 'COMM'),
                     (Token.Prompt, '> ')]
 
-
     cfg = Config()
-    frame_decoder = response_frames.FrameDecoder(response_frames.frame_factories)
+    frame_decoder = FallbackResponseDecorator(response_frames.FrameDecoder(response_frames.frame_factories))
 
     sender = Sender(args.uplink_host, args.uplink_port)
     rcv = Receiver(args.downlink_host, args.downlink_port)
-
 
     def receive():
         data = rcv.decode_kiss(rcv.receive())
         return frame_decoder.decode(data)
 
-
     def receive_raw():
         return rcv.decode_kiss(rcv.receive())
-
 
     def set_timeout(timeout_in_ms=-1):
         rcv.timeout(timeout_in_ms)
 
-
     def send(frame):
         sender.send(frame)
-
 
     def send_receive(frame):
         send(frame)
         return receive()
 
-
     def get_sender():
         return sender
-
 
     def get_receiver():
         return rcv
 
-
     def get_beacon():
         from tools.parse_beacon import ParseBeacon
         return ParseBeacon.parse(send_receive(SendBeacon()))
-
 
     def get_file(file_dict):
         downloader = RemoteFile(sender, rcv)
         data = downloader.download(file_dict)
 
         return data
-
 
     def parse_and_save(path, data, correlation_id):
         import response_frames as rf
@@ -102,7 +91,6 @@ if __name__ == '__main__':
         for i in part:
             part_response.append(i.response)
         RemoteFileTools.save_chunks(path, part_response)
-
 
     def parse_and_save_photo(path, data, correlation_id):
         import response_frames as rf
@@ -118,11 +106,9 @@ if __name__ == '__main__':
             part_response.append(i.response)
         RemoteFileTools.save_photo(path, part_response)
 
-
     def parse_and_save_raw_and_photo(path, data, correlation_id):
         parse_and_save_photo(path + '.jpg', data, correlation_id)
         parse_and_save(path + '.raw', data, correlation_id)
-
 
     def save_beacons(path, data):
         from tools.parse_beacon import ParseBeacon
@@ -133,7 +119,6 @@ if __name__ == '__main__':
 
         with open(path, 'w') as f:
             json.dump(beacons, f, default=ParseBeacon.convert_values, sort_keys=True, indent=4)
-
 
     def run(tasks):
         import pprint
@@ -157,7 +142,6 @@ if __name__ == '__main__':
                 user = ""
                 while user is not "n":
                     user = raw_input()
-
 
     shell = InteractiveShellEmbed(config=cfg, user_ns={'parse_and_save_raw_and_photo': parse_and_save_raw_and_photo,
                                                        'save_beacons': save_beacons,
