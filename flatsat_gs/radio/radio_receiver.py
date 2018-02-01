@@ -13,6 +13,7 @@ except ImportError:
     sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
     from utils import ensure_string, ensure_byte_list
     import response_frames
+    from radio_frame_decoder import FallbackResponseDecorator
 
 
 class Receiver:
@@ -72,7 +73,7 @@ class Receiver:
         return ensure_byte_list(frame)
 
     def make_frame(self, frame):
-        frame_decoder = response_frames.FrameDecoder(response_frames.frame_factories)
+        frame_decoder = FallbackResponseDecorator(response_frames.FrameDecoder(response_frames.frame_factories))
         return frame_decoder.decode(frame)
 
     def receive_frame(self):
@@ -123,16 +124,13 @@ if __name__ == '__main__':
     args = parser.parse_args()
     imp.load_source('config', args.config)
 
-
     class MyPrompt(Prompts):
         def in_prompt_tokens(self, cli=None):
             return [(Token.Prompt, 'COMM'),
                     (Token.Prompt, '> ')]
 
-
     cfg = Config()
-    frame_decoder = response_frames.FrameDecoder(response_frames.frame_factories)
-
+    frame_decoder = FallbackResponseDecorator(response_frames.FrameDecoder(response_frames.frame_factories))
 
     def receive():
         rcv = Receiver(args.target, args.port)
@@ -140,7 +138,6 @@ if __name__ == '__main__':
         data = rcv.decode_kiss(rcv.receive())
         rcv.disconnect()
         return frame_decoder.decode(data)
-
 
     shell = InteractiveShellEmbed(config=cfg, user_ns={'receive': receive},
                                   banner2='COMM Terminal')
