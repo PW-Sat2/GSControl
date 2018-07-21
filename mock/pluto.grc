@@ -551,7 +551,7 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>True</value>
+      <value>1</value>
     </param>
     <param>
       <key>_coordinate</key>
@@ -645,7 +645,7 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>True</value>
+      <value>1</value>
     </param>
     <param>
       <key>_coordinate</key>
@@ -790,7 +790,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(840, 472)</value>
+      <value>(824, 464)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -923,7 +923,7 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>True</value>
+      <value>1</value>
     </param>
     <param>
       <key>_coordinate</key>
@@ -1046,61 +1046,6 @@
     <param>
       <key>type</key>
       <value>byte</value>
-    </param>
-    <param>
-      <key>vlen</key>
-      <value>1</value>
-    </param>
-  </block>
-  <block>
-    <key>blocks_throttle</key>
-    <param>
-      <key>alias</key>
-      <value></value>
-    </param>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>affinity</key>
-      <value></value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>1</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(824, 724)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>blocks_throttle_0_0</value>
-    </param>
-    <param>
-      <key>ignoretag</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>maxoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>minoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>samples_per_second</key>
-      <value>samp_rate</value>
-    </param>
-    <param>
-      <key>type</key>
-      <value>float</value>
     </param>
     <param>
       <key>vlen</key>
@@ -1238,84 +1183,6 @@
     <param>
       <key>seed</key>
       <value>0x0</value>
-    </param>
-  </block>
-  <block>
-    <key>frame_sink</key>
-    <param>
-      <key>addr</key>
-      <value>tcp://localhost:7000</value>
-    </param>
-    <param>
-      <key>alias</key>
-      <value></value>
-    </param>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>affinity</key>
-      <value></value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>1</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(824, 412)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>frame_sink_0</value>
-    </param>
-  </block>
-  <block>
-    <key>frame_source</key>
-    <param>
-      <key>addr</key>
-      <value>tcp://127.0.0.1:7001</value>
-    </param>
-    <param>
-      <key>alias</key>
-      <value></value>
-    </param>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>affinity</key>
-      <value></value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(240, 652)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>frame_source_0</value>
-    </param>
-    <param>
-      <key>maxoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>minoutbuf</key>
-      <value>0</value>
     </param>
   </block>
   <block>
@@ -1966,6 +1833,92 @@
     <param>
       <key>samplerate</key>
       <value>pluto_samp_rate</value>
+    </param>
+  </block>
+  <block>
+    <key>pwsat2_frame_sink</key>
+    <param>
+      <key>addr</key>
+      <value>tcp://*:7002</value>
+    </param>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>affinity</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(824, 412)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>pwsat2_frame_sink_0</value>
+    </param>
+    <param>
+      <key>isBound</key>
+      <value>True</value>
+    </param>
+  </block>
+  <block>
+    <key>pwsat2_frame_source</key>
+    <param>
+      <key>addr</key>
+      <value>tcp://*:7003</value>
+    </param>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>affinity</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(256, 652)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>pwsat2_frame_source_0</value>
+    </param>
+    <param>
+      <key>isBound</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>maxoutbuf</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>minoutbuf</key>
+      <value>0</value>
     </param>
   </block>
   <block>
@@ -4643,7 +4596,7 @@
   </connection>
   <connection>
     <source_block_id>blocks_multiply_const_vxx_0</source_block_id>
-    <sink_block_id>blocks_throttle_0_0</sink_block_id>
+    <sink_block_id>blocks_add_const_vxx_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
@@ -4672,12 +4625,6 @@
     <sink_key>0</sink_key>
   </connection>
   <connection>
-    <source_block_id>blocks_throttle_0_0</source_block_id>
-    <sink_block_id>blocks_add_const_vxx_0</sink_block_id>
-    <source_key>0</source_key>
-    <sink_key>0</sink_key>
-  </connection>
-  <connection>
     <source_block_id>blocks_uchar_to_float_0</source_block_id>
     <sink_block_id>blocks_multiply_const_vxx_0</sink_block_id>
     <source_key>0</source_key>
@@ -4696,12 +4643,6 @@
     <sink_key>0</sink_key>
   </connection>
   <connection>
-    <source_block_id>frame_source_0</source_block_id>
-    <sink_block_id>kiss_hdlc_framer_0</sink_block_id>
-    <source_key>out</source_key>
-    <sink_key>in</sink_key>
-  </connection>
-  <connection>
     <source_block_id>freq_xlating_fir_filter_xxx_0</source_block_id>
     <sink_block_id>blocks_multiply_const_vxx_1</sink_block_id>
     <source_key>0</source_key>
@@ -4715,7 +4656,7 @@
   </connection>
   <connection>
     <source_block_id>kiss_hdlc_deframer_0</source_block_id>
-    <sink_block_id>frame_sink_0</sink_block_id>
+    <sink_block_id>pwsat2_frame_sink_0</sink_block_id>
     <source_key>out</source_key>
     <sink_key>in</sink_key>
   </connection>
@@ -4814,6 +4755,12 @@
     <sink_block_id>qtgui_waterfall_sink_x_3</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>pwsat2_frame_source_0</source_block_id>
+    <sink_block_id>kiss_hdlc_framer_0</sink_block_id>
+    <source_key>out</source_key>
+    <sink_key>in</sink_key>
   </connection>
   <connection>
     <source_block_id>rational_resampler_xxx_0</source_block_id>
