@@ -73,20 +73,12 @@
       <value>True</value>
     </param>
     <param>
-      <key>sizing_mode</key>
-      <value>fixed</value>
-    </param>
-    <param>
       <key>thread_safe_setters</key>
       <value></value>
     </param>
     <param>
       <key>title</key>
       <value></value>
-    </param>
-    <param>
-      <key>placement</key>
-      <value>(0,0)</value>
     </param>
   </block>
   <block>
@@ -507,7 +499,7 @@
     </param>
     <param>
       <key>stop</key>
-      <value>0.1</value>
+      <value>10</value>
     </param>
     <param>
       <key>rangeType</key>
@@ -741,7 +733,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(3024, 320)</value>
+      <value>(3176, 312)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -953,7 +945,7 @@
     </param>
     <param>
       <key>w</key>
-      <value>0.1</value>
+      <value>1</value>
     </param>
     <param>
       <key>maxoutbuf</key>
@@ -1162,41 +1154,6 @@
     </param>
   </block>
   <block>
-    <key>frame_sink</key>
-    <param>
-      <key>addr</key>
-      <value>tcp://*:7001</value>
-    </param>
-    <param>
-      <key>alias</key>
-      <value></value>
-    </param>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>affinity</key>
-      <value></value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>1</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(3022, 147)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>frame_sink_1</value>
-    </param>
-  </block>
-  <block>
     <key>freq_xlating_fir_filter_xxx</key>
     <param>
       <key>alias</key>
@@ -1256,6 +1213,53 @@
     </param>
   </block>
   <block>
+    <key>kiss_check_address</key>
+    <param>
+      <key>address</key>
+      <value>PWSAT2</value>
+    </param>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>affinity</key>
+      <value></value>
+    </param>
+    <param>
+      <key>direction</key>
+      <value>"from"</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(2936, 184)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>kiss_check_address_0</value>
+    </param>
+    <param>
+      <key>maxoutbuf</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>minoutbuf</key>
+      <value>0</value>
+    </param>
+  </block>
+  <block>
     <key>kiss_hdlc_deframer</key>
     <param>
       <key>alias</key>
@@ -1303,7 +1307,7 @@
     </param>
     <param>
       <key>trim_fcs</key>
-      <value>True</value>
+      <value>False</value>
     </param>
   </block>
   <block>
@@ -3670,7 +3674,7 @@
     </param>
     <param>
       <key>sym_rate</key>
-      <value>symb_rate</value>
+      <value>4*symb_rate</value>
     </param>
   </block>
   <block>
@@ -3697,11 +3701,11 @@
     </param>
     <param>
       <key>file</key>
-      <value>downlink_frames</value>
+      <value>/media/pwsat2gs/data/flatsat_comm_sessions/downlink.frames</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(3024, 276)</value>
+      <value>(3160, 248)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -3710,6 +3714,84 @@
     <param>
       <key>id</key>
       <value>save_frame_0</value>
+    </param>
+  </block>
+  <block>
+    <key>zeromq_pub_msg_sink</key>
+    <param>
+      <key>address</key>
+      <value>tcp://*:7001</value>
+    </param>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>affinity</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(3160, 176)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>zeromq_pub_msg_sink_0</value>
+    </param>
+    <param>
+      <key>timeout</key>
+      <value>100</value>
+    </param>
+  </block>
+  <block>
+    <key>zeromq_pub_msg_sink</key>
+    <param>
+      <key>address</key>
+      <value>tcp://*:7003</value>
+    </param>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>affinity</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(3176, 104)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>zeromq_pub_msg_sink_0_0</value>
+    </param>
+    <param>
+      <key>timeout</key>
+      <value>100</value>
     </param>
   </block>
   <connection>
@@ -3763,6 +3845,12 @@
   <connection>
     <source_block_id>digital_costas_loop_cc_0</source_block_id>
     <sink_block_id>qtgui_freq_sink_x_0</sink_block_id>
+    <source_key>0</source_key>
+    <sink_key>0</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>digital_costas_loop_cc_0</source_block_id>
+    <sink_block_id>qtgui_time_sink_x_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
@@ -3833,20 +3921,32 @@
     <sink_key>1</sink_key>
   </connection>
   <connection>
-    <source_block_id>kiss_hdlc_deframer_0</source_block_id>
+    <source_block_id>kiss_check_address_0</source_block_id>
     <sink_block_id>blocks_message_debug_0</sink_block_id>
-    <source_key>out</source_key>
+    <source_key>ok</source_key>
     <sink_key>print_pdu</sink_key>
   </connection>
   <connection>
-    <source_block_id>kiss_hdlc_deframer_0</source_block_id>
-    <sink_block_id>frame_sink_1</sink_block_id>
-    <source_key>out</source_key>
+    <source_block_id>kiss_check_address_0</source_block_id>
+    <sink_block_id>save_frame_0</sink_block_id>
+    <source_key>ok</source_key>
+    <sink_key>in</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>kiss_check_address_0</source_block_id>
+    <sink_block_id>zeromq_pub_msg_sink_0</sink_block_id>
+    <source_key>ok</source_key>
+    <sink_key>in</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>kiss_check_address_0</source_block_id>
+    <sink_block_id>zeromq_pub_msg_sink_0_0</sink_block_id>
+    <source_key>ok</source_key>
     <sink_key>in</sink_key>
   </connection>
   <connection>
     <source_block_id>kiss_hdlc_deframer_0</source_block_id>
-    <sink_block_id>save_frame_0</sink_block_id>
+    <sink_block_id>kiss_check_address_0</sink_block_id>
     <source_key>out</source_key>
     <sink_key>in</sink_key>
   </connection>
@@ -3859,12 +3959,6 @@
   <connection>
     <source_block_id>root_raised_cosine_filter_0_0</source_block_id>
     <sink_block_id>digital_symbol_sync_xx_0</sink_block_id>
-    <source_key>0</source_key>
-    <sink_key>0</sink_key>
-  </connection>
-  <connection>
-    <source_block_id>root_raised_cosine_filter_0_0</source_block_id>
-    <sink_block_id>qtgui_time_sink_x_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
