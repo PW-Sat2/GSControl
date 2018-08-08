@@ -333,53 +333,6 @@
     </param>
   </block>
   <block>
-    <key>afsk_afsk1200</key>
-    <param>
-      <key>alias</key>
-      <value></value>
-    </param>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>affinity</key>
-      <value></value>
-    </param>
-    <param>
-      <key>debug_level</key>
-      <value>4</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(296, 476)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>afsk_afsk1200_0</value>
-    </param>
-    <param>
-      <key>maxoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>minoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>sample_rate</key>
-      <value>symb_rate</value>
-    </param>
-  </block>
-  <block>
     <key>audio_sink</key>
     <param>
       <key>alias</key>
@@ -815,6 +768,49 @@
     </param>
   </block>
   <block>
+    <key>bruninga_fsk_demod</key>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>affinity</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(312, 484)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>bruninga_fsk_demod_0</value>
+    </param>
+    <param>
+      <key>maxoutbuf</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>minoutbuf</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>samp_rate</key>
+      <value>samp_rate</value>
+    </param>
+  </block>
+  <block>
     <key>digital_chunks_to_symbols_xx</key>
     <param>
       <key>alias</key>
@@ -871,49 +867,6 @@
     <param>
       <key>symbol_table</key>
       <value>[audio_lower, audio_higher]</value>
-    </param>
-  </block>
-  <block>
-    <key>frame_source</key>
-    <param>
-      <key>addr</key>
-      <value>tcp://127.0.0.1:7000</value>
-    </param>
-    <param>
-      <key>alias</key>
-      <value></value>
-    </param>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>affinity</key>
-      <value></value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>1</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(8, 132)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>frame_source_0</value>
-    </param>
-    <param>
-      <key>maxoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>minoutbuf</key>
-      <value>0</value>
     </param>
   </block>
   <block>
@@ -1043,6 +996,53 @@
     <param>
       <key>id</key>
       <value>kiss_nrzi_encode_0</value>
+    </param>
+    <param>
+      <key>maxoutbuf</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>minoutbuf</key>
+      <value>0</value>
+    </param>
+  </block>
+  <block>
+    <key>pwsat2_frame_source</key>
+    <param>
+      <key>addr</key>
+      <value>tcp://127.0.0.1:7000</value>
+    </param>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>affinity</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(8, 148)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>pwsat2_frame_source_0</value>
+    </param>
+    <param>
+      <key>isBound</key>
+      <value>True</value>
     </param>
     <param>
       <key>maxoutbuf</key>
@@ -1957,14 +1957,8 @@
     </param>
   </block>
   <connection>
-    <source_block_id>afsk_afsk1200_0</source_block_id>
-    <sink_block_id>kiss_hdlc_deframer_0</sink_block_id>
-    <source_key>0</source_key>
-    <sink_key>0</sink_key>
-  </connection>
-  <connection>
     <source_block_id>audio_source_0</source_block_id>
-    <sink_block_id>afsk_afsk1200_0</sink_block_id>
+    <sink_block_id>bruninga_fsk_demod_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
@@ -2023,22 +2017,16 @@
     <sink_key>0</sink_key>
   </connection>
   <connection>
-    <source_block_id>digital_chunks_to_symbols_xx_0</source_block_id>
-    <sink_block_id>blocks_vco_f_0</sink_block_id>
+    <source_block_id>bruninga_fsk_demod_0</source_block_id>
+    <sink_block_id>kiss_hdlc_deframer_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
   <connection>
-    <source_block_id>frame_source_0</source_block_id>
-    <sink_block_id>kiss_hdlc_framer_0</sink_block_id>
-    <source_key>out</source_key>
-    <sink_key>in</sink_key>
-  </connection>
-  <connection>
-    <source_block_id>frame_source_0</source_block_id>
-    <sink_block_id>save_frame_0</sink_block_id>
-    <source_key>out</source_key>
-    <sink_key>in</sink_key>
+    <source_block_id>digital_chunks_to_symbols_xx_0</source_block_id>
+    <sink_block_id>blocks_vco_f_0</sink_block_id>
+    <source_key>0</source_key>
+    <sink_key>0</sink_key>
   </connection>
   <connection>
     <source_block_id>kiss_hdlc_deframer_0</source_block_id>
@@ -2057,6 +2045,18 @@
     <sink_block_id>blocks_repeat_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>pwsat2_frame_source_0</source_block_id>
+    <sink_block_id>kiss_hdlc_framer_0</sink_block_id>
+    <source_key>out</source_key>
+    <sink_key>in</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>pwsat2_frame_source_0</source_block_id>
+    <sink_block_id>save_frame_0</sink_block_id>
+    <source_key>out</source_key>
+    <sink_key>in</sink_key>
   </connection>
   <connection>
     <source_block_id>pwsat2_ptt_0</source_block_id>
