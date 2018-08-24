@@ -21,6 +21,10 @@
       <value></value>
     </param>
     <param>
+      <key>copyright</key>
+      <value></value>
+    </param>
+    <param>
       <key>description</key>
       <value></value>
     </param>
@@ -105,11 +109,11 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1672, 120)</value>
+      <value>(1664, 84)</value>
     </param>
     <param>
       <key>gui_hint</key>
-      <value></value>
+      <value>5,1,1,1</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -219,11 +223,11 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(968, 360)</value>
+      <value>(952, 376)</value>
     </param>
     <param>
       <key>gui_hint</key>
-      <value></value>
+      <value>1,1,1,1</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -322,7 +326,7 @@
     </param>
     <param>
       <key>gui_hint</key>
-      <value>0,1,1,1</value>
+      <value>2,1,1,1</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -381,11 +385,11 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(680, 320)</value>
+      <value>(432, 648)</value>
     </param>
     <param>
       <key>gui_hint</key>
-      <value></value>
+      <value>4,1,1,1</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -440,7 +444,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(680, 436)</value>
+      <value>(648, 468)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -475,7 +479,7 @@
     </param>
     <param>
       <key>gui_hint</key>
-      <value>0,0,1,1</value>
+      <value>6,1,1,1</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -619,7 +623,7 @@
     </param>
     <param>
       <key>gui_hint</key>
-      <value>0,2,1,1</value>
+      <value>3,1,1,1</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -737,11 +741,11 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>True</value>
+      <value>1</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(3024, 320)</value>
+      <value>(3040, 216)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -750,69 +754,6 @@
     <param>
       <key>id</key>
       <value>blocks_message_debug_0</value>
-    </param>
-  </block>
-  <block>
-    <key>blocks_udp_source</key>
-    <param>
-      <key>alias</key>
-      <value></value>
-    </param>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>affinity</key>
-      <value></value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(80, 216)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>blocks_udp_source_0</value>
-    </param>
-    <param>
-      <key>ipaddr</key>
-      <value>127.0.0.1</value>
-    </param>
-    <param>
-      <key>maxoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>minoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>eof</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>type</key>
-      <value>complex</value>
-    </param>
-    <param>
-      <key>psize</key>
-      <value>1472</value>
-    </param>
-    <param>
-      <key>port</key>
-      <value>20001</value>
-    </param>
-    <param>
-      <key>vlen</key>
-      <value>1</value>
     </param>
   </block>
   <block>
@@ -902,7 +843,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(2192, 204)</value>
+      <value>(2192, 156)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -941,7 +882,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1304, 256)</value>
+      <value>(1280, 256)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -992,7 +933,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(2408, 188)</value>
+      <value>(2424, 140)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1185,7 +1126,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(3022, 147)</value>
+      <value>(3040, 100)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1224,7 +1165,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(648, 232)</value>
+      <value>(632, 232)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1279,7 +1220,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(2696, 188)</value>
+      <value>(2712, 140)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1326,7 +1267,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(2552, 208)</value>
+      <value>(2568, 160)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1377,7 +1318,7 @@
     </param>
     <param>
       <key>gui_hint</key>
-      <value></value>
+      <value>tab@3</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1740,11 +1681,11 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1504, 396)</value>
+      <value>(1496, 116)</value>
     </param>
     <param>
       <key>gui_hint</key>
-      <value></value>
+      <value>tab@1</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -2039,11 +1980,11 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(920, 148)</value>
+      <value>(928, 164)</value>
     </param>
     <param>
       <key>gui_hint</key>
-      <value></value>
+      <value>tab@4</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -2326,11 +2267,11 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1896, 52)</value>
+      <value>(1880, 100)</value>
     </param>
     <param>
       <key>gui_hint</key>
-      <value></value>
+      <value>tab@2</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -2605,6 +2546,10 @@
       <value>samp_rate</value>
     </param>
     <param>
+      <key>stemplot</key>
+      <value>False</value>
+    </param>
+    <param>
       <key>tr_chan</key>
       <value>0</value>
     </param>
@@ -2689,7 +2634,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(2232, 240)</value>
+      <value>(2192, 240)</value>
     </param>
     <param>
       <key>gui_hint</key>
@@ -2966,6 +2911,10 @@
     <param>
       <key>srate</key>
       <value>samp_rate</value>
+    </param>
+    <param>
+      <key>stemplot</key>
+      <value>False</value>
     </param>
     <param>
       <key>tr_chan</key>
@@ -3331,6 +3280,10 @@
       <value>samp_rate</value>
     </param>
     <param>
+      <key>stemplot</key>
+      <value>False</value>
+    </param>
+    <param>
       <key>tr_chan</key>
       <value>0</value>
     </param>
@@ -3419,7 +3372,7 @@
     </param>
     <param>
       <key>gui_hint</key>
-      <value></value>
+      <value>tab@0</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -3634,7 +3587,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1648, 216)</value>
+      <value>(1648, 212)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -3701,7 +3654,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(3024, 276)</value>
+      <value>(3040, 148)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -3712,21 +3665,187 @@
       <value>save_frame_0</value>
     </param>
   </block>
+  <block>
+    <key>qtgui_tab_widget</key>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(1240, 76)</value>
+    </param>
+    <param>
+      <key>gui_hint</key>
+      <value>0,0,12,1</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>tab</value>
+    </param>
+    <param>
+      <key>label0</key>
+      <value>Waterfall</value>
+    </param>
+    <param>
+      <key>label1</key>
+      <value>Tab 1</value>
+    </param>
+    <param>
+      <key>label10</key>
+      <value>Tab 10</value>
+    </param>
+    <param>
+      <key>label11</key>
+      <value>Tab 11</value>
+    </param>
+    <param>
+      <key>label12</key>
+      <value>Tab 12</value>
+    </param>
+    <param>
+      <key>label13</key>
+      <value>Tab 13</value>
+    </param>
+    <param>
+      <key>label14</key>
+      <value>Tab 14</value>
+    </param>
+    <param>
+      <key>label15</key>
+      <value>Tab 15</value>
+    </param>
+    <param>
+      <key>label16</key>
+      <value>Tab 16</value>
+    </param>
+    <param>
+      <key>label17</key>
+      <value>Tab 17</value>
+    </param>
+    <param>
+      <key>label18</key>
+      <value>Tab 18</value>
+    </param>
+    <param>
+      <key>label19</key>
+      <value>Tab 19</value>
+    </param>
+    <param>
+      <key>label2</key>
+      <value>Tab 2</value>
+    </param>
+    <param>
+      <key>label3</key>
+      <value>Constellation</value>
+    </param>
+    <param>
+      <key>label4</key>
+      <value>Tab 4</value>
+    </param>
+    <param>
+      <key>label5</key>
+      <value>Tab 5</value>
+    </param>
+    <param>
+      <key>label6</key>
+      <value>Tab 6</value>
+    </param>
+    <param>
+      <key>label7</key>
+      <value>Tab 7</value>
+    </param>
+    <param>
+      <key>label8</key>
+      <value>Tab 8</value>
+    </param>
+    <param>
+      <key>label9</key>
+      <value>Tab 9</value>
+    </param>
+    <param>
+      <key>num_tabs</key>
+      <value>5</value>
+    </param>
+  </block>
+  <block>
+    <key>zeromq_sub_source</key>
+    <param>
+      <key>address</key>
+      <value>tcp://localhost:20001</value>
+    </param>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>affinity</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(64, 276)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>hwm</key>
+      <value>-1</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>zeromq_sub_source_0</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>complex</value>
+    </param>
+    <param>
+      <key>maxoutbuf</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>minoutbuf</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>pass_tags</key>
+      <value>False</value>
+    </param>
+    <param>
+      <key>timeout</key>
+      <value>100</value>
+    </param>
+    <param>
+      <key>vlen</key>
+      <value>1</value>
+    </param>
+  </block>
   <connection>
     <source_block_id>analog_agc_xx_0</source_block_id>
     <sink_block_id>digital_costas_loop_cc_0</sink_block_id>
-    <source_key>0</source_key>
-    <sink_key>0</sink_key>
-  </connection>
-  <connection>
-    <source_block_id>blocks_udp_source_0</source_block_id>
-    <sink_block_id>channels_channel_model_0_0</sink_block_id>
-    <source_key>0</source_key>
-    <sink_key>0</sink_key>
-  </connection>
-  <connection>
-    <source_block_id>blocks_udp_source_0</source_block_id>
-    <sink_block_id>qtgui_waterfall_sink_x_1</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
@@ -3865,6 +3984,18 @@
   <connection>
     <source_block_id>root_raised_cosine_filter_0_0</source_block_id>
     <sink_block_id>qtgui_time_sink_x_0</sink_block_id>
+    <source_key>0</source_key>
+    <sink_key>0</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>zeromq_sub_source_0</source_block_id>
+    <sink_block_id>channels_channel_model_0_0</sink_block_id>
+    <source_key>0</source_key>
+    <sink_key>0</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>zeromq_sub_source_0</source_block_id>
+    <sink_block_id>qtgui_waterfall_sink_x_1</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
