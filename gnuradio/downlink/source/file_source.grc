@@ -21,6 +21,10 @@
       <value></value>
     </param>
     <param>
+      <key>copyright</key>
+      <value></value>
+    </param>
+    <param>
       <key>description</key>
       <value></value>
     </param>
@@ -73,12 +77,20 @@
       <value>True</value>
     </param>
     <param>
+      <key>sizing_mode</key>
+      <value>fixed</value>
+    </param>
+    <param>
       <key>thread_safe_setters</key>
       <value></value>
     </param>
     <param>
       <key>title</key>
       <value></value>
+    </param>
+    <param>
+      <key>placement</key>
+      <value>(0,0)</value>
     </param>
   </block>
   <block>
@@ -105,7 +117,7 @@
     </param>
     <param>
       <key>file</key>
-      <value>/media/gregg/Ext disk/SDRSharp_20170818_095635Z_435275000Hz_IQ_cut_2</value>
+      <value>path_to_iq_file</value>
     </param>
     <param>
       <key>_coordinate</key>
@@ -133,7 +145,7 @@
     </param>
     <param>
       <key>repeat</key>
-      <value>True</value>
+      <value>False</value>
     </param>
     <param>
       <key>vlen</key>
@@ -196,7 +208,11 @@
     </param>
   </block>
   <block>
-    <key>blocks_udp_sink</key>
+    <key>zeromq_pub_sink</key>
+    <param>
+      <key>address</key>
+      <value>tcp://*:20001</value>
+    </param>
     <param>
       <key>alias</key>
       <value></value>
@@ -210,40 +226,36 @@
       <value></value>
     </param>
     <param>
-      <key>ipaddr</key>
-      <value>127.0.0.1</value>
-    </param>
-    <param>
-      <key>port</key>
-      <value>20001</value>
-    </param>
-    <param>
       <key>_enabled</key>
       <value>True</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(568, 176)</value>
+      <value>(568, 180)</value>
     </param>
     <param>
       <key>_rotation</key>
       <value>0</value>
     </param>
     <param>
+      <key>hwm</key>
+      <value>-1</value>
+    </param>
+    <param>
       <key>id</key>
-      <value>blocks_udp_sink_0</value>
+      <value>zeromq_pub_sink_0</value>
     </param>
     <param>
       <key>type</key>
       <value>complex</value>
     </param>
     <param>
-      <key>psize</key>
-      <value>1472</value>
+      <key>pass_tags</key>
+      <value>False</value>
     </param>
     <param>
-      <key>eof</key>
-      <value>True</value>
+      <key>timeout</key>
+      <value>100</value>
     </param>
     <param>
       <key>vlen</key>
@@ -258,7 +270,7 @@
   </connection>
   <connection>
     <source_block_id>blocks_throttle_0</source_block_id>
-    <sink_block_id>blocks_udp_sink_0</sink_block_id>
+    <sink_block_id>zeromq_pub_sink_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
