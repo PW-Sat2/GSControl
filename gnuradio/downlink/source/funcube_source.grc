@@ -21,10 +21,6 @@
       <value></value>
     </param>
     <param>
-      <key>copyright</key>
-      <value></value>
-    </param>
-    <param>
       <key>description</key>
       <value></value>
     </param>
@@ -42,7 +38,7 @@
     </param>
     <param>
       <key>generate_options</key>
-      <value>qt_gui</value>
+      <value>no_gui</value>
     </param>
     <param>
       <key>hier_block_src_path</key>
@@ -77,125 +73,12 @@
       <value>True</value>
     </param>
     <param>
-      <key>sizing_mode</key>
-      <value>fixed</value>
-    </param>
-    <param>
       <key>thread_safe_setters</key>
       <value></value>
     </param>
     <param>
       <key>title</key>
       <value></value>
-    </param>
-    <param>
-      <key>placement</key>
-      <value>(0,0)</value>
-    </param>
-  </block>
-  <block>
-    <key>variable_qtgui_entry</key>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>value</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(216, 324)</value>
-    </param>
-    <param>
-      <key>gui_hint</key>
-      <value>6,0,1,1</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>freq_corr</value>
-    </param>
-    <param>
-      <key>label</key>
-      <value>Frequency Correction (ppm)</value>
-    </param>
-    <param>
-      <key>type</key>
-      <value>int</value>
-    </param>
-  </block>
-  <block>
-    <key>variable_qtgui_entry</key>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>value</key>
-      <value>435275000</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(8, 156)</value>
-    </param>
-    <param>
-      <key>gui_hint</key>
-      <value>2,0,1,1</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>frequency</value>
-    </param>
-    <param>
-      <key>label</key>
-      <value>PW-Sat2 Frequency (Hz)</value>
-    </param>
-    <param>
-      <key>type</key>
-      <value>int</value>
-    </param>
-  </block>
-  <block>
-    <key>variable</key>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(864, 236)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>frequency</value>
-    </param>
-    <param>
-      <key>value</key>
-      <value>435275000</value>
     </param>
   </block>
   <block>
@@ -210,15 +93,15 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>1</value>
+      <value>0</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(8, 232)</value>
+      <value>(528, 304)</value>
     </param>
     <param>
       <key>gui_hint</key>
-      <value>3,0,1,1</value>
+      <value></value>
     </param>
     <param>
       <key>_rotation</key>
@@ -230,7 +113,7 @@
     </param>
     <param>
       <key>label</key>
-      <value>Frequency Offset (Hz)</value>
+      <value>Frequency Offset</value>
     </param>
     <param>
       <key>min_len</key>
@@ -269,11 +152,11 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>0</value>
+      <value>True</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(864, 172)</value>
+      <value>(672, 300)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -289,14 +172,26 @@
     </param>
   </block>
   <block>
-    <key>variable_qtgui_entry</key>
+    <key>blocks_udp_sink</key>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
     <param>
       <key>comment</key>
       <value></value>
     </param>
     <param>
-      <key>value</key>
-      <value>0</value>
+      <key>affinity</key>
+      <value></value>
+    </param>
+    <param>
+      <key>ipaddr</key>
+      <value>127.0.0.1</value>
+    </param>
+    <param>
+      <key>port</key>
+      <value>20001</value>
     </param>
     <param>
       <key>_enabled</key>
@@ -304,11 +199,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(392, 324)</value>
-    </param>
-    <param>
-      <key>gui_hint</key>
-      <value>7,0,1,1</value>
+      <value>(648, 160)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -316,213 +207,23 @@
     </param>
     <param>
       <key>id</key>
-      <value>if_gain</value>
-    </param>
-    <param>
-      <key>label</key>
-      <value>IF Gain (dB)</value>
+      <value>blocks_udp_sink_0</value>
     </param>
     <param>
       <key>type</key>
-      <value>int</value>
-    </param>
-  </block>
-  <block>
-    <key>variable_qtgui_chooser</key>
-    <param>
-      <key>comment</key>
-      <value></value>
+      <value>complex</value>
     </param>
     <param>
-      <key>value</key>
-      <value>1</value>
+      <key>psize</key>
+      <value>1472</value>
     </param>
     <param>
-      <key>_enabled</key>
+      <key>eof</key>
       <value>True</value>
     </param>
     <param>
-      <key>_coordinate</key>
-      <value>(224, 20)</value>
-    </param>
-    <param>
-      <key>gui_hint</key>
-      <value>4,0,1,1</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>lna</value>
-    </param>
-    <param>
-      <key>label0</key>
-      <value>Enable</value>
-    </param>
-    <param>
-      <key>label1</key>
-      <value>Disable</value>
-    </param>
-    <param>
-      <key>label2</key>
-      <value></value>
-    </param>
-    <param>
-      <key>label3</key>
-      <value></value>
-    </param>
-    <param>
-      <key>label4</key>
-      <value></value>
-    </param>
-    <param>
-      <key>label</key>
-      <value>LNA</value>
-    </param>
-    <param>
-      <key>labels</key>
-      <value>[]</value>
-    </param>
-    <param>
-      <key>num_opts</key>
-      <value>2</value>
-    </param>
-    <param>
-      <key>option0</key>
+      <key>vlen</key>
       <value>1</value>
-    </param>
-    <param>
-      <key>option1</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>option2</key>
-      <value>2</value>
-    </param>
-    <param>
-      <key>option3</key>
-      <value>3</value>
-    </param>
-    <param>
-      <key>option4</key>
-      <value>4</value>
-    </param>
-    <param>
-      <key>options</key>
-      <value>[0, 1, 2]</value>
-    </param>
-    <param>
-      <key>orient</key>
-      <value>Qt.QVBoxLayout</value>
-    </param>
-    <param>
-      <key>type</key>
-      <value>int</value>
-    </param>
-    <param>
-      <key>widget</key>
-      <value>combo_box</value>
-    </param>
-  </block>
-  <block>
-    <key>variable_qtgui_chooser</key>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>value</key>
-      <value>1</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(224, 172)</value>
-    </param>
-    <param>
-      <key>gui_hint</key>
-      <value>5,0,1,1</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>mixer_gain_status</value>
-    </param>
-    <param>
-      <key>label0</key>
-      <value>Enable</value>
-    </param>
-    <param>
-      <key>label1</key>
-      <value>Disable</value>
-    </param>
-    <param>
-      <key>label2</key>
-      <value></value>
-    </param>
-    <param>
-      <key>label3</key>
-      <value></value>
-    </param>
-    <param>
-      <key>label4</key>
-      <value></value>
-    </param>
-    <param>
-      <key>label</key>
-      <value>Mixer Gain</value>
-    </param>
-    <param>
-      <key>labels</key>
-      <value>[]</value>
-    </param>
-    <param>
-      <key>num_opts</key>
-      <value>2</value>
-    </param>
-    <param>
-      <key>option0</key>
-      <value>1</value>
-    </param>
-    <param>
-      <key>option1</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>option2</key>
-      <value>2</value>
-    </param>
-    <param>
-      <key>option3</key>
-      <value>3</value>
-    </param>
-    <param>
-      <key>option4</key>
-      <value>4</value>
-    </param>
-    <param>
-      <key>options</key>
-      <value>[0, 1, 2]</value>
-    </param>
-    <param>
-      <key>orient</key>
-      <value>Qt.QVBoxLayout</value>
-    </param>
-    <param>
-      <key>type</key>
-      <value>int</value>
-    </param>
-    <param>
-      <key>widget</key>
-      <value>combo_box</value>
     </param>
   </block>
   <block>
@@ -549,15 +250,15 @@
     </param>
     <param>
       <key>freq</key>
-      <value>frequency+frequency_offset</value>
+      <value>435275000+frequency_offset</value>
     </param>
     <param>
       <key>ppm</key>
-      <value>freq_corr</value>
+      <value>0</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(560, 40)</value>
+      <value>(336, 136)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -569,11 +270,11 @@
     </param>
     <param>
       <key>if_gain</key>
-      <value>if_gain</value>
+      <value>10</value>
     </param>
     <param>
       <key>lnaswitch</key>
-      <value>lna</value>
+      <value>0</value>
     </param>
     <param>
       <key>maxoutbuf</key>
@@ -585,71 +286,16 @@
     </param>
     <param>
       <key>mixergainswitch</key>
-      <value>mixer_gain_status</value>
+      <value>1</value>
     </param>
     <param>
       <key>unit</key>
       <value>1</value>
     </param>
   </block>
-  <block>
-    <key>zeromq_pub_sink</key>
-    <param>
-      <key>address</key>
-      <value>tcp://*:20001</value>
-    </param>
-    <param>
-      <key>alias</key>
-      <value></value>
-    </param>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>affinity</key>
-      <value></value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(872, 68)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>hwm</key>
-      <value>-1</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>zeromq_pub_sink_0</value>
-    </param>
-    <param>
-      <key>type</key>
-      <value>complex</value>
-    </param>
-    <param>
-      <key>pass_tags</key>
-      <value>False</value>
-    </param>
-    <param>
-      <key>timeout</key>
-      <value>100</value>
-    </param>
-    <param>
-      <key>vlen</key>
-      <value>1</value>
-    </param>
-  </block>
   <connection>
     <source_block_id>fcdproplus_fcdproplus_0</source_block_id>
-    <sink_block_id>zeromq_pub_sink_0</sink_block_id>
+    <sink_block_id>blocks_udp_sink_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
