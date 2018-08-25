@@ -21,6 +21,10 @@
       <value></value>
     </param>
     <param>
+      <key>copyright</key>
+      <value></value>
+    </param>
+    <param>
       <key>description</key>
       <value></value>
     </param>
@@ -46,7 +50,7 @@
     </param>
     <param>
       <key>id</key>
-      <value>file_source</value>
+      <value>plutosdr_source</value>
     </param>
     <param>
       <key>max_nouts</key>
@@ -73,12 +77,20 @@
       <value>True</value>
     </param>
     <param>
+      <key>sizing_mode</key>
+      <value>fixed</value>
+    </param>
+    <param>
       <key>thread_safe_setters</key>
       <value></value>
     </param>
     <param>
       <key>title</key>
       <value></value>
+    </param>
+    <param>
+      <key>placement</key>
+      <value>(0,0)</value>
     </param>
   </block>
   <block>
@@ -97,11 +109,11 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(480, 460)</value>
+      <value>(8, 300)</value>
     </param>
     <param>
       <key>gui_hint</key>
-      <value></value>
+      <value>4,0,2,1</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -132,7 +144,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(432, 100)</value>
+      <value>(576, 44)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -148,6 +160,162 @@
     </param>
   </block>
   <block>
+    <key>variable_qtgui_entry</key>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>435275000</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(8, 84)</value>
+    </param>
+    <param>
+      <key>gui_hint</key>
+      <value>2,0,1,1</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>frequency</value>
+    </param>
+    <param>
+      <key>label</key>
+      <value>Frequency (Hz)</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>int</value>
+    </param>
+  </block>
+  <block>
+    <key>variable</key>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(176, 164)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>frequency</value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>435275000</value>
+    </param>
+  </block>
+  <block>
+    <key>variable_qtgui_range</key>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>20e3</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>1</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(8, 168)</value>
+    </param>
+    <param>
+      <key>gui_hint</key>
+      <value>3,0,1,1</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>frequency_offset</value>
+    </param>
+    <param>
+      <key>label</key>
+      <value>Frequency Offset (Hz)</value>
+    </param>
+    <param>
+      <key>min_len</key>
+      <value>200</value>
+    </param>
+    <param>
+      <key>orient</key>
+      <value>Qt.Horizontal</value>
+    </param>
+    <param>
+      <key>start</key>
+      <value>-40e3</value>
+    </param>
+    <param>
+      <key>step</key>
+      <value>10</value>
+    </param>
+    <param>
+      <key>stop</key>
+      <value>40e3</value>
+    </param>
+    <param>
+      <key>rangeType</key>
+      <value>float</value>
+    </param>
+    <param>
+      <key>widget</key>
+      <value>counter_slider</value>
+    </param>
+  </block>
+  <block>
+    <key>variable</key>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(176, 100)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>frequency_offset</value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>20e3</value>
+    </param>
+  </block>
+  <block>
     <key>variable</key>
     <param>
       <key>comment</key>
@@ -159,7 +327,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(192, 100)</value>
+      <value>(376, 44)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -186,7 +354,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(304, 100)</value>
+      <value>(480, 44)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -199,61 +367,6 @@
     <param>
       <key>value</key>
       <value>192000</value>
-    </param>
-  </block>
-  <block>
-    <key>blocks_udp_sink</key>
-    <param>
-      <key>alias</key>
-      <value></value>
-    </param>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>affinity</key>
-      <value></value>
-    </param>
-    <param>
-      <key>ipaddr</key>
-      <value>127.0.0.1</value>
-    </param>
-    <param>
-      <key>port</key>
-      <value>20001</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(696, 272)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>blocks_udp_sink_0</value>
-    </param>
-    <param>
-      <key>type</key>
-      <value>complex</value>
-    </param>
-    <param>
-      <key>psize</key>
-      <value>1472</value>
-    </param>
-    <param>
-      <key>eof</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>vlen</key>
-      <value>1</value>
     </param>
   </block>
   <block>
@@ -279,10 +392,6 @@
       <value></value>
     </param>
     <param>
-      <key>decimation</key>
-      <value>1</value>
-    </param>
-    <param>
       <key>uri</key>
       <value>ip:192.168.2.1</value>
     </param>
@@ -300,7 +409,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(216, 208)</value>
+      <value>(288, 272)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -316,7 +425,7 @@
     </param>
     <param>
       <key>frequency</key>
-      <value>435275000+20000</value>
+      <value>int(frequency+frequency_offset)</value>
     </param>
     <param>
       <key>manual_gain</key>
@@ -375,7 +484,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(472, 272)</value>
+      <value>(544, 328)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -406,6 +515,61 @@
       <value>ccc</value>
     </param>
   </block>
+  <block>
+    <key>zeromq_pub_sink</key>
+    <param>
+      <key>address</key>
+      <value>tcp://*:20001</value>
+    </param>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>affinity</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(736, 332)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>hwm</key>
+      <value>-1</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>zeromq_pub_sink_0</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>complex</value>
+    </param>
+    <param>
+      <key>pass_tags</key>
+      <value>False</value>
+    </param>
+    <param>
+      <key>timeout</key>
+      <value>100</value>
+    </param>
+    <param>
+      <key>vlen</key>
+      <value>1</value>
+    </param>
+  </block>
   <connection>
     <source_block_id>pluto_source_0</source_block_id>
     <sink_block_id>rational_resampler_xxx_0</sink_block_id>
@@ -414,7 +578,7 @@
   </connection>
   <connection>
     <source_block_id>rational_resampler_xxx_0</source_block_id>
-    <sink_block_id>blocks_udp_sink_0</sink_block_id>
+    <sink_block_id>zeromq_pub_sink_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
