@@ -1,10 +1,17 @@
-## PW-Sat2 GS-Modem
+## PW-Sat2 GSControl
 
-This repository contains source code of the PW-Sat 2 GS modem software.
+This repository contains tools dedicated for PW-Sat2 Ground Station Operation Team as well as advanced radio amateurs (gnuradio part).
 
-To run this software:
- - install gr_kiss package [[ https://github.com/PW-Sat2/gr-kiss | link ]]
- - set proper input file and sample rate for bpsk_demodulator
- - run kiss_viewer, this module will print incoming AX.25 frames
+If you are interested in receiving of PW-Sat2 downlink signal find out more at: http://radio.pw-sat.pl/ and https://github.com/PW-Sat2/HAMRadio/wiki
 
-Example of file which can be used: ftp:/gs/tests/2017-04-06/gnuradio_48kHz
+Content of the repository:
+ - gnuradio: GRC flow graphs for uplink (shared key needed) & downlink (signal sources from SDRs, downlink demodulator/frame decoder)
+ - radio: console (iPython-based) to send telecommands and receive frames (the console connects to GRC part via ZMQ)
+ - tools:
+    - grafana_beacon_uploader: beacon uploader to OPER's internal database for Grafana tool
+    - telemetry_files_analyzer: predict which telemetry file should be requested by the OPER team (`telemetry.current` / `telemetry.previous`)
+    - decode_downlink_frames.py: downlink frames decoder
+    - parse_beacon.py: methods to parse beacon frames
+    - remote_files.py: tools for remote files (i.e. satellite files) handling, decoding photos, etc.
+    - upload_software.py: script to upload software via radio
+

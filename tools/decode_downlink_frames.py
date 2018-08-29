@@ -7,8 +7,7 @@ sys.path.append(os.path.join(os.path.dirname(
     __file__), '../PWSat2OBC/integration_tests'))
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
-from tools.parse_beacon import *
-# from radio.radio_frame_decoder import *
+from radio.radio_frame_decoder import *
 
 import binascii
 
