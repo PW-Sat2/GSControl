@@ -6,6 +6,12 @@ import re
 import struct
 import json
 
+sys.path.append(os.path.join(os.path.dirname(
+    __file__), '../build/integration_tests'))
+sys.path.append(os.path.join(os.path.dirname(
+    __file__), '../PWSat2OBC/integration_tests'))
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+
 from datetime import timedelta, datetime, date, time
 
 from struct import pack
