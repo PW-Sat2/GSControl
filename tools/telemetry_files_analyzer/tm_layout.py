@@ -4,7 +4,7 @@ import os
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 from datetime import datetime, timedelta
-from telemetry import TelemetryView, FileView, MAX_TELEMETRY_IN_FILE, MAX_FILE_TIME_SPAN
+from telemetry_files_analyzer import TelemetryView, FileView, MAX_TELEMETRY_IN_FILE, MAX_FILE_TIME_SPAN
 import argparse
 
 

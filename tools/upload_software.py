@@ -19,7 +19,6 @@ from tools.parse_beacon import *
 from telecommand import *
 from response_frames import operation
 from devices import comm
-from tools.tools import SimpleLogger
 import datetime
 import pprint
 import time
