@@ -101,6 +101,45 @@
     </param>
     <param>
       <key>value</key>
+      <value>10</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(184, 244)</value>
+    </param>
+    <param>
+      <key>gui_hint</key>
+      <value>4,0,1,1</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>bb_gain</value>
+    </param>
+    <param>
+      <key>label</key>
+      <value>BB Gain (dB)</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>int</value>
+    </param>
+  </block>
+  <block>
+    <key>variable_qtgui_entry</key>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>value</key>
       <value>435275000</value>
     </param>
     <param>
@@ -109,11 +148,11 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(8, 156)</value>
+      <value>(8, 76)</value>
     </param>
     <param>
       <key>gui_hint</key>
-      <value>2,0,1,1</value>
+      <value>0,0,1,1</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -148,11 +187,11 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(8, 240)</value>
+      <value>(8, 164)</value>
     </param>
     <param>
       <key>gui_hint</key>
-      <value>3,0,1,1</value>
+      <value>1,0,1,1</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -215,7 +254,7 @@
     </param>
     <param>
       <key>gui_hint</key>
-      <value>5,0,1,1</value>
+      <value>3,0,1,1</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -254,7 +293,7 @@
     </param>
     <param>
       <key>gui_hint</key>
-      <value>4,0,1,1</value>
+      <value>2,0,1,1</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -297,34 +336,38 @@
     </param>
     <param>
       <key>value</key>
-      <value>192000</value>
+      <value>192000*8</value>
     </param>
   </block>
   <block>
-    <key>variable_qtgui_label</key>
+    <key>freq_xlating_fir_filter_xxx</key>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>center_freq</key>
+      <value>frequency_offset</value>
+    </param>
     <param>
       <key>comment</key>
       <value></value>
     </param>
     <param>
-      <key>value</key>
+      <key>affinity</key>
       <value></value>
+    </param>
+    <param>
+      <key>decim</key>
+      <value>8</value>
     </param>
     <param>
       <key>_enabled</key>
       <value>True</value>
     </param>
     <param>
-      <key>formatter</key>
-      <value>None</value>
-    </param>
-    <param>
       <key>_coordinate</key>
-      <value>(8, 76)</value>
-    </param>
-    <param>
-      <key>gui_hint</key>
-      <value>0,0,2,1</value>
+      <value>(608, 124)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -332,15 +375,27 @@
     </param>
     <param>
       <key>id</key>
-      <value>variable_qtgui_label_0</value>
+      <value>freq_xlating_fir_filter_xxx_0</value>
     </param>
     <param>
-      <key>label</key>
-      <value>Keep the same offset frequency here as well as in demodulator</value>
+      <key>maxoutbuf</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>minoutbuf</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>samp_rate</key>
+      <value>samp_rate</value>
+    </param>
+    <param>
+      <key>taps</key>
+      <value>firdes.low_pass(1, 192000, 40000, 1000)</value>
     </param>
     <param>
       <key>type</key>
-      <value>string</value>
+      <value>ccc</value>
     </param>
   </block>
   <block>
@@ -355,7 +410,7 @@
     </param>
     <param>
       <key>bb_gain0</key>
-      <value>20</value>
+      <value>bb_gain</value>
     </param>
     <param>
       <key>bw0</key>
@@ -1647,7 +1702,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(472, 76)</value>
+      <value>(344, 68)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1774,7 +1829,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(792, 116)</value>
+      <value>(864, 132)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1806,8 +1861,14 @@
     </param>
   </block>
   <connection>
-    <source_block_id>rtlsdr_source_0</source_block_id>
+    <source_block_id>freq_xlating_fir_filter_xxx_0</source_block_id>
     <sink_block_id>zeromq_pub_sink_0</sink_block_id>
+    <source_key>0</source_key>
+    <sink_key>0</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>rtlsdr_source_0</source_block_id>
+    <sink_block_id>freq_xlating_fir_filter_xxx_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
