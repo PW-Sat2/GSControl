@@ -101,11 +101,11 @@
     </param>
     <param>
       <key>value</key>
-      <value>0.5</value>
+      <value>2</value>
     </param>
     <param>
       <key>_enabled</key>
-      <value>True</value>
+      <value>1</value>
     </param>
     <param>
       <key>_coordinate</key>
@@ -113,7 +113,7 @@
     </param>
     <param>
       <key>gui_hint</key>
-      <value></value>
+      <value>0,1,1,1</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -141,11 +141,11 @@
     </param>
     <param>
       <key>step</key>
-      <value>1e-3</value>
+      <value>1e-1</value>
     </param>
     <param>
       <key>stop</key>
-      <value>1</value>
+      <value>2</value>
     </param>
     <param>
       <key>rangeType</key>
@@ -227,7 +227,7 @@
     </param>
     <param>
       <key>gui_hint</key>
-      <value>(0,0,1,2)</value>
+      <value>0,0,1,1</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -866,7 +866,7 @@
     </param>
     <param>
       <key>gui_hint</key>
-      <value>(2,1,1,1)</value>
+      <value>2,1,1,1</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1233,7 +1233,7 @@
     </param>
     <param>
       <key>gui_hint</key>
-      <value>(2,0,1,1)</value>
+      <value>2,0,1,1</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1520,7 +1520,7 @@
     </param>
     <param>
       <key>gui_hint</key>
-      <value>(1,1,1,1)</value>
+      <value>1,1,1,1</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -2621,7 +2621,7 @@
     </param>
     <param>
       <key>gui_hint</key>
-      <value>(1,0,1,1)</value>
+      <value>1,0,1,1</value>
     </param>
     <param>
       <key>_rotation</key>
