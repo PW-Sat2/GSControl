@@ -797,7 +797,7 @@
     </param>
     <param>
       <key>corr0</key>
-      <value>0</value>
+      <value>freq_correction_ppm</value>
     </param>
     <param>
       <key>freq0</key>
