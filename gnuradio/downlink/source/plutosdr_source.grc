@@ -6,7 +6,7 @@
     <key>options</key>
     <param>
       <key>author</key>
-      <value></value>
+      <value>PW-Sat2 Team, G. Gajoch, M. Gumiela</value>
     </param>
     <param>
       <key>window_size</key>
@@ -26,7 +26,7 @@
     </param>
     <param>
       <key>description</key>
-      <value></value>
+      <value>Pluto SDR source for PW-Sat2 Ground Station Software</value>
     </param>
     <param>
       <key>_enabled</key>
@@ -86,7 +86,7 @@
     </param>
     <param>
       <key>title</key>
-      <value></value>
+      <value>Pluto SDR Source</value>
     </param>
     <param>
       <key>placement</key>
@@ -109,11 +109,11 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(8, 404)</value>
+      <value>(16, 284)</value>
     </param>
     <param>
       <key>gui_hint</key>
-      <value>3,0,1,1</value>
+      <value>4,0,1,1</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -144,7 +144,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(576, 44)</value>
+      <value>(416, 12)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -160,14 +160,10 @@
     </param>
   </block>
   <block>
-    <key>variable_qtgui_entry</key>
+    <key>variable</key>
     <param>
       <key>comment</key>
       <value></value>
-    </param>
-    <param>
-      <key>value</key>
-      <value>435275000</value>
     </param>
     <param>
       <key>_enabled</key>
@@ -175,11 +171,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(8, 84)</value>
-    </param>
-    <param>
-      <key>gui_hint</key>
-      <value>0,0,1,1</value>
+      <value>(208, 196)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -187,132 +179,11 @@
     </param>
     <param>
       <key>id</key>
-      <value>frequency</value>
-    </param>
-    <param>
-      <key>label</key>
-      <value>Satellite Frequency (Hz)</value>
-    </param>
-    <param>
-      <key>type</key>
-      <value>int</value>
-    </param>
-  </block>
-  <block>
-    <key>variable</key>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(176, 164)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>frequency</value>
+      <value>doppler</value>
     </param>
     <param>
       <key>value</key>
-      <value>435275000</value>
-    </param>
-  </block>
-  <block>
-    <key>variable_qtgui_range</key>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>value</key>
-      <value>20e3</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>1</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(8, 168)</value>
-    </param>
-    <param>
-      <key>gui_hint</key>
-      <value>1,0,1,1</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>frequency_offset</value>
-    </param>
-    <param>
-      <key>label</key>
-      <value>Frequency Offset (Hz)</value>
-    </param>
-    <param>
-      <key>min_len</key>
-      <value>200</value>
-    </param>
-    <param>
-      <key>orient</key>
-      <value>Qt.Horizontal</value>
-    </param>
-    <param>
-      <key>start</key>
-      <value>-40e3</value>
-    </param>
-    <param>
-      <key>step</key>
-      <value>10</value>
-    </param>
-    <param>
-      <key>stop</key>
-      <value>40e3</value>
-    </param>
-    <param>
-      <key>rangeType</key>
-      <value>float</value>
-    </param>
-    <param>
-      <key>widget</key>
-      <value>counter_slider</value>
-    </param>
-  </block>
-  <block>
-    <key>variable</key>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(176, 100)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>frequency_offset</value>
-    </param>
-    <param>
-      <key>value</key>
-      <value>20e3</value>
+      <value>freq_from_gpredict-435275000</value>
     </param>
   </block>
   <block>
@@ -327,7 +198,34 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(376, 44)</value>
+      <value>(384, 108)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>freq_from_gpredict</value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>435275000</value>
+    </param>
+  </block>
+  <block>
+    <key>variable</key>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(216, 12)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -354,7 +252,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(480, 44)</value>
+      <value>(320, 12)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -370,6 +268,84 @@
     </param>
   </block>
   <block>
+    <key>variable_qtgui_entry</key>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>435275000</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(8, 204)</value>
+    </param>
+    <param>
+      <key>gui_hint</key>
+      <value>1,0,1,1</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>sat_frequency</value>
+    </param>
+    <param>
+      <key>label</key>
+      <value>PW-Sat2 Frequency (Hz)</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>int</value>
+    </param>
+  </block>
+  <block>
+    <key>variable_qtgui_entry</key>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>435295000</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(8, 124)</value>
+    </param>
+    <param>
+      <key>gui_hint</key>
+      <value>0,0,1,1</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>sdr_center_frequency</value>
+    </param>
+    <param>
+      <key>label</key>
+      <value>SDR Center Frequency (Hz)</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>int</value>
+    </param>
+  </block>
+  <block>
     <key>variable_qtgui_label</key>
     <param>
       <key>comment</key>
@@ -377,7 +353,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>frequency+frequency_offset</value>
+      <value>"%d" % (sat_frequency+doppler)</value>
     </param>
     <param>
       <key>_enabled</key>
@@ -389,7 +365,50 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(8, 308)</value>
+      <value>(168, 308)</value>
+    </param>
+    <param>
+      <key>gui_hint</key>
+      <value>3,0,1,1</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>sdr_freq_label</value>
+    </param>
+    <param>
+      <key>label</key>
+      <value>Current PW-Sat2 Frequency (with Doppler correction) (Hz)</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>string</value>
+    </param>
+  </block>
+  <block>
+    <key>variable_qtgui_label</key>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>"%d" % doppler</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>formatter</key>
+      <value>None</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(168, 388)</value>
     </param>
     <param>
       <key>gui_hint</key>
@@ -401,15 +420,58 @@
     </param>
     <param>
       <key>id</key>
-      <value>variable_qtgui_label_0</value>
+      <value>sdr_freq_label_0</value>
     </param>
     <param>
       <key>label</key>
-      <value>SDR Center Frequency (Hz)</value>
+      <value>Doppler correction (Hz)</value>
     </param>
     <param>
       <key>type</key>
-      <value>real</value>
+      <value>string</value>
+    </param>
+  </block>
+  <block>
+    <key>variable_qtgui_label</key>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>value</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>formatter</key>
+      <value>None</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(392, 340)</value>
+    </param>
+    <param>
+      <key>gui_hint</key>
+      <value>5,0,1,1</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>waterfall_label</value>
+    </param>
+    <param>
+      <key>label</key>
+      <value>Center frequency on waterfall is "Current PW-Sat2 Frequency (with Doppler correction)"</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>string</value>
     </param>
   </block>
   <block>
@@ -420,7 +482,7 @@
     </param>
     <param>
       <key>center_freq</key>
-      <value>-frequency_offset</value>
+      <value>(sat_frequency-sdr_center_frequency)+doppler</value>
     </param>
     <param>
       <key>comment</key>
@@ -440,7 +502,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(520, 356)</value>
+      <value>(808, 328)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -469,6 +531,49 @@
     <param>
       <key>type</key>
       <value>ccc</value>
+    </param>
+  </block>
+  <block>
+    <key>gpredict_doppler</key>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(208, 104)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>gpredict_host</key>
+      <value>localhost</value>
+    </param>
+    <param>
+      <key>gpredict_port</key>
+      <value>4532</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>gpredict_doppler_0</value>
+    </param>
+    <param>
+      <key>target</key>
+      <value>freq_from_gpredict</value>
+    </param>
+    <param>
+      <key>verbose</key>
+      <value>True</value>
     </param>
   </block>
   <block>
@@ -511,7 +616,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(288, 276)</value>
+      <value>(576, 248)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -527,7 +632,7 @@
     </param>
     <param>
       <key>frequency</key>
-      <value>int(frequency+frequency_offset)</value>
+      <value>int(sdr_center_frequency)</value>
     </param>
     <param>
       <key>manual_gain</key>
@@ -594,11 +699,11 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(816, 436)</value>
+      <value>(1104, 404)</value>
     </param>
     <param>
       <key>gui_hint</key>
-      <value>7,0,1,1</value>
+      <value>6,0,1,1</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -805,7 +910,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(816, 292)</value>
+      <value>(1104, 260)</value>
     </param>
     <param>
       <key>_rotation</key>
