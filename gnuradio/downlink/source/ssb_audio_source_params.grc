@@ -6,7 +6,7 @@
     <key>options</key>
     <param>
       <key>author</key>
-      <value></value>
+      <value>PW-Sat2 Team, G. Gajoch, M. Gumiela</value>
     </param>
     <param>
       <key>window_size</key>
@@ -46,7 +46,7 @@
     </param>
     <param>
       <key>id</key>
-      <value>top_block</value>
+      <value>ssb_audio_source</value>
     </param>
     <param>
       <key>max_nouts</key>
@@ -82,11 +82,50 @@
     </param>
     <param>
       <key>title</key>
-      <value></value>
+      <value>SSB (USB) audio source for PW-Sat2 Ground Station</value>
     </param>
     <param>
       <key>placement</key>
       <value>(0,0)</value>
+    </param>
+  </block>
+  <block>
+    <key>variable_qtgui_entry</key>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>-3000</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(576, 52)</value>
+    </param>
+    <param>
+      <key>gui_hint</key>
+      <value>0,0,1,1</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>frequency</value>
+    </param>
+    <param>
+      <key>label</key>
+      <value>Frequency below downlink (Hz)</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>real</value>
     </param>
   </block>
   <block>
@@ -117,6 +156,53 @@
     </param>
   </block>
   <block>
+    <key>parameter</key>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(448, 52)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>audio_dev</value>
+    </param>
+    <param>
+      <key>label</key>
+      <value>audio_dev</value>
+    </param>
+    <param>
+      <key>short_id</key>
+      <value>a</value>
+    </param>
+    <param>
+      <key>hide</key>
+      <value>none</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>string</value>
+    </param>
+    <param>
+      <key>value</key>
+      <value></value>
+    </param>
+  </block>
+  <block>
     <key>audio_source</key>
     <param>
       <key>alias</key>
@@ -132,7 +218,7 @@
     </param>
     <param>
       <key>device_name</key>
-      <value>sysdefault:CARD=Creative</value>
+      <value>audio_dev</value>
     </param>
     <param>
       <key>_enabled</key>
@@ -246,7 +332,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(240, 68)</value>
+      <value>(184, 12)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -277,7 +363,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(216, 116)</value>
+      <value>(184, 60)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -289,7 +375,7 @@
     </param>
     <param>
       <key>note</key>
-      <value>3kHz less than downlink</value>
+      <value>x kHz less than downlink</value>
     </param>
   </block>
   <block>
@@ -340,11 +426,11 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(448, 180)</value>
+      <value>(408, 180)</value>
     </param>
     <param>
       <key>gui_hint</key>
-      <value></value>
+      <value>1,0,1,1</value>
     </param>
     <param>
       <key>_rotation</key>
