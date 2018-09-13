@@ -2,6 +2,7 @@ from tabulate import tabulate
 from colorama import init, Fore, Style
 from telecommand_data.commands import TelecommandDataFactory
 from telecommand_data.duration import Duration
+from task_actions import *
 
 init()
 
@@ -150,8 +151,8 @@ if __name__ == '__main__':
     import telecommand as tc
 
     test_tasks = [
-        [tc.SetBitrate(1, 8), "SendReceive", "NoWait"],
-        [tc.SendBeacon(), "SendReceive", "NoWait"],
+        [tc.SetBitrate(1, 8), SendReceive, "NoWait"],
+        [tc.SendBeacon(), SendReceive, "NoWait"],
         [tc.SendBeacon(), "Send", "NoWait"],
         [tc.ListFiles(1, '/'), "Send", "NoWait"],
         [tc.ResetTransmitterTelecommand(), "Send", "NoWait"],
@@ -161,7 +162,7 @@ if __name__ == '__main__':
         [tc.DownloadFile(20, '/telemetry.current', [i for i in range(720, 960, 7)]), "Send", "Wait"],
         [tc.SendBeacon(), "Send", "NoWait"],
         [tc.SendBeacon(), "Send", "NoWait"],
-        [tc.SetBitrate(1, 1), "SendReceive", "Nowait"]
+        [tc.SetBitrate(1, 1), SendReceive, "Nowait"]
     ]
 
     analyzer = Analyzer(test_tasks, 1)

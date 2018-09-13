@@ -1,3 +1,5 @@
+from enum import Enum, unique
+
 class SendReceive(object):
     def __init__(self, arg):
         self.telecommand = arg
@@ -38,4 +40,14 @@ class Sleep(object):
         from time import sleep
         sleep(self.seconds)
 
+@unique
+class WaitMode(Enum):
+    Wait = 1,
+    NoWait = 2,
+    def __str__(self):
+        map = {
+            self.Wait: "Wait",
+            self.NoWait: "NoWait"
+        }
 
+        return map[self]
