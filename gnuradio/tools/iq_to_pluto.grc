@@ -50,7 +50,7 @@
     </param>
     <param>
       <key>id</key>
-      <value>top_block</value>
+      <value>iq_to_pluto</value>
     </param>
     <param>
       <key>max_nouts</key>
@@ -101,7 +101,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>40</value>
+      <value>10</value>
     </param>
     <param>
       <key>_enabled</key>
@@ -222,7 +222,7 @@
     </param>
     <param>
       <key>file</key>
-      <value>path/to/file.iq</value>
+      <value>/home/pwsat2/40 - IQ recordings/1200.iq</value>
     </param>
     <param>
       <key>_coordinate</key>
