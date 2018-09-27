@@ -203,7 +203,7 @@ if __name__ == '__main__':
                                                        'send_receive': send_receive,
                                                        'parse_file_list': RemoteFileTools.parse_file_list,
                                                        'get_file': get_file, 'RemoteFileTools': RemoteFileTools,
-                                                       'RemoteFile': RemoteFile, 'sender': sender, 'receiver': rcv,
+                                                       'sender': sender, 'receiver': rcv,
                                                        'get_beacon': get_beacon, 
                                                        'receiver_loop': receiver_loop},
                                   banner2='COMM Terminal')
