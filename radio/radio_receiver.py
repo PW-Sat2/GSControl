@@ -68,7 +68,7 @@ class Receiver:
             return val
 
     def decode_kiss(self, frame):
-        frame = frame[16:]
+        frame = frame[16:-2]
 
         return ensure_byte_list(frame)
 
