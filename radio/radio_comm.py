@@ -121,6 +121,20 @@ if __name__ == '__main__':
         with open(path, 'w') as f:
             json.dump(beacons, f, default=ParseBeacon.convert_values, sort_keys=True, indent=4)
 
+    def receiver_loop():
+        import pprint
+        frames = []
+        
+        try:
+            while True:
+                x = receive()
+                pprint.pprint(x)
+                frames.append(x)
+        except KeyboardInterrupt:
+            pass
+        finally:
+            return frames
+
     def run(tasks):
         """
         Performs list of tasks.
@@ -190,7 +204,8 @@ if __name__ == '__main__':
                                                        'parse_file_list': RemoteFileTools.parse_file_list,
                                                        'get_file': get_file, 'RemoteFileTools': RemoteFileTools,
                                                        'RemoteFile': RemoteFile, 'sender': sender, 'receiver': rcv,
-                                                       'get_beacon': get_beacon},
+                                                       'get_beacon': get_beacon, 
+                                                       'receiver_loop': receiver_loop},
                                   banner2='COMM Terminal')
     shell.prompts = MyPrompt(shell)
     shell.run_code('from tools.parse_beacon import ParseBeacon')
