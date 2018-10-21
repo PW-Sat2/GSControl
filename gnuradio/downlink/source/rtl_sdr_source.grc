@@ -21,10 +21,6 @@
       <value></value>
     </param>
     <param>
-      <key>copyright</key>
-      <value></value>
-    </param>
-    <param>
       <key>description</key>
       <value>RTL-SDR source for PW-Sat2 Ground Station Software</value>
     </param>
@@ -2236,7 +2232,7 @@
     </param>
     <param>
       <key>args</key>
-      <value></value>
+      <value>rtl=1</value>
     </param>
     <param>
       <key>_enabled</key>
