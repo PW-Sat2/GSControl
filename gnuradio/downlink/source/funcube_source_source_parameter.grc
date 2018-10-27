@@ -50,7 +50,7 @@
     </param>
     <param>
       <key>id</key>
-      <value>funcube_source</value>
+      <value>funcube_source_source_parameter</value>
     </param>
     <param>
       <key>max_nouts</key>
@@ -113,7 +113,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(528, 24)</value>
+      <value>(512, 16)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -160,7 +160,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(704, 24)</value>
+      <value>(688, 16)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -775,11 +775,11 @@
     </param>
     <param>
       <key>file</key>
-      <value>config_iq_data_from_current_session_after_doppler_correction</value>
+      <value>config_iq_data_from_current_session_raw</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1064, 276)</value>
+      <value>(1064, 380)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -787,7 +787,7 @@
     </param>
     <param>
       <key>id</key>
-      <value>blocks_file_sink_0</value>
+      <value>blocks_file_sink_0_0</value>
     </param>
     <param>
       <key>type</key>
@@ -826,11 +826,11 @@
     </param>
     <param>
       <key>file</key>
-      <value>config_iq_data_from_current_session_raw</value>
+      <value>config_iq_data_from_current_session_after_doppler_correction</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1064, 372)</value>
+      <value>(1064, 284)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -838,7 +838,7 @@
     </param>
     <param>
       <key>id</key>
-      <value>blocks_file_sink_0_0</value>
+      <value>blocks_file_sink_0_1</value>
     </param>
     <param>
       <key>type</key>
@@ -851,6 +851,53 @@
     <param>
       <key>vlen</key>
       <value>1</value>
+    </param>
+  </block>
+  <block>
+    <key>parameter</key>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(384, 12)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>device</value>
+    </param>
+    <param>
+      <key>label</key>
+      <value>dev</value>
+    </param>
+    <param>
+      <key>short_id</key>
+      <value>d</value>
+    </param>
+    <param>
+      <key>hide</key>
+      <value>none</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>string</value>
+    </param>
+    <param>
+      <key>value</key>
+      <value></value>
     </param>
   </block>
   <block>
@@ -869,7 +916,7 @@
     </param>
     <param>
       <key>device_name</key>
-      <value></value>
+      <value>device</value>
     </param>
     <param>
       <key>_enabled</key>
@@ -885,7 +932,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(528, 232)</value>
+      <value>(512, 176)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -948,7 +995,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(776, 272)</value>
+      <value>(768, 216)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1314,7 +1361,7 @@
   </connection>
   <connection>
     <source_block_id>freq_xlating_fir_filter_xxx_0</source_block_id>
-    <sink_block_id>blocks_file_sink_0</sink_block_id>
+    <sink_block_id>blocks_file_sink_0_1</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
