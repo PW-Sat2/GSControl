@@ -133,6 +133,100 @@
     </param>
   </block>
   <block>
+    <key>variable_config</key>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>config_file</key>
+      <value>gr_config</value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>iq_data_from_current_session_after_doppler_correction</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(432, 8)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>config_iq_data_from_current_session_after_doppler_correction</value>
+    </param>
+    <param>
+      <key>option</key>
+      <value>iq_data_from_current_session_after_doppler_correction</value>
+    </param>
+    <param>
+      <key>section</key>
+      <value>main</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>string</value>
+    </param>
+    <param>
+      <key>writeback</key>
+      <value>None</value>
+    </param>
+  </block>
+  <block>
+    <key>variable_config</key>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>config_file</key>
+      <value>gr_config</value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>iq_data_from_current_session_raw</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(608, 8)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>config_iq_data_from_current_session_raw</value>
+    </param>
+    <param>
+      <key>option</key>
+      <value>iq_data_from_current_session_raw</value>
+    </param>
+    <param>
+      <key>section</key>
+      <value>main</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>string</value>
+    </param>
+    <param>
+      <key>writeback</key>
+      <value>None</value>
+    </param>
+  </block>
+  <block>
     <key>variable</key>
     <param>
       <key>comment</key>
@@ -237,7 +331,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(616, 316)</value>
+      <value>(616, 372)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -588,7 +682,7 @@
     </param>
     <param>
       <key>file</key>
-      <value>iq_data_from_current_session_after_doppler_correction</value>
+      <value>config_iq_data_from_current_session_after_doppler_correction</value>
     </param>
     <param>
       <key>_coordinate</key>
@@ -639,7 +733,7 @@
     </param>
     <param>
       <key>file</key>
-      <value>iq_data_from_current_session_raw</value>
+      <value>config_iq_data_from_current_session_raw</value>
     </param>
     <param>
       <key>_coordinate</key>
@@ -694,7 +788,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(728, 144)</value>
+      <value>(736, 208)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -741,7 +835,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(440, 320)</value>
+      <value>(440, 376)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -2287,7 +2381,7 @@
     </param>
     <param>
       <key>args</key>
-      <value>rtl=1</value>
+      <value>rtl=0</value>
     </param>
     <param>
       <key>_enabled</key>
@@ -2295,7 +2389,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(456, 92)</value>
+      <value>(456, 148)</value>
     </param>
     <param>
       <key>_rotation</key>
