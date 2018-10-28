@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<?grc format='1' created='3.7.13'?>
+<?grc format='1' created='3.7.12'?>
 <flow_graph>
   <timestamp>Mon Aug 21 11:43:56 2017</timestamp>
   <block>
@@ -18,6 +18,10 @@
     </param>
     <param>
       <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>copyright</key>
       <value></value>
     </param>
     <param>
@@ -633,7 +637,7 @@
     </param>
     <param>
       <key>gui_hint</key>
-      <value>9,1,1,1</value>
+      <value>10,1,1,1</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -676,7 +680,7 @@
     </param>
     <param>
       <key>gui_hint</key>
-      <value>9,0,1,1</value>
+      <value>10,0,1,1</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -689,6 +693,49 @@
     <param>
       <key>label</key>
       <value>Analyzed signal spectrum</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>string</value>
+    </param>
+  </block>
+  <block>
+    <key>variable_qtgui_label</key>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>""</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>formatter</key>
+      <value>None</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(1952, 716)</value>
+    </param>
+    <param>
+      <key>gui_hint</key>
+      <value>3,0,1,1</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>variable_qtgui_label_0_1</value>
+    </param>
+    <param>
+      <key>label</key>
+      <value>Whole signal spectrum (red spikes indicate analyzed bandwidth - move them using 'Frequency offset')</value>
     </param>
     <param>
       <key>type</key>
@@ -892,7 +939,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(96, 560)</value>
+      <value>(96, 544)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1633,7 +1680,7 @@ class frames_counter(gr.sync_block):
     </param>
     <param>
       <key>gui_hint</key>
-      <value>10,1,1,1</value>
+      <value>11,1,1,1</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -2000,7 +2047,7 @@ class frames_counter(gr.sync_block):
     </param>
     <param>
       <key>gui_hint</key>
-      <value>2,0,1,2</value>
+      <value>4,0,1,2</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -2299,7 +2346,7 @@ class frames_counter(gr.sync_block):
     </param>
     <param>
       <key>gui_hint</key>
-      <value>8,0,1,1</value>
+      <value>11,0,1,1</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -2586,7 +2633,7 @@ class frames_counter(gr.sync_block):
     </param>
     <param>
       <key>gui_hint</key>
-      <value>8,1,1,1</value>
+      <value>9,1,1,1</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -3687,7 +3734,7 @@ class frames_counter(gr.sync_block):
     </param>
     <param>
       <key>gui_hint</key>
-      <value>10,0,1,1</value>
+      <value>9,0,1,1</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -3910,7 +3957,7 @@ class frames_counter(gr.sync_block):
     </param>
     <param>
       <key>gui_hint</key>
-      <value>3,0,3,2</value>
+      <value>2,0,1,2</value>
     </param>
     <param>
       <key>_rotation</key>
