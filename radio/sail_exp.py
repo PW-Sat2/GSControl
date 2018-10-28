@@ -1,5 +1,8 @@
 import math
 
+# INFO: results are cross-checked with data from experiment:
+# PWSat2-SVN\system\tests_and_reports\38 - Sail experiment radio
+
 # EPS constants
 
 EFFICIENCY_3V3 = 0.7  # (source: @pkuligowski)
