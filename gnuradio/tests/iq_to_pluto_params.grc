@@ -195,7 +195,7 @@
     </param>
     <param>
       <key>type</key>
-      <value>intx</value>
+      <value>eng_float</value>
     </param>
     <param>
       <key>value</key>
@@ -203,11 +203,50 @@
     </param>
   </block>
   <block>
-    <key>blocks_file_source</key>
+    <key>blocks_float_to_complex</key>
     <param>
-      <key>begin_tag</key>
-      <value>pmt.PMT_NIL</value>
+      <key>alias</key>
+      <value></value>
     </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>affinity</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(472, 264)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>blocks_float_to_complex_0</value>
+    </param>
+    <param>
+      <key>maxoutbuf</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>minoutbuf</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>vlen</key>
+      <value>1</value>
+    </param>
+  </block>
+  <block>
+    <key>blocks_wavfile_source</key>
     <param>
       <key>alias</key>
       <value></value>
@@ -226,11 +265,11 @@
     </param>
     <param>
       <key>file</key>
-      <value>/home/gregg/pwsat/10frames_flt.iq</value>
+      <value>filename</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(272, 264)</value>
+      <value>(320, 264)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -238,7 +277,7 @@
     </param>
     <param>
       <key>id</key>
-      <value>blocks_file_source_0</value>
+      <value>blocks_wavfile_source_0</value>
     </param>
     <param>
       <key>maxoutbuf</key>
@@ -249,16 +288,59 @@
       <value>0</value>
     </param>
     <param>
-      <key>type</key>
-      <value>complex</value>
+      <key>nchan</key>
+      <value>2</value>
     </param>
     <param>
       <key>repeat</key>
       <value>False</value>
     </param>
+  </block>
+  <block>
+    <key>parameter</key>
     <param>
-      <key>vlen</key>
-      <value>1</value>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(56, 448)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>filename</value>
+    </param>
+    <param>
+      <key>label</key>
+      <value></value>
+    </param>
+    <param>
+      <key>short_id</key>
+      <value></value>
+    </param>
+    <param>
+      <key>hide</key>
+      <value>none</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>string</value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>""</value>
     </param>
   </block>
   <block>
@@ -348,7 +430,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(688, 220)</value>
+      <value>(856, 220)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -423,7 +505,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(688, 24)</value>
+      <value>(856, 24)</value>
     </param>
     <param>
       <key>gui_hint</key>
@@ -710,7 +792,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(688, 100)</value>
+      <value>(856, 104)</value>
     </param>
     <param>
       <key>gui_hint</key>
@@ -925,7 +1007,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(480, 256)</value>
+      <value>(648, 256)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -957,10 +1039,22 @@
     </param>
   </block>
   <connection>
-    <source_block_id>blocks_file_source_0</source_block_id>
+    <source_block_id>blocks_float_to_complex_0</source_block_id>
     <sink_block_id>rational_resampler_xxx_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>blocks_wavfile_source_0</source_block_id>
+    <sink_block_id>blocks_float_to_complex_0</sink_block_id>
+    <source_key>0</source_key>
+    <sink_key>0</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>blocks_wavfile_source_0</source_block_id>
+    <sink_block_id>blocks_float_to_complex_0</sink_block_id>
+    <source_key>1</source_key>
+    <sink_key>1</sink_key>
   </connection>
   <connection>
     <source_block_id>rational_resampler_xxx_0</source_block_id>

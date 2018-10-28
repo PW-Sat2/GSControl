@@ -3,18 +3,18 @@
 # 2) adjust parameters below
 # 3) run ths piece of software
 
-attenuation_range = [60, 68]
-attenuation_step = 2
-frequency = 435293700
+attenuation_range = [66.2, 68]
+attenuation_step = 0.2
+frequency = 435303500
 
-frames_on_each_attenuation = 100
+frames_on_each_attenuation = 50
+
+filename = "/home/gregg/pwsat/1200_10.wav"
 
 frames_in_wav = 10
 
 
-import os
-import subprocess
-import time
+import os, subprocess, time, numpy
 
 os.system('rm downlink_frames results_file')
 os.system('touch downlink_frames')
@@ -33,12 +33,14 @@ results = []
 
 results_file_ = open('results_file', 'w')
 
-for att in range(attenuation_range[0], attenuation_range[1]+1, attenuation_step):
+time.sleep(3)
+
+for att in numpy.arange(attenuation_range[0], attenuation_range[1]+attenuation_step, attenuation_step):
     print("Attenuation {}".format(att))
 
     start = get_frames()
     for i in range(0, frames_on_each_attenuation/frames_in_wav):
-        os.system("./iq_to_pluto_params.py -f {} -a {}".format(frequency, att))
+        os.system("./iq_to_pluto_params.py -f {} -a {} --file {}".format(frequency, att, filename))
     time.sleep(1)
     end = get_frames()
 
