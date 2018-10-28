@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<?grc format='1' created='3.7.12'?>
+<?grc format='1' created='3.7.13'?>
 <flow_graph>
   <timestamp>Mon Aug 21 11:43:56 2017</timestamp>
   <block>
@@ -18,10 +18,6 @@
     </param>
     <param>
       <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>copyright</key>
       <value></value>
     </param>
     <param>
@@ -257,11 +253,11 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1728, 0)</value>
+      <value>(1656, 776)</value>
     </param>
     <param>
       <key>gui_hint</key>
-      <value>3,0,1,2</value>
+      <value>6,0,1,2</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -273,7 +269,7 @@
     </param>
     <param>
       <key>label</key>
-      <value>Frequency offset (Hz)</value>
+      <value> Frequency offset</value>
     </param>
     <param>
       <key>min_len</key>
@@ -289,7 +285,7 @@
     </param>
     <param>
       <key>step</key>
-      <value>500</value>
+      <value>200</value>
     </param>
     <param>
       <key>stop</key>
@@ -401,7 +397,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(936, 480)</value>
+      <value>(1536, 488)</value>
     </param>
     <param>
       <key>gui_hint</key>
@@ -504,7 +500,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1544, 576)</value>
+      <value>(1536, 696)</value>
     </param>
     <param>
       <key>gui_hint</key>
@@ -547,11 +543,11 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1712, 576)</value>
+      <value>(1568, 904)</value>
     </param>
     <param>
       <key>gui_hint</key>
-      <value>4,0,1,1</value>
+      <value>7,0,1,1</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -590,11 +586,11 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1544, 656)</value>
+      <value>(1752, 904)</value>
     </param>
     <param>
       <key>gui_hint</key>
-      <value>4,1,1,1</value>
+      <value>7,1,1,1</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -633,11 +629,11 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1544, 744)</value>
+      <value>(1752, 992)</value>
     </param>
     <param>
       <key>gui_hint</key>
-      <value>6,1,1,1</value>
+      <value>9,1,1,1</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -676,11 +672,11 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1720, 656)</value>
+      <value>(1576, 992)</value>
     </param>
     <param>
       <key>gui_hint</key>
-      <value>6,0,1,1</value>
+      <value>9,0,1,1</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -719,7 +715,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(3112, 600)</value>
+      <value>(1704, 512)</value>
     </param>
     <param>
       <key>gui_hint</key>
@@ -758,7 +754,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(488, 88)</value>
+      <value>(1712, 648)</value>
     </param>
     <param>
       <key>gui_hint</key>
@@ -888,7 +884,7 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>0</value>
+      <value>1</value>
     </param>
     <param>
       <key>freq</key>
@@ -896,7 +892,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(264, 392)</value>
+      <value>(96, 560)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -951,7 +947,7 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>0</value>
+      <value>1</value>
     </param>
     <param>
       <key>freq</key>
@@ -959,7 +955,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(264, 488)</value>
+      <value>(96, 656)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -995,85 +991,6 @@
     </param>
   </block>
   <block>
-    <key>band_pass_filter</key>
-    <param>
-      <key>beta</key>
-      <value>6.76</value>
-    </param>
-    <param>
-      <key>alias</key>
-      <value></value>
-    </param>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>affinity</key>
-      <value></value>
-    </param>
-    <param>
-      <key>decim</key>
-      <value>1</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>type</key>
-      <value>fir_filter_ccc</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(288, 660)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>gain</key>
-      <value>1</value>
-    </param>
-    <param>
-      <key>high_cutoff_freq</key>
-      <value>frequency_offset+symb_rate*3</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>band_pass_filter_0</value>
-    </param>
-    <param>
-      <key>interp</key>
-      <value>1</value>
-    </param>
-    <param>
-      <key>low_cutoff_freq</key>
-      <value>frequency_offset-symb_rate*3</value>
-    </param>
-    <param>
-      <key>maxoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>minoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>samp_rate</key>
-      <value>in_samp_rate</value>
-    </param>
-    <param>
-      <key>width</key>
-      <value>1000</value>
-    </param>
-    <param>
-      <key>win</key>
-      <value>firdes.WIN_HAMMING</value>
-    </param>
-  </block>
-  <block>
     <key>blocks_add_xx</key>
     <param>
       <key>alias</key>
@@ -1089,11 +1006,11 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>0</value>
+      <value>1</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(464, 448)</value>
+      <value>(296, 616)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1118,61 +1035,6 @@
     <param>
       <key>num_inputs</key>
       <value>2</value>
-    </param>
-    <param>
-      <key>vlen</key>
-      <value>1</value>
-    </param>
-  </block>
-  <block>
-    <key>blocks_copy</key>
-    <param>
-      <key>alias</key>
-      <value></value>
-    </param>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>affinity</key>
-      <value></value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(288, 604)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>blocks_copy_0</value>
-    </param>
-    <param>
-      <key>maxoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>minoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>showports</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>type</key>
-      <value>complex</value>
     </param>
     <param>
       <key>vlen</key>
@@ -1347,7 +1209,7 @@ class frames_counter(gr.sync_block):
     </param>
     <param>
       <key>w</key>
-      <value>0.1</value>
+      <value>0.15</value>
     </param>
     <param>
       <key>maxoutbuf</key>
@@ -1591,14 +1453,10 @@ class frames_counter(gr.sync_block):
     </param>
   </block>
   <block>
-    <key>freq_xlating_fir_filter_xxx</key>
+    <key>frequency_shift</key>
     <param>
       <key>alias</key>
       <value></value>
-    </param>
-    <param>
-      <key>center_freq</key>
-      <value>frequency_offset</value>
     </param>
     <param>
       <key>comment</key>
@@ -1609,16 +1467,12 @@ class frames_counter(gr.sync_block):
       <value></value>
     </param>
     <param>
-      <key>decim</key>
-      <value>1</value>
-    </param>
-    <param>
       <key>_enabled</key>
-      <value>1</value>
+      <value>True</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(496, 232)</value>
+      <value>(520, 224)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1626,7 +1480,7 @@ class frames_counter(gr.sync_block):
     </param>
     <param>
       <key>id</key>
-      <value>freq_xlating_fir_filter_xxx_0</value>
+      <value>frequency_shift_0</value>
     </param>
     <param>
       <key>maxoutbuf</key>
@@ -1637,16 +1491,24 @@ class frames_counter(gr.sync_block):
       <value>0</value>
     </param>
     <param>
+      <key>bw</key>
+      <value>symb_rate*3</value>
+    </param>
+    <param>
+      <key>center_frequency</key>
+      <value>frequency_offset</value>
+    </param>
+    <param>
+      <key>decimation</key>
+      <value>1</value>
+    </param>
+    <param>
       <key>samp_rate</key>
       <value>in_samp_rate</value>
     </param>
     <param>
-      <key>taps</key>
-      <value>firdes.low_pass(1, 192000, 40000, 1000)</value>
-    </param>
-    <param>
-      <key>type</key>
-      <value>ccc</value>
+      <key>transition_width</key>
+      <value>1000</value>
     </param>
   </block>
   <block>
@@ -1740,81 +1602,6 @@ class frames_counter(gr.sync_block):
     </param>
   </block>
   <block>
-    <key>low_pass_filter</key>
-    <param>
-      <key>beta</key>
-      <value>6.76</value>
-    </param>
-    <param>
-      <key>alias</key>
-      <value></value>
-    </param>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>affinity</key>
-      <value></value>
-    </param>
-    <param>
-      <key>cutoff_freq</key>
-      <value>symb_rate*3</value>
-    </param>
-    <param>
-      <key>decim</key>
-      <value>1</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>type</key>
-      <value>fir_filter_ccf</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(720, 212)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>gain</key>
-      <value>1</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>low_pass_filter_0</value>
-    </param>
-    <param>
-      <key>interp</key>
-      <value>1</value>
-    </param>
-    <param>
-      <key>maxoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>minoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>samp_rate</key>
-      <value>in_samp_rate</value>
-    </param>
-    <param>
-      <key>width</key>
-      <value>symb_rate*0.5</value>
-    </param>
-    <param>
-      <key>win</key>
-      <value>firdes.WIN_HAMMING</value>
-    </param>
-  </block>
-  <block>
     <key>qtgui_const_sink_x</key>
     <param>
       <key>autoscale</key>
@@ -1846,7 +1633,7 @@ class frames_counter(gr.sync_block):
     </param>
     <param>
       <key>gui_hint</key>
-      <value>7,1,1,1</value>
+      <value>10,1,1,1</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -2201,7 +1988,7 @@ class frames_counter(gr.sync_block):
     </param>
     <param>
       <key>_enabled</key>
-      <value>0</value>
+      <value>1</value>
     </param>
     <param>
       <key>fftsize</key>
@@ -2209,11 +1996,11 @@ class frames_counter(gr.sync_block):
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(544, 680)</value>
+      <value>(408, 512)</value>
     </param>
     <param>
       <key>gui_hint</key>
-      <value>9,0,2,2</value>
+      <value>2,0,1,2</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -2229,7 +2016,7 @@ class frames_counter(gr.sync_block):
     </param>
     <param>
       <key>legend</key>
-      <value>True</value>
+      <value>False</value>
     </param>
     <param>
       <key>alpha1</key>
@@ -2441,7 +2228,7 @@ class frames_counter(gr.sync_block):
     </param>
     <param>
       <key>wintype</key>
-      <value>firdes.WIN_BLACKMAN_hARRIS</value>
+      <value>firdes.WIN_BLACKMAN</value>
     </param>
     <param>
       <key>label</key>
@@ -2512,7 +2299,7 @@ class frames_counter(gr.sync_block):
     </param>
     <param>
       <key>gui_hint</key>
-      <value>7,0,1,1</value>
+      <value>8,0,1,1</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -2799,7 +2586,7 @@ class frames_counter(gr.sync_block):
     </param>
     <param>
       <key>gui_hint</key>
-      <value>5,1,1,1</value>
+      <value>8,1,1,1</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -3900,7 +3687,7 @@ class frames_counter(gr.sync_block):
     </param>
     <param>
       <key>gui_hint</key>
-      <value>5,0,1,1</value>
+      <value>10,0,1,1</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -4119,11 +3906,11 @@ class frames_counter(gr.sync_block):
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(576, 352)</value>
+      <value>(408, 432)</value>
     </param>
     <param>
       <key>gui_hint</key>
-      <value>2,0,1,2</value>
+      <value>3,0,3,2</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -4147,7 +3934,7 @@ class frames_counter(gr.sync_block):
     </param>
     <param>
       <key>legend</key>
-      <value>True</value>
+      <value>False</value>
     </param>
     <param>
       <key>alpha1</key>
@@ -4299,7 +4086,7 @@ class frames_counter(gr.sync_block):
     </param>
     <param>
       <key>update_time</key>
-      <value>0.10</value>
+      <value>0.50</value>
     </param>
     <param>
       <key>wintype</key>
@@ -4440,7 +4227,7 @@ class frames_counter(gr.sync_block):
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(32, 224)</value>
+      <value>(32, 240)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -4498,16 +4285,10 @@ class frames_counter(gr.sync_block):
     <sink_key>1</sink_key>
   </connection>
   <connection>
-    <source_block_id>band_pass_filter_0</source_block_id>
+    <source_block_id>blocks_add_xx_0</source_block_id>
     <sink_block_id>qtgui_freq_sink_x_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>1</sink_key>
-  </connection>
-  <connection>
-    <source_block_id>blocks_copy_0</source_block_id>
-    <sink_block_id>qtgui_freq_sink_x_0</sink_block_id>
-    <source_key>0</source_key>
-    <sink_key>0</sink_key>
   </connection>
   <connection>
     <source_block_id>digital_constellation_decoder_cb_0</source_block_id>
@@ -4594,8 +4375,8 @@ class frames_counter(gr.sync_block):
     <sink_key>0</sink_key>
   </connection>
   <connection>
-    <source_block_id>freq_xlating_fir_filter_xxx_0</source_block_id>
-    <sink_block_id>low_pass_filter_0</sink_block_id>
+    <source_block_id>frequency_shift_0</source_block_id>
+    <sink_block_id>fractional_resampler_xx_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
@@ -4630,12 +4411,6 @@ class frames_counter(gr.sync_block):
     <sink_key>0</sink_key>
   </connection>
   <connection>
-    <source_block_id>low_pass_filter_0</source_block_id>
-    <sink_block_id>fractional_resampler_xx_0</sink_block_id>
-    <source_key>0</source_key>
-    <sink_key>0</sink_key>
-  </connection>
-  <connection>
     <source_block_id>root_raised_cosine_filter_0_0</source_block_id>
     <sink_block_id>digital_symbol_sync_xx_0</sink_block_id>
     <source_key>0</source_key>
@@ -4649,19 +4424,13 @@ class frames_counter(gr.sync_block):
   </connection>
   <connection>
     <source_block_id>zeromq_sub_source_0</source_block_id>
-    <sink_block_id>band_pass_filter_0</sink_block_id>
+    <sink_block_id>frequency_shift_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
   <connection>
     <source_block_id>zeromq_sub_source_0</source_block_id>
-    <sink_block_id>blocks_copy_0</sink_block_id>
-    <source_key>0</source_key>
-    <sink_key>0</sink_key>
-  </connection>
-  <connection>
-    <source_block_id>zeromq_sub_source_0</source_block_id>
-    <sink_block_id>freq_xlating_fir_filter_xxx_0</sink_block_id>
+    <sink_block_id>qtgui_freq_sink_x_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>

@@ -207,7 +207,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>freq_from_gpredict-435275000</value>
+      <value>freq_from_gpredict-sat_frequency</value>
     </param>
   </block>
   <block>
@@ -775,7 +775,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1064, 276)</value>
+      <value>(1064, 264)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -869,7 +869,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(632, 268)</value>
+      <value>(648, 268)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -968,14 +968,10 @@
     </param>
   </block>
   <block>
-    <key>freq_xlating_fir_filter_xxx</key>
+    <key>frequency_shift</key>
     <param>
       <key>alias</key>
       <value></value>
-    </param>
-    <param>
-      <key>center_freq</key>
-      <value>(sat_frequency-sdr_center_frequency)+doppler</value>
     </param>
     <param>
       <key>comment</key>
@@ -986,16 +982,12 @@
       <value></value>
     </param>
     <param>
-      <key>decim</key>
-      <value>1</value>
-    </param>
-    <param>
       <key>_enabled</key>
-      <value>1</value>
+      <value>True</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(776, 272)</value>
+      <value>(792, 248)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1003,7 +995,7 @@
     </param>
     <param>
       <key>id</key>
-      <value>freq_xlating_fir_filter_xxx_0</value>
+      <value>frequency_shift_0</value>
     </param>
     <param>
       <key>maxoutbuf</key>
@@ -1014,16 +1006,24 @@
       <value>0</value>
     </param>
     <param>
+      <key>bw</key>
+      <value>92000</value>
+    </param>
+    <param>
+      <key>center_frequency</key>
+      <value>(sat_frequency-sdr_center_frequency)+doppler</value>
+    </param>
+    <param>
+      <key>decimation</key>
+      <value>1</value>
+    </param>
+    <param>
       <key>samp_rate</key>
       <value>samp_rate</value>
     </param>
     <param>
-      <key>taps</key>
-      <value>firdes.low_pass(1, 192000, 92000, 1000)</value>
-    </param>
-    <param>
-      <key>type</key>
-      <value>ccc</value>
+      <key>transition_width</key>
+      <value>1000</value>
     </param>
   </block>
   <block>
@@ -1349,7 +1349,7 @@
   </block>
   <connection>
     <source_block_id>dc_blocker_xx_0</source_block_id>
-    <sink_block_id>freq_xlating_fir_filter_xxx_0</sink_block_id>
+    <sink_block_id>frequency_shift_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
@@ -1366,19 +1366,19 @@
     <sink_key>0</sink_key>
   </connection>
   <connection>
-    <source_block_id>freq_xlating_fir_filter_xxx_0</source_block_id>
+    <source_block_id>frequency_shift_0</source_block_id>
     <sink_block_id>blocks_file_sink_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
   <connection>
-    <source_block_id>freq_xlating_fir_filter_xxx_0</source_block_id>
+    <source_block_id>frequency_shift_0</source_block_id>
     <sink_block_id>qtgui_waterfall_sink_x_1</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
   <connection>
-    <source_block_id>freq_xlating_fir_filter_xxx_0</source_block_id>
+    <source_block_id>frequency_shift_0</source_block_id>
     <sink_block_id>zeromq_pub_sink_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
