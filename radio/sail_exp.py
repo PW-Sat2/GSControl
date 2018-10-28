@@ -75,8 +75,8 @@ def comm_energy_usage(transmission_time):
 
 print "Experiment duration:", sail_experiment_duration(), "s"
 print "Energy consumption from BP:", sail_experiment_energy_consumption(), "Wh"
-print "Storage usage:", sail_data_file_storage_usage(), sail_photos_storage_usage(), "frames"
-print "TX time - data file, photos:", comm_transmission_time(sail_data_file_storage_usage()), "s",\
+print "Storage usage:", sail_data_file_storage_usage(), "frames,", sail_photos_storage_usage(), "frames"
+print "TX time - data file, photos:", comm_transmission_time(sail_data_file_storage_usage()), "s,",\
                                       comm_transmission_time(sail_photos_storage_usage()), "s"
-print "TX power usage - data file, photos:", comm_energy_usage(comm_transmission_time(sail_data_file_storage_usage())), "Wh",\
+print "TX power usage - data file, photos:", comm_energy_usage(comm_transmission_time(sail_data_file_storage_usage())), "Wh,",\
                                              comm_energy_usage(comm_transmission_time(sail_photos_storage_usage())), "Wh"
