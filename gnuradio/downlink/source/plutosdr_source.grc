@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<?grc format='1' created='3.7.12'?>
+<?grc format='1' created='3.7.13'?>
 <flow_graph>
   <timestamp>Fri Sep 15 09:28:19 2017</timestamp>
   <block>
@@ -18,10 +18,6 @@
     </param>
     <param>
       <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>copyright</key>
       <value></value>
     </param>
     <param>
@@ -545,7 +541,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(392, 340)</value>
+      <value>(168, 480)</value>
     </param>
     <param>
       <key>gui_hint</key>
@@ -647,7 +643,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1104, 588)</value>
+      <value>(696, 592)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -668,6 +664,57 @@
     <param>
       <key>vlen</key>
       <value>1</value>
+    </param>
+  </block>
+  <block>
+    <key>dc_blocker_xx</key>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>affinity</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(672, 324)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>dc_blocker_xx_0</value>
+    </param>
+    <param>
+      <key>length</key>
+      <value>32</value>
+    </param>
+    <param>
+      <key>long_form</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>maxoutbuf</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>minoutbuf</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>cc</value>
     </param>
   </block>
   <block>
@@ -812,7 +859,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(576, 248)</value>
+      <value>(440, 256)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1138,6 +1185,12 @@
     </param>
   </block>
   <connection>
+    <source_block_id>dc_blocker_xx_0</source_block_id>
+    <sink_block_id>freq_xlating_fir_filter_xxx_0</sink_block_id>
+    <source_key>0</source_key>
+    <sink_key>0</sink_key>
+  </connection>
+  <connection>
     <source_block_id>freq_xlating_fir_filter_xxx_0</source_block_id>
     <sink_block_id>blocks_file_sink_0</sink_block_id>
     <source_key>0</source_key>
@@ -1163,7 +1216,7 @@
   </connection>
   <connection>
     <source_block_id>pluto_source_0</source_block_id>
-    <sink_block_id>freq_xlating_fir_filter_xxx_0</sink_block_id>
+    <sink_block_id>dc_blocker_xx_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
