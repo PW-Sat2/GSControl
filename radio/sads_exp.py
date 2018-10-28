@@ -25,8 +25,8 @@ def sads_experiment_duration():
 
 
 def sads_experiment_energy_consumption():
-    SADS_ENERGY_CoNSUMPTION = 0.2138  # W (source: PWSat2-SVN\system\tests_and_reports\39 - SADS with load)
-    return SADS_ENERGY_CoNSUMPTION
+    SADS_ENERGY_CONSUMPTION = 0.1293  # Wh (source: PWSat2-SVN\system\tests_and_reports\39 - SADS with load)
+    return SADS_ENERGY_CONSUMPTION
 
 
 def sads_data_file_storage_usage():
