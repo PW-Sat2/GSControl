@@ -3,8 +3,10 @@
 # 2) adjust parameters below
 # 3) run ths piece of software
 
-attenuation_range = [66.2, 68]
-attenuation_step = 0.2
+# hardware step is 0.25 dB
+
+attenuation_range = [65, 65.8]
+attenuation_step = 0.25
 frequency = 435303500
 
 frames_on_each_attenuation = 50
@@ -13,6 +15,9 @@ filename = "/home/gregg/pwsat/1200_10.wav"
 
 frames_in_wav = 10
 
+
+assert float(attenuation_range[0]/0.25).is_integer()
+assert float(attenuation_step/0.25).is_integer()
 
 import os, subprocess, time, numpy
 
