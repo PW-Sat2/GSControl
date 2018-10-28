@@ -1256,7 +1256,7 @@ class frames_counter(gr.sync_block):
     </param>
     <param>
       <key>w</key>
-      <value>0.15</value>
+      <value>0.1</value>
     </param>
     <param>
       <key>maxoutbuf</key>
