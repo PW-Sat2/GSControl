@@ -100,8 +100,9 @@ def comm_transmission_time(full_frames_qty):
 
 
 def comm_energy_usage(transmission_time):
+    comm_energy = {}
     for key in transmission_time:
-        comm_energy = round(TX_POWER_CONSUMPTION * transmission_time[key] / 3600.0, 4)
+        comm_energy[key] = round(TX_POWER_CONSUMPTION * transmission_time[key] / 3600.0, 4)
     return comm_energy
 
 
