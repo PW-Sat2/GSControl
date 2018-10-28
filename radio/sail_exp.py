@@ -22,7 +22,7 @@ FULL_FRAME = 235  # bytes
 SUNS_REF_AVERAGE_POWER_5V0 = 0.05  # W (source: datasheet)
 PLD_SENS_AVERAGE_POWER_5V0 = 5.0*0.0243  # W (source: https://team.pw-sat.pl/w/system/power-budget/experiments/#payload-commisioning - PLD SENS @ idle state)
 
-SAIL_TK_POWER = 3  # W
+SAIL_TK_POWER = 2  # W
 CAMERA_POWER = 0.2618  # W
 
 
