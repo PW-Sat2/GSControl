@@ -6,12 +6,16 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '../..'))
 
 import math
 import telecommand as tc
-from duration import Duration
+from resources import *
 
 class TelecommandData(object):
     uplink_header_bytes_count = 3
     downlink_header_bytes_count = 3
     downlink_frame_bytes_count = 235
+
+    UPLINK_PTT_DELAY = Duration(1.0)
+    COMM_PREAMBLE = Duration(0.3)
+    COMM_PREAMBLE_9600 = Duration(0.2)
 
     def __init__(self, telecommand):
         self.telecommand = telecommand
@@ -28,7 +32,7 @@ class TelecommandData(object):
 
     def get_uplink_duration(self, bitrate):
         bits_count = (self.uplink_header_bytes_count + self.get_payload_size()) * 8
-        return Duration(float(bits_count) / bitrate)
+        return Duration(float(bits_count) / bitrate) + self.UPLINK_PTT_DELAY
 
     def get_uplink_frames_count(self):
         return 1
@@ -36,7 +40,10 @@ class TelecommandData(object):
     def get_downlink_duration(self, bitrate):
         response_bytes_count = self.get_response_bytes_count()
         bits_count = (self.downlink_header_bytes_count + response_bytes_count) * 8
-        return Duration(float(bits_count) / bitrate)
+        comm_preamble = self.COMM_PREAMBLE
+        if bitrate == 9600:
+            comm_preamble = self.COMM_PREAMBLE_9600
+        return Duration(float(bits_count) / bitrate) + comm_preamble
 
     def get_downlink_frames_count(self):
         response_bytes_count = self.get_response_bytes_count()
