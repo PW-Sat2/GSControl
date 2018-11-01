@@ -58,11 +58,11 @@ def comm_energy_usage(transmission_time):
         comm_energy[key] = round(TX_POWER_CONSUMPTION * transmission_time[key] / 3600.0, 4)
     return comm_energy
 
-
-print "Experiment duration:", cam_commissioning_experiment_duration(), "s"
-print "Energy consumption from BP:", cam_commissioning_experiment_energy_consumption(), "Wh"
-print "Storage usage:", cam_commissioning_data_file_storage_usage(), "frames,", cam_commissioning_photo_storage_usage(), "frames"
-print "TX time - data file, photo:", comm_transmission_time(cam_commissioning_data_file_storage_usage()), "s,",\
-                                      comm_transmission_time(cam_commissioning_photo_storage_usage()), "s"
-print "TX power usage - data file, photo:", comm_energy_usage(comm_transmission_time(cam_commissioning_data_file_storage_usage())), "Wh,",\
-                                             comm_energy_usage(comm_transmission_time(cam_commissioning_photo_storage_usage())), "Wh"
+if __name__ == '__main__':
+    print "Experiment duration:", cam_commissioning_experiment_duration(), "s"
+    print "Energy consumption from BP:", cam_commissioning_experiment_energy_consumption(), "Wh"
+    print "Storage usage:", cam_commissioning_data_file_storage_usage(), "frames,", cam_commissioning_photo_storage_usage(), "frames"
+    print "TX time - data file, photo:", comm_transmission_time(cam_commissioning_data_file_storage_usage()), "s,",\
+                                         comm_transmission_time(cam_commissioning_photo_storage_usage()), "s"
+    print "TX power usage - data file, photo:", comm_energy_usage(comm_transmission_time(cam_commissioning_data_file_storage_usage())), "Wh,",\
+                                                comm_energy_usage(comm_transmission_time(cam_commissioning_photo_storage_usage())), "Wh"

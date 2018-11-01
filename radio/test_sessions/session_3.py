@@ -1,0 +1,11 @@
+tasks = [[tc.SendBeacon(), "SendReceive", "Wait"],
+[tc.SendBeacon(), "SendReceive", "Wait"],
+[tc.ListFiles(9, '/'), "Send", "Wait"],
+[tc.PerformPayloadCommissioningExperiment(14, 'pld_1'), "SendReceive", "NoWait"],
+[tc.SendBeacon(), "SendReceive", "Wait"],
+[tc.SendBeacon(), "SendReceive", "Wait"],
+[tc.DownloadFile(10, '/leop', [301, 302, 303, 304, 305, 306, 307, 308, 309, 310]), "Send", "Wait"],
+[tc.DownloadFile(11, '/leop', [99, 100, 101, 102, 103, 104, 105, 106, 107, 108]), "Send", "Wait"],
+[tc.DownloadFile(12, '/telemetry.leop', [98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112]), "Send", "Wait"],
+[tc.DownloadFile(13, '/telemetry.leop', [424, 425, 426, 427, 428, 429, 430, 431, 432, 433]), "Send", "Wait"],
+]

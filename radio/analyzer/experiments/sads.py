@@ -57,10 +57,11 @@ def comm_energy_usage(transmission_time):
     return comm_energy
 
 
-print "Experiment duration:", sads_experiment_duration(), "s"
-print "Energy consumption from BP:", sads_experiment_energy_consumption(), "Wh"
-print "Storage usage:", sads_data_file_storage_usage(), "frames,", sads_photo_storage_usage(), "frames"
-print "TX time - data file, photo:", comm_transmission_time(sads_data_file_storage_usage()), "s,",\
-                                      comm_transmission_time(sads_photo_storage_usage()), "s"
-print "TX power usage - data file, photo:", comm_energy_usage(comm_transmission_time(sads_data_file_storage_usage())), "Wh,",\
-                                             comm_energy_usage(comm_transmission_time(sads_photo_storage_usage())), "Wh"
+if __name__ == '__main__':
+    print "Experiment duration:", sads_experiment_duration(), "s"
+    print "Energy consumption from BP:", sads_experiment_energy_consumption(), "Wh"
+    print "Storage usage:", sads_data_file_storage_usage(), "frames,", sads_photo_storage_usage(), "frames"
+    print "TX time - data file, photo:", comm_transmission_time(sads_data_file_storage_usage()), "s,",\
+                                         comm_transmission_time(sads_photo_storage_usage()), "s"
+    print "TX power usage - data file, photo:", comm_energy_usage(comm_transmission_time(sads_data_file_storage_usage())), "Wh,",\
+                                                comm_energy_usage(comm_transmission_time(sads_photo_storage_usage())), "Wh"

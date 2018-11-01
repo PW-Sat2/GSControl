@@ -106,9 +106,10 @@ def comm_energy_usage(transmission_time):
     return comm_energy
 
 
-print "Equipment active time:", equipment_active_time(100, 15, 2, 10), "s"
-print "Experiment duration:", experiment_time(100, 15, 2, 24, 10), "s"
-print "Energy consumption from BP:", energy_consumption(10, 15, 2, 24, 10), "Wh"
-print "Storage usage (primary, secondary):", storage_usage(20, 20), "frames"
-print "TX time (primary, secondary files):", comm_transmission_time(storage_usage(20, 20)[0]), comm_transmission_time(storage_usage(20, 20)[1]), "s"
-print "TX power usage (primary, secondary files):", comm_energy_usage(comm_transmission_time(storage_usage(20, 20)[0])), comm_energy_usage(comm_transmission_time(storage_usage(20, 20)[1])), "Wh"
+if __name__ == '__main__':
+    print "Equipment active time:", equipment_active_time(100, 15, 2, 10), "s"
+    print "Experiment duration:", experiment_time(100, 15, 2, 24, 10), "s"
+    print "Energy consumption from BP:", energy_consumption(10, 15, 2, 24, 10), "Wh"
+    print "Storage usage (primary, secondary):", storage_usage(20, 20), "frames"
+    print "TX time (primary, secondary files):", comm_transmission_time(storage_usage(20, 20)[0]), comm_transmission_time(storage_usage(20, 20)[1]), "s"
+    print "TX power usage (primary, secondary files):", comm_energy_usage(comm_transmission_time(storage_usage(20, 20)[0])), comm_energy_usage(comm_transmission_time(storage_usage(20, 20)[1])), "Wh"

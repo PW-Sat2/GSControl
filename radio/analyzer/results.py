@@ -1,6 +1,13 @@
 from task import *
 
+
 class Results:
+    '''Prepares results ready to display.
+
+    Output can be displayed as a table directly.
+    It returns both tables content and headers.
+    '''
+
     @classmethod
     def session_headers(self):
         session_headers = [
@@ -12,9 +19,10 @@ class Results:
             'Notes'
         ]
 
-        session_resources_names = Resources.session_names()
-        for i in range(0, len(session_resources_names)):
-            session_headers.insert(len(session_headers)-1, session_resources_names[i].replace(' ', '\n'))
+        session_names = Resources.session_names()
+        for i in range(0, len(session_names)):
+            session_headers.insert(len(session_headers)-1, 
+                                   session_names[i].replace(' ', '\n'))
 
         return session_headers
 
@@ -40,31 +48,32 @@ class Results:
     
     @classmethod
     def scheduled_headers(self):
-        experiments_headers = [
+        scheduled_headers = [
             '#',
             'Name'
             # Place for utilized resources
         ]
 
-        experiments_resources_names = Resources.scheduled_names()
+        scheduled_names = Resources.scheduled_names()
 
-        for i in range(0, len(experiments_resources_names)):
-            experiments_headers.insert(len(experiments_headers), experiments_resources_names[i].replace(' ', '\n'))
+        for i in range(0, len(scheduled_names)):
+            scheduled_headers.insert(len(scheduled_headers),
+                                     scheduled_names[i])
 
-        return experiments_headers
-
+        return scheduled_headers
 
     @classmethod
     def scheduled_task(self, index, task_data):
-        experiment_results = [
+        scheduled_results = [
             index,
             task_data.name
             # Place for utilized resources
         ]
 
-        experiment_resources_utilization = Resources.scheduled_params(task_data.resources_utilization)
+        scheduled_utilization = Resources.scheduled_params(task_data.resources_utilization)
 
-        for i in range(0, len(experiment_resources_utilization)):
-            experiment_results.insert(len(experiment_results), experiment_resources_utilization[i])
+        for i in range(0, len(scheduled_utilization)):
+            scheduled_results.insert(len(scheduled_results),
+                                     scheduled_utilization[i])
 
-        return experiment_results
+        return scheduled_results

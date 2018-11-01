@@ -1,21 +1,21 @@
 import os
 import sys
 
-sys.path.append(os.path.join(os.path.dirname(__file__), '../../PWSat2OBC/integration_tests'))
-sys.path.append(os.path.join(os.path.dirname(__file__), '../..'))
+sys.path.append(os.path.join(os.path.dirname(__file__),
+                '../../PWSat2OBC/integration_tests'))
+sys.path.append(os.path.join(os.path.dirname(__file__),
+                '../..'))
 
 import math
 import telecommand as tc
 from resources import *
+from subsystems import *
+
 
 class TelecommandData(object):
     uplink_header_bytes_count = 3
     downlink_header_bytes_count = 3
     downlink_frame_bytes_count = 235
-
-    UPLINK_PTT_DELAY = Duration(1.0)
-    COMM_PREAMBLE = Duration(0.3)
-    COMM_PREAMBLE_9600 = Duration(0.2)
 
     def __init__(self, telecommand):
         self.telecommand = telecommand
@@ -31,19 +31,19 @@ class TelecommandData(object):
         return len(payload)
 
     def get_uplink_duration(self, bitrate):
-        bits_count = (self.uplink_header_bytes_count + self.get_payload_size()) * 8
-        return Duration(float(bits_count) / bitrate) + self.UPLINK_PTT_DELAY
+        return Comm.uplink_bytes_duration(self.uplink_header_bytes_count +
+                                          self.get_payload_size(), bitrate)
 
     def get_uplink_frames_count(self):
         return 1
 
     def get_downlink_duration(self, bitrate):
-        response_bytes_count = self.get_response_bytes_count()
-        bits_count = (self.downlink_header_bytes_count + response_bytes_count) * 8
-        comm_preamble = self.COMM_PREAMBLE
-        if bitrate == 9600:
-            comm_preamble = self.COMM_PREAMBLE_9600
-        return Duration(float(bits_count) / bitrate) + comm_preamble
+        return Comm.downlink_bytes_duration(self.downlink_header_bytes_count +
+                                            self.get_response_bytes_count(),
+                                            bitrate)
+    
+    def get_downlink_energy_consumption(self, duration):
+        return Comm.downlink_energy_consumption(duration)
 
     def get_downlink_frames_count(self):
         response_bytes_count = self.get_response_bytes_count()

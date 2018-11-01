@@ -5,6 +5,7 @@ from analyzer.resources import *
 from analyzer.task import *
 from analyzer.results import *
 from analyzer.file import *
+from analyzer.scheduled import *
 from analyzer.commands import TelecommandDataFactory
 
 
@@ -26,13 +27,14 @@ class Analyzer:
         for task in self.tasks:
             task_data = TaskAnalyzer.process(task, self.bitrate_index)
 
-            is_experiment = TaskAnalyzer.is_experiment(task)
-            if is_experiment:
-                scheduled_results.append(Results.scheduled_task(index, task_data))
+            if task_data.is_scheduled:
+                task_data.resources_utilization += Scheduled.process(task)
+                scheduled_results.append(Results.scheduled_task(index,
+                                                                task_data))
 
             session_results.append(Results.session_task(index,
                                                         task_data,
-                                                        is_experiment,
+                                                        task_data.is_scheduled,
                                                         self.bitrate_index))
 
             self.bitrate_index = TaskAnalyzer.update_bitrate_index(task, self.bitrate_index)
@@ -58,12 +60,13 @@ class Analyzer:
         if len(scheduled_results) > 1:
             print Style.RESET_ALL + tabulate(scheduled_results, Results.scheduled_headers())
             print '\nScheduled downlink frames count: {}'.format(self.overall_resources_utilization.scheduled.downlink.frames_count)
-            print 'Scheduled downlink duration [s]: {}'.format(self.overall_resources_utilization.scheduled.downlink.duration)
-            print 'Scheduled power budget energy [mWh]: {}'.format(self.overall_resources_utilization.scheduled.power_budget.energy)
-            print 'Scheduled power budget mean power [mW]: {}'.format(self.overall_resources_utilization.scheduled.power_budget.mean_power)
+            print 'Scheduled downlink duration at 1200 2400 4800 9600 [s]: {}'.format(self.overall_resources_utilization.scheduled.downlink.duration)
+            print 'Scheduled power budget energy at 1200 2400 4800 9600 [mWh]: {}'.format(self.overall_resources_utilization.scheduled.power_budget.energy)
+            print 'Scheduled power budget mean power at 1200 2400 4800 9600 [mW]: {}'.format(self.overall_resources_utilization.scheduled.power_budget.mean_power)
+            print 'Scheduled tasks duration [s]: {}'.format(self.overall_resources_utilization.scheduled.task_duration)
             print 'Scheduled storage usage [kB]: {}'.format(self.overall_resources_utilization.scheduled.storage)
         else:
-            print Fore.CYAN + '[Info] NO scheduled experiments or tasks.' + Style.RESET_ALL
+            print Fore.CYAN + '[Info] No scheduled experiments or tasks.' + Style.RESET_ALL
 
 
 if __name__ == '__main__':
