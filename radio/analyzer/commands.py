@@ -19,6 +19,7 @@ class TelecommandData(object):
 
     def __init__(self, telecommand):
         self.telecommand = telecommand
+        self.correlation_id = None
 
     def telecommand_name(self):
         return type(self.telecommand).__name__
@@ -51,8 +52,7 @@ class TelecommandData(object):
         return int(math.ceil(bytes_count / self.downlink_frame_bytes_count))
 
     def get_correlation_id(self):
-        payload = self.get_payload()
-        return payload[0]
+        return self.correlation_id
 
     def get_response_bytes_count(self):
         raise NotImplementedError()
@@ -106,23 +106,34 @@ class SimpleTelecommandData(TelecommandData):
     def get_requires_send_receive(self):
         return False
 
+def set_correlation_id(init):
+    def wrap(self, telecommand, *args, **kwargs):
+        init(self, telecommand, *args, **kwargs)
+        self.correlation_id = telecommand.correlation_id()
+    return wrap
+
 class SetBuiltinDetumblingBlockMaskTelecommandData(SimpleTelecommandData):
+    @set_correlation_id
     def __init__(self, telecommand):
         super(SetBuiltinDetumblingBlockMaskTelecommandData, self).__init__(telecommand, 2)
 
 class SetAdcsModeTelecommandData(SimpleTelecommandData):
+    @set_correlation_id
     def __init__(self, telecommand):
         super(SetAdcsModeTelecommandData, self).__init__(telecommand, 2)
 
 class SetAntennaDeploymentData(SimpleTelecommandData):
+    @set_correlation_id
     def __init__(self, telecommand):
         super(SetAntennaDeploymentData, self).__init__(telecommand, 2)
 
 class SetBootSlotsData(SimpleTelecommandData):
+    @set_correlation_id
     def __init__(self, telecommand):
         super(SetBootSlotsData, self).__init__(telecommand, 4)
 
 class EnterIdleStateData(SimpleTelecommandData):
+    @set_correlation_id
     def __init__(self, telecommand):
         super(EnterIdleStateData, self).__init__(telecommand, 2)
 
@@ -149,6 +160,7 @@ class ResetTransmitterTelecommandData(SimpleTelecommandData):
 
 class SetBitrateData(SimpleTelecommandData):
     BIT_RATE_MAP = [0, 1200, 2400, 0, 4800, 0, 0, 0, 9600]
+    @set_correlation_id
     def __init__(self, telecommand):
         super(SetBitrateData, self).__init__(telecommand, 2)
 
@@ -166,30 +178,37 @@ class GetCompileInfoTelecommandData(SimpleTelecommandData):
         super(GetCompileInfoTelecommandData, self).__init__(telecommand, 300)
 
 class DisableOverheatSubmodeData(SimpleTelecommandData):
+    @set_correlation_id
     def __init__(self, telecommand):
         super(DisableOverheatSubmodeData, self).__init__(telecommand, 2)
 
 class PerformDetumblingExperimentData(SimpleTelecommandData):
+    @set_correlation_id
     def __init__(self, telecommand):
         super(PerformDetumblingExperimentData, self).__init__(telecommand, 2)
 
 class AbortExperimentData(SimpleTelecommandData):
+    @set_correlation_id
     def __init__(self, telecommand):
         super(AbortExperimentData, self).__init__(telecommand, 2)
 
 class PerformSunSExperimentData(SimpleTelecommandData):
+    @set_correlation_id
     def __init__(self, telecommand):
         super(PerformSunSExperimentData, self).__init__(telecommand, 2)
 
 class PerformRadFETExperimentData(SimpleTelecommandData):
+    @set_correlation_id
     def __init__(self, telecommand):
         super(PerformRadFETExperimentData, self).__init__(telecommand, 2)
 
 class PerformSailExperimentData(SimpleTelecommandData):
+    @set_correlation_id
     def __init__(self, telecommand):
         super(PerformSailExperimentData, self).__init__(telecommand, 2)
 
 class PerformPayloadCommissioningExperimentData(SimpleTelecommandData):
+    @set_correlation_id
     def __init__(self, telecommand):
         super(PerformPayloadCommissioningExperimentData, self).__init__(telecommand, 2)
 
@@ -197,18 +216,22 @@ class PerformPayloadCommissioningExperimentData(SimpleTelecommandData):
         return True
 
 class PerformSADSExperimentData(SimpleTelecommandData):
+    @set_correlation_id
     def __init__(self, telecommand):
         super(PerformSADSExperimentData, self).__init__(telecommand, 2)
 
 class PerformCameraCommissioningExperimentData(SimpleTelecommandData):
+    @set_correlation_id
     def __init__(self, telecommand):
         super(PerformCameraCommissioningExperimentData, self).__init__(telecommand, 2)
 
 class CopyBootSlotsData(SimpleTelecommandData):
+    @set_correlation_id
     def __init__(self, telecommand):
         super(CopyBootSlotsData, self).__init__(telecommand, 2)
 
 class SetErrorCounterConfigData(SimpleTelecommandData):
+    @set_correlation_id
     def __init__(self, telecommand):
         super(SetErrorCounterConfigData, self).__init__(telecommand, 2)
 
@@ -220,6 +243,7 @@ class GetErrorCounterConfigData(SimpleTelecommandData):
         return None
 
 class DownloadFileData(TelecommandData):
+    @set_correlation_id
     def __init__(self, telecommand):
         super(DownloadFileData, self).__init__(telecommand)
 
@@ -237,6 +261,7 @@ class DownloadFileData(TelecommandData):
         return False
 
 class RemoveFileData(TelecommandData):
+    @set_correlation_id
     def __init__(self, telecommand):
         super(RemoveFileData, self).__init__(telecommand)
 
@@ -252,6 +277,7 @@ class RemoveFileData(TelecommandData):
         return False
 
 class ListFilesData(TelecommandData):
+    @set_correlation_id
     def __init__(self, telecommand):
         super(ListFilesData, self).__init__(telecommand)
 
@@ -265,14 +291,17 @@ class ListFilesData(TelecommandData):
         return False
 
 class EraseFlashData(SimpleTelecommandData):
+    @set_correlation_id
     def __init__(self, telecommand):
         super(EraseFlashData, self).__init__(telecommand, 3)
 
 class RawI2CData(SimpleTelecommandData):
+    @set_correlation_id
     def __init__(self, telecommand):
         super(RawI2CData, self).__init__(telecommand, self.downlink_frame_bytes_count)
 
 class ReadMemoryData(TelecommandData):
+    @set_correlation_id
     def __init__(self, telecommand):
         super(ReadMemoryData, self).__init__(telecommand)
 
@@ -291,6 +320,7 @@ class ReadMemoryData(TelecommandData):
 
 # --------------------------
 class SetPeriodicMessageTelecommandData(SimpleTelecommandData):
+    @set_correlation_id
     def __init__(self, telecommand):
         super(SetPeriodicMessageTelecommandData, self).__init__(telecommand, 2)
 
@@ -299,6 +329,7 @@ class SendPeriodicMessageTelecommandData(SimpleTelecommandData):
         super(SendPeriodicMessageTelecommandData, self).__init__(telecommand, 2)
 
 class TakePhotoTelecommandData(SimpleTelecommandData):
+    @set_correlation_id
     def __init__(self, telecommand):
         super(TakePhotoTelecommandData, self).__init__(telecommand, 2)
 
@@ -306,10 +337,12 @@ class TakePhotoTelecommandData(SimpleTelecommandData):
         return True
 
 class PurgePhotoTelecommandData(SimpleTelecommandData):
+    @set_correlation_id
     def __init__(self, telecommand):
         super(PurgePhotoTelecommandData, self).__init__(telecommand, 2)
 
 class PowerCycleTelecommandData(SimpleTelecommandData):
+    @set_correlation_id
     def __init__(self, telecommand):
         super(PowerCycleTelecommandData, self).__init__(telecommand, 2)
 
@@ -330,6 +363,7 @@ class FinalizeProgramEntryData(SimpleTelecommandData):
         super(FinalizeProgramEntryData, self).__init__(telecommand, 2)
 
 class OpenSailTelecommandData(SimpleTelecommandData):
+    @set_correlation_id
     def __init__(self, telecommand):
         super(OpenSailTelecommandData, self).__init__(telecommand, 2)
 
@@ -338,6 +372,7 @@ class OpenSailTelecommandData(SimpleTelecommandData):
         notes.warning('Did you mean: PerformSailExperiment?')
 
 class StopSailDeploymentData(SimpleTelecommandData):
+    @set_correlation_id
     def __init__(self, telecommand):
         super(StopSailDeploymentData, self).__init__(telecommand, 2)
 
@@ -346,14 +381,17 @@ class GetPersistentStateData(SimpleTelecommandData):
         super(GetPersistentStateData, self).__init__(telecommand, 2)
 
 class GetSunSDataSetsData(SimpleTelecommandData):
+    @set_correlation_id
     def __init__(self, telecommand):
         super(GetSunSDataSetsData, self).__init__(telecommand, 2)
 
 class SetTimeCorrectionConfigData(SimpleTelecommandData):
+    @set_correlation_id
     def __init__(self, telecommand):
         super(SetTimeCorrectionConfigData, self).__init__(telecommand, 2)
 
 class SetTimeData(SimpleTelecommandData):
+    @set_correlation_id
     def __init__(self, telecommand):
         super(SetTimeData, self).__init__(telecommand, 2)
 

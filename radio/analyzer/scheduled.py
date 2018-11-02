@@ -7,8 +7,8 @@ class Scheduled:
     def process(self, task):
         resources_utilization = Resources.init_with_zeros()
 
-        if TaskAnalyzer.get_task_name(task) == "PerformPayloadCommissioningExperiment":
-            return PerformPayloadCommissioningExperiment.process(resources_utilization)
+        # if TaskAnalyzer.get_task_name(task) == "PerformPayloadCommissioningExperiment":
+        #     return PerformPayloadCommissioningExperiment.process(resources_utilization)
 
         return resources_utilization
 
