@@ -1,7 +1,7 @@
 from resources import *
 from notes import *
 from commands import TelecommandDataFactory
-from task_actions import WaitMode
+from task_actions import WaitMode, SendReceive
 
 class TaskData:
     def __init__(self, name, is_scheduled, resources_utilization, notes):
@@ -35,7 +35,7 @@ class TaskAnalyzer:
         if command_data.get_requires_wait() and wait_mode != WaitMode.Wait:
             notes.warning('Wait suggested')
 
-        if command_data.get_requires_send_receive() and send_mode != 'SendReceive':
+        if command_data.get_requires_send_receive() and send_mode != SendReceive:
             notes.warning('SendReceive suggested')
 
         task_resources.session.uplink.duration = command_data.get_uplink_duration(state.current_uplink_bitrate())
