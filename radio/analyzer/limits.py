@@ -1,6 +1,6 @@
 class Limits(object):
     DOWNLINK_MAX_FRAME_SIZE = 235
-    MAX_RESPONSE_FRAMES = 39
+    MAX_RESPONSE_FRAMES = 38
 
     def __init__(self):
         self.downlink_frame_size_limit = Limits.DOWNLINK_MAX_FRAME_SIZE

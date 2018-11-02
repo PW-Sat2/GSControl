@@ -243,6 +243,7 @@ class GetErrorCounterConfigData(SimpleTelecommandData):
         return None
 
 class DownloadFileData(TelecommandData):
+    MAX_PATH_LENGTH = 100
     @set_correlation_id
     def __init__(self, telecommand):
         super(DownloadFileData, self).__init__(telecommand)
@@ -260,6 +261,15 @@ class DownloadFileData(TelecommandData):
     def get_requires_send_receive(self):
         return False
 
+    def process(self, state, notes, send_mode, wait_mode, limits):
+        self.process_common_command(state, notes, send_mode, wait_mode, limits)
+        path = self.telecommand._path
+        if len(path) > self.MAX_PATH_LENGTH:
+            notes.error('Path too long: {0}'.format(len(path)))
+        seqs = self.telecommand._seqs
+        if len(seqs) > limits.max_response_frames():
+            notes.error('Too many sequences are requested for download: {0}'.format(len(seqs)))
+        
 class RemoveFileData(TelecommandData):
     @set_correlation_id
     def __init__(self, telecommand):
