@@ -19,7 +19,7 @@ class ScheduledTaskDataFactory(object):
     })
 
     def get_process(self, task):
-        taskType = type(task)
+        taskType = type(task[0])
         if taskType in ScheduledTaskDataFactory.map:
             return ScheduledTaskDataFactory.map[taskType]
         return None
