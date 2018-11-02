@@ -32,17 +32,8 @@ class TaskAnalyzer:
         command_data = self.telecommand_data_factory.get_telecommand_data(frame)
         command_data.process(state, notes, send_mode, wait_mode, limits)
 
-        if command_data.get_requires_wait() and wait_mode != WaitMode.Wait:
-            notes.warning('Wait suggested')
-
-        if command_data.get_requires_send_receive() and send_mode != SendReceive:
-            notes.warning('SendReceive suggested')
-
         task_resources.session.uplink.duration = command_data.get_uplink_duration(state.current_uplink_bitrate())
         task_resources.session.downlink.duration = command_data.get_downlink_duration(state.current_downlink_bitrate())
         task_resources.session.power_budget.energy = command_data.get_downlink_energy_consumption(task_resources.session.downlink.duration)
 
         return TaskData(command_data.telecommand_name(), command_data.is_scheduled(), task_resources, notes)
-
-
-

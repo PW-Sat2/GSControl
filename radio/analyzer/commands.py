@@ -10,7 +10,7 @@ import math
 import telecommand as tc
 from resources import *
 from subsystems import *
-
+from task_actions import *
 
 class TelecommandData(object):
     uplink_header_bytes_count = 3
@@ -76,18 +76,16 @@ class TelecommandData(object):
 
     def process_common_command(self, state, notes, send_mode, wait_mode, limits):
         state.add_corelation_id(self.get_correlation_id(), notes)
-        # state.count_uplink_frames(self.get_uplink_frame_count())
-        # state.count_downlink_frames(self.get_downlink_frames_count())
         self.check_frame_size(notes, limits)       
 
         for extra_note in self.get_extra_notes():
             notes.info(extra_note)
 
-        # if self.communication_mode != send_mode:
-        #     notes.warning('Unexpected communication mode')
+        if self.get_requires_send_receive() and send_mode != SendReceive:
+            notes.warning('SendReceive suggested')
 
-        # if self.wait_mode != wait_mode:
-        #     notes.warning('Unexpected wait mode')
+        if self.get_requires_wait() and wait_mode != WaitMode.Wait:
+            notes.warning('Wait suggested')
 
     def process(self, state, notes, send_mode, wait_mode, limits):
         self.process_common_command(state, notes, send_mode, wait_mode, limits)
