@@ -66,6 +66,9 @@ class TelecommandData(object):
     def get_extra_notes(self):
         return []
 
+    def is_scheduled(self):
+        return False
+
     def get_frame_size(self):
         return len(self.telecommand.build())
 
@@ -193,6 +196,9 @@ class PerformPayloadCommissioningExperimentData(SimpleTelecommandData):
     def __init__(self, telecommand):
         super(PerformPayloadCommissioningExperimentData, self).__init__(telecommand, 2)
 
+    def is_scheduled(self):
+        return True
+        
 class PerformSADSExperimentData(SimpleTelecommandData):
     def __init__(self, telecommand):
         super(PerformSADSExperimentData, self).__init__(telecommand, 2)
@@ -298,6 +304,9 @@ class SendPeriodicMessageTelecommandData(SimpleTelecommandData):
 class TakePhotoTelecommandData(SimpleTelecommandData):
     def __init__(self, telecommand):
         super(TakePhotoTelecommandData, self).__init__(telecommand, 2)
+
+    def is_scheduled(self):
+        return True
 
 class PurgePhotoTelecommandData(SimpleTelecommandData):
     def __init__(self, telecommand):

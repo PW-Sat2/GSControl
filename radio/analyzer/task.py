@@ -12,13 +12,8 @@ class TaskData:
 
 
 class TaskAnalyzer:
-    DOWNLINK_MAX_FRAME_SIZE = 235
-    UPLINK_MAX_FRAME_SIZE = 200
-    UPLINK_BITRATE = 1200
     MAX_PATH_LENGTH = 100
     MAX_DOWNLOAD_CHUNKS = 38
-    TASK_FRAME_OFFSET = 0
-    FRAME_PAYLOAD_OFFSET = 1
 
     @classmethod
     def process(self, task, state, limits):
@@ -43,7 +38,7 @@ class TaskAnalyzer:
         if command_data.get_requires_send_receive() and send_mode != 'SendReceive':
             notes.warning('SendReceive suggested')
 
-        if self.get_task_name(task) == 'DownloadFile':
+        if command_data.telecommand_name() == 'DownloadFile':
             payload = command_data.get_payload()
             path_length = payload[1]
             if path_length > self.MAX_PATH_LENGTH:
@@ -54,30 +49,11 @@ class TaskAnalyzer:
                 notes.error('Too many sequences to download')
             task_resources.session.downlink.frames_count += seqs_count
 
-        task_resources.session.uplink.duration = command_data.get_uplink_duration(self.UPLINK_BITRATE)
+        task_resources.session.uplink.duration = command_data.get_uplink_duration(state.current_uplink_bitrate())
         task_resources.session.downlink.duration = command_data.get_downlink_duration(state.current_downlink_bitrate())
         task_resources.session.power_budget.energy = command_data.get_downlink_energy_consumption(task_resources.session.downlink.duration)
 
-        return TaskData(self.get_task_name(task), self.is_scheduled(task), task_resources, notes)
-
-    @classmethod
-    def is_scheduled(self, task):
-        if self.get_task_name(task) == "TakePhotoTelecommand":
-            return True
-        
-        if self.get_task_name(task) == "PerformPayloadCommissioningExperiment":
-            return True
-
-        return False
-    
-    @classmethod
-    def get_task_name(self, task):
-        frame = task[0]
-
-        telecommand_data_factory = TelecommandDataFactory()
-        command_data = telecommand_data_factory.get_telecommand_data(frame)
-
-        return command_data.telecommand_name()
+        return TaskData(command_data.telecommand_name(), command_data.is_scheduled(), task_resources, notes)
 
 
 
