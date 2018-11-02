@@ -1,7 +1,6 @@
 from resources import *
 from notes import *
 from commands import TelecommandDataFactory
-from task_actions import WaitMode, SendReceive
 
 class TaskData:
     def __init__(self, name, is_scheduled, resources_utilization, notes):
@@ -12,9 +11,6 @@ class TaskData:
 
 
 class TaskAnalyzer:
-    MAX_PATH_LENGTH = 100
-    MAX_DOWNLOAD_CHUNKS = 38
-
     def __init__(self):
         self.telecommand_data_factory = TelecommandDataFactory()
 
