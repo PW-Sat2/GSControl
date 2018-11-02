@@ -1,6 +1,6 @@
 from resources import *
+from notes import *
 from commands import TelecommandDataFactory
-from colorama import init, Fore, Style
 
 
 class TaskData:
@@ -127,12 +127,4 @@ class TaskAnalyzer:
         return command_data.telecommand_name()
 
 
-class Notes(list):
-    def warning(self, text):
-        self.append(Fore.YELLOW + '[Warning] ' + text + Style.RESET_ALL)
 
-    def error(self, text):
-        self.append(Fore.RED + '[Error] ' + text + Style.RESET_ALL)
-
-    def info(self, text):
-        self.append(Fore.CYAN + '[Info] ' + text + Style.RESET_ALL)
