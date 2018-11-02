@@ -69,13 +69,10 @@ class TelecommandData(object):
     def is_scheduled(self):
         return False
 
-    def get_frame_size(self):
-        return len(self.telecommand.build())
-
     def check_frame_size(self, notes, limits):
-        uplink_frame_size = self.get_frame_size()
-        if uplink_frame_size > limits.max_uplink_frame_size():
-            notes.error('Frame is too long: {0}'.format(uplink_frame_size))
+        payload_size = self.get_payload_size()
+        if payload_size > self.telecommand.MAX_PAYLOAD_SIZE:
+            notes.error('Frame is too long: {0}'.format(payload_size))
 
     def process_common_command(self, state, notes, send_mode, wait_mode, limits):
         state.add_corelation_id(self.get_correlation_id(), notes)
@@ -198,7 +195,7 @@ class PerformPayloadCommissioningExperimentData(SimpleTelecommandData):
 
     def is_scheduled(self):
         return True
-        
+
 class PerformSADSExperimentData(SimpleTelecommandData):
     def __init__(self, telecommand):
         super(PerformSADSExperimentData, self).__init__(telecommand, 2)
