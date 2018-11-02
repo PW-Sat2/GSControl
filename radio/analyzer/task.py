@@ -15,7 +15,9 @@ class TaskAnalyzer:
     MAX_PATH_LENGTH = 100
     MAX_DOWNLOAD_CHUNKS = 38
 
-    @classmethod
+    def __init__(self):
+        self.telecommand_data_factory = TelecommandDataFactory()
+
     def process(self, task, state, limits):
         frame = task[0]
         send_mode = task[1]
@@ -27,9 +29,7 @@ class TaskAnalyzer:
         task_resources.session.uplink.frames_count += 1
         task_resources.session.downlink.frames_count += 1
 
-        telecommand_data_factory = TelecommandDataFactory()
-        command_data = telecommand_data_factory.get_telecommand_data(frame)
-
+        command_data = self.telecommand_data_factory.get_telecommand_data(frame)
         command_data.process(state, notes, send_mode, wait_mode, limits)
 
         if command_data.get_requires_wait() and wait_mode != WaitMode.Wait:

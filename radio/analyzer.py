@@ -26,8 +26,9 @@ class Analyzer:
         state = State()
         notes = Notes()
         limits = Limits()
+        analyzer = TaskAnalyzer()
         for task in self.tasks:
-            task_data = TaskAnalyzer.process(task, state, limits)
+            task_data = analyzer.process(task, state, limits)
 
             if task_data.is_scheduled:
                 task_data.resources_utilization += Scheduled.process(task)
