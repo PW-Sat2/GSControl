@@ -8,6 +8,7 @@ from analyzer.file import *
 from analyzer.scheduled import *
 from analyzer.commands import TelecommandDataFactory
 from analyzer.state import State
+from analyzer.limits import Limits
 
 init()
 
@@ -24,8 +25,9 @@ class Analyzer:
         index = 1
         state = State()
         notes = Notes()
+        limits = Limits()
         for task in self.tasks:
-            task_data = TaskAnalyzer.process(task, state)
+            task_data = TaskAnalyzer.process(task, state, limits)
 
             if task_data.is_scheduled:
                 task_data.resources_utilization += Scheduled.process(task)

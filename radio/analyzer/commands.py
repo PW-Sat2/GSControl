@@ -66,10 +66,20 @@ class TelecommandData(object):
     def get_extra_notes(self):
         return []
 
-    def process_common_command(self, state, notes, send_mode, wait_mode):
+    def get_frame_size(self):
+        return len(self.telecommand.build())
+
+    def check_frame_size(self, notes, limits):
+        uplink_frame_size = self.get_frame_size()
+        if uplink_frame_size > limits.max_uplink_frame_size():
+            notes.error('Frame is too long: {0}'.format(uplink_frame_size))
+
+    def process_common_command(self, state, notes, send_mode, wait_mode, limits):
         state.add_corelation_id(self.get_correlation_id(), notes)
         # state.count_uplink_frames(self.get_uplink_frame_count())
         # state.count_downlink_frames(self.get_downlink_frames_count())
+        self.check_frame_size(notes, limits)       
+
         for extra_note in self.get_extra_notes():
             notes.info(extra_note)
 
@@ -79,8 +89,8 @@ class TelecommandData(object):
         # if self.wait_mode != wait_mode:
         #     notes.warning('Unexpected wait mode')
 
-    def process(self, state, notes, send_mode, wait_mode):
-        self.process_common_command(state, notes, send_mode, wait_mode)
+    def process(self, state, notes, send_mode, wait_mode, limits):
+        self.process_common_command(state, notes, send_mode, wait_mode, limits)
 
 class SimpleTelecommandData(TelecommandData):
     def __init__(self, telecommand, response_bytes_count):
@@ -133,8 +143,8 @@ class ResetTransmitterTelecommandData(SimpleTelecommandData):
     def get_extra_notes(self):
         return ['Wait 2-3 seconds before sending next command']
 
-    def process(self, state, notes, send_mode, wait_mode):
-        self.process_common_command(state, notes, send_mode, wait_mode)
+    def process(self, state, notes, send_mode, wait_mode, limits):
+        self.process_common_command(state, notes, send_mode, wait_mode, limits)
         state.reset_transmitter()
 
 class SetBitrateData(SimpleTelecommandData):
@@ -142,8 +152,8 @@ class SetBitrateData(SimpleTelecommandData):
     def __init__(self, telecommand):
         super(SetBitrateData, self).__init__(telecommand, 2)
 
-    def process(self, state, notes, send_mode, wait_mode):
-        self.process_common_command(state, notes, send_mode, wait_mode)
+    def process(self, state, notes, send_mode, wait_mode, limits):
+        self.process_common_command(state, notes, send_mode, wait_mode, limits)
         payload = self.get_payload()
         index = payload[1]
         if index not in [1, 2, 4, 8]:
@@ -297,8 +307,8 @@ class PowerCycleTelecommandData(SimpleTelecommandData):
     def __init__(self, telecommand):
         super(PowerCycleTelecommandData, self).__init__(telecommand, 2)
 
-    def process(self, state, notes, send_mode, wait_mode):
-        self.process_common_command(state, notes, send_mode, wait_mode)
+    def process(self, state, notes, send_mode, wait_mode, limits):
+        self.process_common_command(state, notes, send_mode, wait_mode, limits)
         state.reset_satellite()
 
 class EraseBootTableEntryData(SimpleTelecommandData):
@@ -316,6 +326,10 @@ class FinalizeProgramEntryData(SimpleTelecommandData):
 class OpenSailTelecommandData(SimpleTelecommandData):
     def __init__(self, telecommand):
         super(OpenSailTelecommandData, self).__init__(telecommand, 2)
+
+    def process(self, state, notes, send_mode, wait_mode, limits):
+        self.process_common_command(state, notes, send_mode, wait_mode, limits)
+        notes.warning('Did you mean: PerformSailExperiment?')
 
 class StopSailDeploymentData(SimpleTelecommandData):
     def __init__(self, telecommand):
