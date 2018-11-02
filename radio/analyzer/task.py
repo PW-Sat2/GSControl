@@ -1,7 +1,7 @@
 from resources import *
 from notes import *
 from commands import TelecommandDataFactory
-
+from task_actions import WaitMode
 
 class TaskData:
     def __init__(self, name, is_scheduled, bitrate_index, resources_utilization, notes):
@@ -47,7 +47,7 @@ class TaskAnalyzer:
                 notes.error('Duplicate correlation id = {}'.format(correlation_id))
             correlation_ids.append(correlation_id)
 
-        if command_data.get_requires_wait() and wait_mode != 'Wait':
+        if command_data.get_requires_wait() and wait_mode != WaitMode.Wait:
             notes.warning('Wait suggested')
 
         if command_data.get_requires_send_receive() and send_mode != 'SendReceive':
