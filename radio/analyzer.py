@@ -7,7 +7,7 @@ from analyzer.results import *
 from analyzer.file import *
 from analyzer.scheduled import *
 from analyzer.commands import TelecommandDataFactory
-
+from analyzer.state import State
 
 init()
 
@@ -15,8 +15,6 @@ init()
 class Analyzer:
     def __init__(self, tasks):
         self.tasks = tasks
-        self.initial_bitrate_index = 1
-        self.bitrate_index = 1
         self.overall_resources_utilization = Resources.init_with_zeros()
 
     def run(self):
@@ -24,8 +22,10 @@ class Analyzer:
         scheduled_results = [[]]
 
         index = 1
+        state = State()
+        notes = Notes()
         for task in self.tasks:
-            task_data = TaskAnalyzer.process(task, self.bitrate_index)
+            task_data = TaskAnalyzer.process(task, state)
 
             if task_data.is_scheduled:
                 task_data.resources_utilization += Scheduled.process(task)
@@ -35,19 +35,18 @@ class Analyzer:
             session_results.append(Results.session_task(index,
                                                         task_data,
                                                         task_data.is_scheduled,
-                                                        self.bitrate_index))
-
-            self.bitrate_index = TaskAnalyzer.update_bitrate_index(task, self.bitrate_index)
+                                                        state.current_downlink_bitrate()))
 
             self.overall_resources_utilization += task_data.resources_utilization
             index += 1
 
+        state.validate(notes)
+
+        print '\n======================================= General =======================================\n'
+        print '\n'.join(notes)
+        
         print '\n======================== Resources utilization for THIS session ========================\n'
         print Style.RESET_ALL + tabulate(session_results, Results.session_headers())
-
-        if self.bitrate_index != self.initial_bitrate_index:
-            print Fore.YELLOW + '[Warning] Bitrate not restored ({})'.format(self.initial_bitrate_index)\
-                  + Style.RESET_ALL
 
         print '\nSession downlink frames count: {}'.format(self.overall_resources_utilization.session.downlink.frames_count)
         print 'Session downlink duration [s]: {}'.format(self.overall_resources_utilization.session.downlink.duration)

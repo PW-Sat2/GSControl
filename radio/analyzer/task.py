@@ -4,10 +4,9 @@ from commands import TelecommandDataFactory
 from task_actions import WaitMode
 
 class TaskData:
-    def __init__(self, name, is_scheduled, bitrate_index, resources_utilization, notes):
+    def __init__(self, name, is_scheduled, resources_utilization, notes):
         self.name = name
         self.is_scheduled = is_scheduled
-        self.bitrate_index = bitrate_index
         self.resources_utilization = resources_utilization
         self.notes = notes
 
@@ -22,7 +21,7 @@ class TaskAnalyzer:
     FRAME_PAYLOAD_OFFSET = 1
 
     @classmethod
-    def process(self, task, bitrate_index=1):
+    def process(self, task, state):
         frame = task[0]
         send_mode = task[1]
         wait_mode = task[2]
@@ -34,18 +33,12 @@ class TaskAnalyzer:
         task_resources.session.uplink.frames_count += 1
         task_resources.session.downlink.frames_count += 1
 
-        downlink_bitrate = self.to_bitrate(bitrate_index)
-
         notes = Notes()
 
         telecommand_data_factory = TelecommandDataFactory()
         command_data = telecommand_data_factory.get_telecommand_data(frame)
 
-        correlation_id = command_data.get_correlation_id()
-        if correlation_id is not None:
-            if correlation_id in correlation_ids:
-                notes.error('Duplicate correlation id = {}'.format(correlation_id))
-            correlation_ids.append(correlation_id)
+        command_data.process(state, notes, send_mode, wait_mode)
 
         if command_data.get_requires_wait() and wait_mode != WaitMode.Wait:
             notes.warning('Wait suggested')
@@ -81,10 +74,10 @@ class TaskAnalyzer:
             notes.info(extra_note)
 
         task_resources.session.uplink.duration = command_data.get_uplink_duration(self.UPLINK_BITRATE)
-        task_resources.session.downlink.duration = command_data.get_downlink_duration(downlink_bitrate)
+        task_resources.session.downlink.duration = command_data.get_downlink_duration(state.current_downlink_bitrate())
         task_resources.session.power_budget.energy = command_data.get_downlink_energy_consumption(task_resources.session.downlink.duration)
 
-        return TaskData(self.get_task_name(task), self.is_scheduled(task), bitrate_index, task_resources, notes)
+        return TaskData(self.get_task_name(task), self.is_scheduled(task), task_resources, notes)
 
     @classmethod
     def update_bitrate_index(self, task, current_bitrate_index):

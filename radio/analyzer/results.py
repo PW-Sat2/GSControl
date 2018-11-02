@@ -27,14 +27,14 @@ class Results:
         return session_headers
 
     @classmethod
-    def session_task(self, index, task_data, is_experiment, bitrate_index):
+    def session_task(self, index, task_data, is_experiment, bitrate):
         task_results = []
 
         task_results = [
             index,
             task_data.name,
             is_experiment,
-            TaskAnalyzer.to_bitrate(task_data.bitrate_index),
+            bitrate,
             # Place for utilized resources
             '\n'.join(task_data.notes)
         ]

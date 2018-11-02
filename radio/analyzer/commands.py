@@ -66,6 +66,22 @@ class TelecommandData(object):
     def get_extra_notes(self):
         return []
 
+    def process_common_command(self, state, notes, send_mode, wait_mode):
+        state.add_corelation_id(self.get_correlation_id(), notes)
+        # state.count_uplink_frames(self.get_uplink_frame_count())
+        # state.count_downlink_frames(self.get_downlink_frames_count())
+        for extra_note in self.get_extra_notes():
+            notes.info(extra_note)
+
+        # if self.communication_mode != send_mode:
+        #     notes.warning('Unexpected communication mode')
+
+        # if self.wait_mode != wait_mode:
+        #     notes.warning('Unexpected wait mode')
+
+    def process(self, state, notes, send_mode, wait_mode):
+        self.process_common_command(state, notes, send_mode, wait_mode)
+
 class SimpleTelecommandData(TelecommandData):
     def __init__(self, telecommand, response_bytes_count):
         super(SimpleTelecommandData, self).__init__(telecommand)
