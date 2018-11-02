@@ -133,9 +133,23 @@ class ResetTransmitterTelecommandData(SimpleTelecommandData):
     def get_extra_notes(self):
         return ['Wait 2-3 seconds before sending next command']
 
+    def process(self, state, notes, send_mode, wait_mode):
+        self.process_common_command(state, notes, send_mode, wait_mode)
+        state.reset_transmitter()
+
 class SetBitrateData(SimpleTelecommandData):
+    BIT_RATE_MAP = [0, 1200, 2400, 0, 4800, 0, 0, 0, 9600]
     def __init__(self, telecommand):
         super(SetBitrateData, self).__init__(telecommand, 2)
+
+    def process(self, state, notes, send_mode, wait_mode):
+        self.process_common_command(state, notes, send_mode, wait_mode)
+        payload = self.get_payload()
+        index = payload[1]
+        if index not in [1, 2, 4, 8]:
+            notes.error('Wrong bitrate value: {0}'.format(index))
+        else:
+            state.change_downlink_bit_rate(SetBitrateData.BIT_RATE_MAP[index])
 
 class GetCompileInfoTelecommandData(SimpleTelecommandData):
     def __init__(self, telecommand):
@@ -282,6 +296,10 @@ class PurgePhotoTelecommandData(SimpleTelecommandData):
 class PowerCycleTelecommandData(SimpleTelecommandData):
     def __init__(self, telecommand):
         super(PowerCycleTelecommandData, self).__init__(telecommand, 2)
+
+    def process(self, state, notes, send_mode, wait_mode):
+        self.process_common_command(state, notes, send_mode, wait_mode)
+        state.reset_satellite()
 
 class EraseBootTableEntryData(SimpleTelecommandData):
     def __init__(self, telecommand):

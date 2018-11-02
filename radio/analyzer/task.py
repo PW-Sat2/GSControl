@@ -12,7 +12,6 @@ class TaskData:
 
 
 class TaskAnalyzer:
-    BITRATE_MAP = [0, 1200, 2400, 0, 4800, 0, 0, 0, 9600]
     DOWNLINK_MAX_FRAME_SIZE = 235
     UPLINK_BITRATE = 1200
     MAX_PATH_LENGTH = 100
@@ -49,13 +48,6 @@ class TaskAnalyzer:
         if self.get_task_name(task) == 'OpenSailTelecommand':
             notes.warning('Did you mean: PerformSailExperiment?')
 
-        if self.get_task_name(task) == 'SetBitrate':
-            payload = command_data.get_payload()
-            if payload[1] not in [1, 2, 4, 8]:
-                notes.error('Wrong bitrate value')
-            else:
-                self.bitrate_index = payload[1]
-
         if self.get_task_name(task) == 'DownloadFile':
             payload = command_data.get_payload()
             path_length = payload[1]
@@ -78,27 +70,6 @@ class TaskAnalyzer:
         task_resources.session.power_budget.energy = command_data.get_downlink_energy_consumption(task_resources.session.downlink.duration)
 
         return TaskData(self.get_task_name(task), self.is_scheduled(task), task_resources, notes)
-
-    @classmethod
-    def update_bitrate_index(self, task, current_bitrate_index):
-        new_bitrate_index = current_bitrate_index
-
-        if self.get_task_name(task) == "SetBitrate":
-            frame = task[self.TASK_FRAME_OFFSET]
-            telecommand_data_factory = TelecommandDataFactory()
-            new_bitrate_index = telecommand_data_factory.get_telecommand_data(frame).get_payload()[self.FRAME_PAYLOAD_OFFSET]
-
-        if self.get_task_name(task) == "PowerCycleTelecommand":
-            new_bitrate_index = 1
-
-        if self.get_task_name(task) == "ResetTransmitterTelecommand":
-            new_bitrate_index = 1
-
-        return new_bitrate_index
-
-    @classmethod
-    def to_bitrate(self, bitrate_index):
-        return self.BITRATE_MAP[bitrate_index]
 
     @classmethod
     def is_scheduled(self, task):

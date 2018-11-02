@@ -1,4 +1,5 @@
 tasks = [
+    [tc.SetBitrate(3, 3), SendReceive, WaitMode.NoWait],
     [tc.SetBitrate(1, 8), SendReceive, WaitMode.NoWait],
     [tc.SendBeacon(), SendReceive, WaitMode.NoWait],
     [tc.SendBeacon(), "Send", WaitMode.NoWait],
