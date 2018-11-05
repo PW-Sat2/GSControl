@@ -12,7 +12,12 @@ def build(sender, rcv, frame_decoder, ns):
         """
         Performs list of tasks.
 
-        Each task is defined as list: [<telecommand object>, Send|SendReceive, "Wait|NoWait"]
+        Each task is defined as list: [<arg>, Send|SendReceive|Sleep|Print, "Wait|NoWait"]
+        
+        For Send <arg> is a telecommand object
+        For SendReceive <arg> is a telecommand object
+        For Sleep <arg> is time in seconds
+        For Print <arg> is text to display
 
         When using "Wait" it is necessary to type 'n<ENTER>' to continue running tasks
         """
