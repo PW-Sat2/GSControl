@@ -11,7 +11,7 @@ def build(*args):
 
         return result
 
-    def parse_and_save_file_chunks(path, frames, correlation_ids):
+    def extract_and_save_file_chunks(path, frames, correlation_ids):
         """
         Extracts file chunks from frames list
 
@@ -26,7 +26,7 @@ def build(*args):
         
         RemoteFileTools.save_chunks(path, part_response)
 
-    def parse_and_save_photo_chunks(path, frames, correlation_ids):
+    def extract_and_save_photo_chunks(path, frames, correlation_ids):
         """
         Extracts photo chunks from frames list
 
@@ -41,7 +41,7 @@ def build(*args):
 
         RemoteFileTools.save_photo(path, part_response)
 
-    def parse_and_save_raw_and_photo(path, frames, correlation_ids):
+    def extract_and_save_raw_and_photo(path, frames, correlation_ids):
         """
         Extracts photo chunks from frames list
 
@@ -58,7 +58,7 @@ def build(*args):
         parse_and_save_photo_chunks(path + '.jpg', frames, correlation_ids)
         parse_and_save_file_chunks(path + '.raw', frames, correlation_ids)
 
-    def parse_and_save_beacons(path, frames):
+    def extract_and_save_beacons(path, frames):
         """
         Extracts beacon frames, parses them and dumps to file
 
@@ -78,7 +78,7 @@ def build(*args):
         with open(path, 'w') as f:
             json.dump(beacons, f, default=ParseBeacon.convert_values, sort_keys=True, indent=4)
 
-    def parse_and_save_file_list(path, frames, correlation_id):
+    def extract_and_save_file_list(path, frames, correlation_id):
         """
         Extracts file list frames, parses them and dumps to file
 
@@ -109,9 +109,9 @@ def build(*args):
             f.write(text)
 
     return {
-        'parse_and_save_file_chunks': parse_and_save_file_chunks,                     
-        'parse_and_save_photo_chunks': parse_and_save_photo_chunks,
-        'parse_and_save_raw_and_photo': parse_and_save_raw_and_photo,
-        'parse_and_save_beacons': parse_and_save_beacons,
-        'parse_and_save_file_list': parse_and_save_file_list
+        'extract_and_save_file_chunks': extract_and_save_file_chunks,
+        'extract_and_save_photo_chunks': extract_and_save_photo_chunks,
+        'extract_and_save_raw_and_photo': extract_and_save_raw_and_photo,
+        'extract_and_save_beacons': extract_and_save_beacons,
+        'extract_and_save_file_list': extract_and_save_file_list
     }
