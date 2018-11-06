@@ -135,6 +135,12 @@ class EnterIdleStateData(SimpleTelecommandData):
     def __init__(self, telecommand):
         super(EnterIdleStateData, self).__init__(telecommand, 2)
 
+    def process(self, state, notes, send_mode, wait_mode, limits):
+        self.process_common_command(state, notes, send_mode, wait_mode, limits)
+        notes.info('Prefer using Ping/SendBeacon telecommands instead')
+        if self.telecommand._duration > 100:
+            notes.warning('Prolonged COMM Idle state with significant power consumption (>= 100mWh)')
+
 class SendBeaconData(SimpleTelecommandData):
     def __init__(self, telecommand):
         super(SendBeaconData, self).__init__(telecommand, 1)
@@ -180,6 +186,13 @@ class DisableOverheatSubmodeData(SimpleTelecommandData):
     def __init__(self, telecommand):
         super(DisableOverheatSubmodeData, self).__init__(telecommand, 2)
 
+    def process(self, state, notes, send_mode, wait_mode, limits):
+        self.process_common_command(state, notes, send_mode, wait_mode, limits)
+        notes.warning('Overheat submode can be enabled only by restarting EPS controller')
+        notes.warning('It is not possible to determine current state of overheat submode (enabled/disabled)')
+        if self.telecommand._controller != 0 and self.telecommand._controller != 1:
+            notes.error('Invalid controller id: "{0}"'.format(self.telecommand._controller))
+
 class PerformDetumblingExperimentData(SimpleTelecommandData):
     @set_correlation_id
     def __init__(self, telecommand):
@@ -189,6 +202,11 @@ class AbortExperimentData(SimpleTelecommandData):
     @set_correlation_id
     def __init__(self, telecommand):
         super(AbortExperimentData, self).__init__(telecommand, 2)
+
+    def process(self, state, notes, send_mode, wait_mode, limits):
+        self.process_common_command(state, notes, send_mode, wait_mode, limits)
+        notes.warning('Aborting experiment has unpredicted results')
+        notes.warning('Experiment is aborted during next experiment loop iteration')
 
 class PerformSunSExperimentData(SimpleTelecommandData):
     @set_correlation_id
