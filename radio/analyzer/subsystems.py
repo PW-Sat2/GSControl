@@ -17,6 +17,7 @@ class Comm:
     DOWNLINK_MAX_PREAMBLE_9600 = Duration(0.3)
     UPLINK_PTT_DELAY = Duration(1.0)
     FULL_FRAME = 235  # bytes
+    PROPAGATION_DELAY = Duration((2000.0/300000.0) * 2) # in both ways
 
     @classmethod
     def downlink_frames_duration(self, frames_count, bitrate):
@@ -35,7 +36,7 @@ class Comm:
         tx_preamble = self.DOWNLINK_MAX_PREAMBLE
         if bitrate == 9600:
             tx_preamble = self.DOWNLINK_MAX_PREAMBLE_9600
-        return Duration(float(bits_count) / bitrate) + tx_preamble
+        return Duration(float(bits_count) / bitrate) + tx_preamble + self.PROPAGATION_DELAY
 
     @classmethod
     def downlink_durations(self, frames_count):
@@ -55,14 +56,25 @@ class Comm:
         return Duration(float(bits_count) / bitrate) + self.UPLINK_PTT_DELAY
 
 
-class Cam:
-    PHOTO_128_MAX_FULL_FRAMES = 12 # in FULL FRAMES
-    PHOTO_240_MAX_FULL_FRAMES = 20 # in FULL FRAMES
-    PHOTO_480_MAX_FULL_FRAMES = 80 # in FULL FRAMES
+class Camera:
+    '''
+    Resources utilization for Cameras.
+
+    Source: PWSat2-SVN/system/tests_and_reports/29 -
+            Experiments power consumption estimation/data/plots
+    '''
+
+    PHOTO_128_MAX_FULL_FRAMES = 12 # in FULL FRAMES (232 bytes each)
+    PHOTO_240_MAX_FULL_FRAMES = 20 # in FULL FRAMES (232 bytes each)
+    PHOTO_480_MAX_FULL_FRAMES = 80 # in FULL FRAMES (232 bytes each)
+
+    COMMISSIONING_EXP_DURATION = Duration(230)
+    COMMISSIONING_3V3_ENERGY_CONSUMPTION = Energy(0.0178 * 1000.0)
+
 
 class Pld:
     '''
-    Resources utilization for Payload Commissioning.
+    Resources utilization for Payload.
 
     Source: PWSat2-SVN/system/tests_and_reports/29 -
             Experiments power consumption estimation/data/plots
@@ -70,3 +82,16 @@ class Pld:
 
     SENS_5V0_ENERGY_CONSUMPTION = 0.0021 # Wh
     PLD_3V3_ENERGY_CONSUMPTION = 0.0178 # Wh
+
+class Suns:
+    EQUIPMENT_TURN_ON_TIME = Duration(3)  # s
+    ESTIMATED_OBC_DELAY_PER_SAMPLE = Duration(0.01)  # s
+
+    # W (source: https://team.pw-sat.pl/w/suns/suns_fm/power_consumption/)
+    SUNS_EXP_AVERAGE_POWER_3V3 = 0.0701 
+    
+    # W (source: datasheet)
+    SUNS_REF_AVERAGE_POWER_5V0 = 0.05  
+
+    # W (source: https://team.pw-sat.pl/w/system/power-budget/experiments/#payload-commisioning - PLD SENS @ idle state)
+    PLD_SENS_AVERAGE_POWER_5V0 = 5.0*0.0243  
