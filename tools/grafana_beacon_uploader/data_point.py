@@ -94,10 +94,12 @@ def _lcl_data_points(timestamp, telemetry):
     return points
 
 
-def generate_data_points(timestamp, telemetry):
+def generate_data_points(timestamp, telemetry, extra_tags):
     tags = {
         "source": "comm",
     }
+
+    tags.update(extra_tags)
 
     telemetry_point = [_data_point(
         timestamp=timestamp,
