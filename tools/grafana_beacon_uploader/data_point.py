@@ -136,6 +136,26 @@ def _temperate_data_points(timestamp, telemetry):
 
     return points
 
+def _gyro_data_points(timestamp, telemetry):
+    points = []
+
+    gyro = telemetry['10: Gyroscope']
+
+    for field in ['0510: X measurement', '0526: Y measurement', '0542: Z measurement']:
+        axis = field[6]    
+        points.append(_data_point(
+            timestamp=timestamp,
+            measurement="gyroscope",
+            tags={
+                "axis": axis
+            },
+            fields={
+                "value": float(gyro[field].converted)
+            }
+        ))
+
+    return points
+
 def generate_data_points(timestamp, telemetry, extra_tags):
     tags = {
         "source": "comm",
@@ -153,8 +173,9 @@ def generate_data_points(timestamp, telemetry, extra_tags):
     error_counters = _error_counter_data_points(timestamp, telemetry)
     lcl = _lcl_data_points(timestamp, telemetry)
     temperatures = _temperate_data_points(timestamp, telemetry)
+    gyro = _gyro_data_points(timestamp, telemetry)
 
-    points = telemetry_point + error_counters + lcl + temperatures
+    points = telemetry_point + error_counters + lcl + temperatures + gyro
 
     for p in points:
         p['tags'].update(tags)
