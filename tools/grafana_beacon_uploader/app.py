@@ -7,7 +7,7 @@ from influxdb import InfluxDBClient
 
 import response_frames
 from data_point import generate_data_points
-from devices import BeaconFrame
+from devices.comm import BeaconFrame
 from radio.radio_receiver import Receiver
 from tools.parse_beacon import ParseBeacon
 
