@@ -185,6 +185,39 @@ def _mppt_data_points(timestamp, telemetry):
 
     return points
 
+def _eps_dist_data_points(timestamp, telemetry):
+    points = []
+
+    sensors = [
+        ('3V3', '14: Controller A', '0946: DISTR.VOLT_3V3', '0956: DISTR.CURR_3V3'),
+        ('5V', '14: Controller A', '0966: DISTR.VOLT_5V', '0976: DISTR.CURR_5V'),
+        ('VBAT', '14: Controller A', '0986: DISTR.VOLT_VBAT', '0996: DISTR.CURR_VBAT'),
+        ('BATC (A)', '14: Controller A', '1019: BATC.VOLT_A', None),
+        ('BATC (B)', '15: Controller B', '1204: BATC.VOLT_B', None),
+        ('BATC Charging', '14: Controller A', None, '1029: BATC.CHRG_CURR'),
+        ('BATC Discharging', '14: Controller A', None, '1039: BATC.DCHRG_CURR'),
+        ('EPS B', '14: Controller A', None, '1164: ControllerB.3V3d'),
+        ('EPS A', '15: Controller B', None, '1290: ControllerA.3V3d'),
+    ]
+
+    for (name, group, volt, curr) in sensors:
+        fields = {}
+        if volt is not None:
+            fields['voltage'] = float(telemetry[group][volt].converted)
+        if curr is not None:
+            fields['current'] = float(telemetry[group][curr].converted)
+
+        points.append(_data_point(
+            timestamp=timestamp,
+            measurement="distribution",
+            tags={
+                "name": name
+            },
+            fields=fields
+        ))
+
+    return points
+
 def generate_data_points(timestamp, telemetry, extra_tags):
     tags = {
         "source": "comm",
@@ -204,8 +237,9 @@ def generate_data_points(timestamp, telemetry, extra_tags):
     temperatures = _temperate_data_points(timestamp, telemetry)
     gyro = _gyro_data_points(timestamp, telemetry)
     mppt = _mppt_data_points(timestamp, telemetry)
+    dist = _eps_dist_data_points(timestamp, telemetry)
 
-    points = telemetry_point + error_counters + lcl + temperatures + gyro + mppt
+    points = telemetry_point + error_counters + lcl + temperatures + gyro + mppt + dist
 
     for p in points:
         p['tags'].update(tags)
