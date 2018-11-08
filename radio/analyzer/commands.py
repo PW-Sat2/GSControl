@@ -58,7 +58,16 @@ class TelecommandData(object):
         raise NotImplementedError()
 
     def get_requires_wait(self):
-        raise NotImplementedError()
+        return True
+
+    def validate_wait_mode(self, wait_mode, notes):
+        requires_wait = self.get_requires_wait()
+        
+        if requires_wait and wait_mode != WaitMode.Wait:
+            notes.warning('Waiting is suggested')
+
+        if not requires_wait and wait_mode != WaitMode.NoWait:
+            notes.warning('Waiting is not recommended')
 
     def get_requires_send_receive(self):
         raise NotImplementedError()
@@ -84,8 +93,7 @@ class TelecommandData(object):
         if self.get_requires_send_receive() and send_mode != SendReceive:
             notes.warning('SendReceive suggested')
 
-        if self.get_requires_wait() and wait_mode != WaitMode.Wait:
-            notes.warning('Wait suggested')
+        self.validate_wait_mode(wait_mode, notes)
 
     def process(self, state, notes, send_mode, wait_mode, limits):
         self.process_common_command(state, notes, send_mode, wait_mode, limits)
@@ -143,17 +151,14 @@ class EnterIdleStateData(SimpleTelecommandData):
 
 class SendBeaconData(SimpleTelecommandData):
     def __init__(self, telecommand):
-        super(SendBeaconData, self).__init__(telecommand, 1)
-
-    def get_correlation_id(self):
-        return None
+        super(SendBeaconData, self).__init__(telecommand, 235)
 
 class ResetTransmitterTelecommandData(SimpleTelecommandData):
     def __init__(self, telecommand):
         super(ResetTransmitterTelecommandData, self).__init__(telecommand, 2)
 
-    def get_correlation_id(self):
-        return None
+    def get_requires_wait(self):
+        return True
 
     def get_extra_notes(self):
         return ['Wait 2-3 seconds before sending next command']
@@ -191,7 +196,7 @@ class DisableOverheatSubmodeData(SimpleTelecommandData):
         notes.warning('Overheat submode can be enabled only by restarting EPS controller')
         notes.warning('It is not possible to determine current state of overheat submode (enabled/disabled)')
         if self.telecommand._controller != 0 and self.telecommand._controller != 1:
-            notes.error('Invalid controller id: "{0}"'.format(self.telecommand._controller))
+            notes.error('Invalid controller id: {0}'.format(self.telecommand._controller))
 
 class PerformDetumblingExperimentData(SimpleTelecommandData):
     @set_correlation_id
@@ -221,10 +226,20 @@ class PerformRadFETExperimentData(SimpleTelecommandData):
     def __init__(self, telecommand):
         super(PerformRadFETExperimentData, self).__init__(telecommand, 2)
 
+    def process(self, state, notes, send_mode, wait_mode, limits):
+        self.process_common_command(state, notes, send_mode, wait_mode, limits)
+        path = self.telecommand.output_file_name
+        if len(path) + 1 > 30:
+            notes.error("Path is too long: {0}. 30 characters including null terminator are allowed.".format(len(path) + 1))
+
 class PerformSailExperimentData(SimpleTelecommandData):
     @set_correlation_id
     def __init__(self, telecommand):
         super(PerformSailExperimentData, self).__init__(telecommand, 2)
+
+    def process(self, state, notes, send_mode, wait_mode, limits):
+        self.process_common_command(state, notes, send_mode, wait_mode, limits)
+        notes.warning('This command effectively ends satellite mission')
 
 class PerformPayloadCommissioningExperimentData(SimpleTelecommandData):
     @set_correlation_id
@@ -233,6 +248,12 @@ class PerformPayloadCommissioningExperimentData(SimpleTelecommandData):
 
     def is_scheduled(self):
         return True
+
+    def process(self, state, notes, send_mode, wait_mode, limits):
+        self.process_common_command(state, notes, send_mode, wait_mode, limits)
+        path = self.telecommand.file_name
+        if len(path) + 1 > 30:
+            notes.error("Path is too long: {0}. 30 characters including null terminator are allowed.".format(len(path) + 1))
 
 class PerformSADSExperimentData(SimpleTelecommandData):
     @set_correlation_id
@@ -261,9 +282,6 @@ class GetErrorCounterConfigData(SimpleTelecommandData):
     def __init__(self, telecommand):
         super(GetErrorCounterConfigData, self).__init__(telecommand, 4)
 
-    def get_correlation_id(self):
-        return None
-
 class DownloadFileData(TelecommandData):
     MAX_PATH_LENGTH = 100
     @set_correlation_id
@@ -287,12 +305,13 @@ class DownloadFileData(TelecommandData):
         self.process_common_command(state, notes, send_mode, wait_mode, limits)
         path = self.telecommand._path
         if len(path) > self.MAX_PATH_LENGTH:
-            notes.error('Path too long: {0}'.format(len(path)))
+            notes.error('Path too long: {0} characters. Only {1} characters are allowed'.format(len(path), self.MAX_PATH_LENGTH))
         seqs = self.telecommand._seqs
         if len(seqs) > limits.max_response_frames():
             notes.error('Too many sequences are requested for download: {0}'.format(len(seqs)))
         
 class RemoveFileData(TelecommandData):
+    MAX_PATH_LENGTH = 192
     @set_correlation_id
     def __init__(self, telecommand):
         super(RemoveFileData, self).__init__(telecommand)
@@ -308,7 +327,18 @@ class RemoveFileData(TelecommandData):
     def get_requires_send_receive(self):
         return False
 
+    def process(self, state, notes, send_mode, wait_mode, limits):
+        self.process_common_command(state, notes, send_mode, wait_mode, limits)
+        path = self.telecommand._path
+        if len(path) > self.MAX_PATH_LENGTH:
+            notes.error('Path too long: {0} characters. Only {1} characters are allowed'.format(len(path), self.MAX_PATH_LENGTH))
+        if path == 'telemetry.current' or path == '/telemetry.current' or path == './telemetry.current':
+            notes.warning("Removing current telemetry file is not recommended")
+        if path == 'telemetry.previous' or path == '/telemetry.previous' or path == './telemetry.previous':
+            notes.warning("Removing previous telemetry file is not recommended")
+
 class ListFilesData(TelecommandData):
+    MAX_PATH_LENGTH = 194
     @set_correlation_id
     def __init__(self, telecommand):
         super(ListFilesData, self).__init__(telecommand)
@@ -321,6 +351,12 @@ class ListFilesData(TelecommandData):
 
     def get_requires_send_receive(self):
         return False
+        
+    def process(self, state, notes, send_mode, wait_mode, limits):
+        self.process_common_command(state, notes, send_mode, wait_mode, limits)
+        path = self.telecommand._path
+        if (len(path) + 1) > self.MAX_PATH_LENGTH:
+            notes.error('Path too long: {0} 194 characters including null terminator are allowed'.format(len(path) + 1))
 
 class EraseFlashData(SimpleTelecommandData):
     @set_correlation_id
@@ -328,9 +364,48 @@ class EraseFlashData(SimpleTelecommandData):
         super(EraseFlashData, self).__init__(telecommand, 3)
 
 class RawI2CData(SimpleTelecommandData):
+    BUS_DEVICES = [
+        0x10,    # Imtq
+        0x31,    # Primary Antenna
+        0x35,    # EPS A
+        0x60,    # Comm Receiver
+        0x61,    # Comm Transmitter,
+    ]
+
+    PAYLOAD_DEVICES = [
+        0x30,    # Payload
+        0x32,    # Backup Antenna
+        0x36,    # EPS B
+        0x44,    # Suns
+        0x51,    # RTC
+        0x68,    # Gyroscope
+    ]
+
     @set_correlation_id
     def __init__(self, telecommand):
         super(RawI2CData, self).__init__(telecommand, self.downlink_frame_bytes_count)
+
+    def process(self, state, notes, send_mode, wait_mode, limits):
+        self.process_common_command(state, notes, send_mode, wait_mode, limits)
+        notes.warning("This is last resort command do not use it recklessly")
+
+        address = self.telecommand._address[0]
+        bus = self.telecommand._busSelect[0]
+        if bus != 0 and bus != 1:
+            notes.error("Invalid i2c bus: {0}. 0 or 1 are allowed".format(bus))
+
+        if bus == 0 and address not in RawI2CData.BUS_DEVICES:
+            notes.error('There is no device at address {0} on primary i2c bus'.format(address))
+
+        if bus == 1 and address not in RawI2CData.PAYLOAD_DEVICES:
+            notes.error('There is no device at address {0} on payload i2c bus'.format(address))
+
+        data = self.telecommand._data
+        if len(data) > 190:
+            notes.error("Too long payload size: {0}. At most 190 bytes are allowed".format(len(data)))
+
+        if len(data) == 0:
+            notes.warning("Empty i2c frame detected")
 
 class ReadMemoryData(TelecommandData):
     @set_correlation_id
@@ -358,7 +433,15 @@ class SetPeriodicMessageTelecommandData(SimpleTelecommandData):
 
 class SendPeriodicMessageTelecommandData(SimpleTelecommandData):
     def __init__(self, telecommand):
-        super(SendPeriodicMessageTelecommandData, self).__init__(telecommand, 2)
+        super(SendPeriodicMessageTelecommandData, self).__init__(telecommand, 200)
+
+    def process(self, state, notes, send_mode, wait_mode, limits):
+        self.process_common_command(state, notes, send_mode, wait_mode, limits)
+        
+        count = self.telecommand.count
+        if count > limits.max_response_frames():
+            notes.error("Too many periodic messsages are requested: {0}".format(count))
+        
 
 class TakePhotoTelecommandData(SimpleTelecommandData):
     @set_correlation_id
@@ -381,10 +464,31 @@ class PowerCycleTelecommandData(SimpleTelecommandData):
     def process(self, state, notes, send_mode, wait_mode, limits):
         self.process_common_command(state, notes, send_mode, wait_mode, limits)
         state.reset_satellite()
+        notes.warning("Communication with satellite will be unavailable for the next few minutes")
+        if wait_mode != WaitMode.Wait:
+            notes.error("Wait is suggested as next telecommand will most likely will not be processed")
 
 class EraseBootTableEntryData(SimpleTelecommandData):
     def __init__(self, telecommand):
         super(EraseBootTableEntryData, self).__init__(telecommand, 2)
+
+    def process(self, state, notes, send_mode, wait_mode, limits):
+        self.process_common_command(state, notes, send_mode, wait_mode, limits)
+        length = len(self.telecommand._entries)
+        if length > 3:
+            notes.error("Too many boot entries will be erased: {0}. At most 3 should be erased".format(length))
+
+        if length > 5:
+            notes.error("Are you trying to brick the satellite?")
+
+        groups = set([])
+        for e in self.telecommand._entries:
+            if e > 6 or e < 0:
+                notes.error("Invalid boot entry id: {0}.".format(e))
+            groups.add(e / 3)
+
+        if len(groups) > 1:
+            notes.error("Erasing boot entries from more than one set is an error")      
 
 class WriteProgramPartData(SimpleTelecommandData):
     def __init__(self, telecommand):
@@ -402,6 +506,7 @@ class OpenSailTelecommandData(SimpleTelecommandData):
     def process(self, state, notes, send_mode, wait_mode, limits):
         self.process_common_command(state, notes, send_mode, wait_mode, limits)
         notes.warning('Did you mean: PerformSailExperiment?')
+        notes.warning('This command effectively ends satellite mission')
 
 class StopSailDeploymentData(SimpleTelecommandData):
     @set_correlation_id
@@ -426,6 +531,10 @@ class SetTimeData(SimpleTelecommandData):
     @set_correlation_id
     def __init__(self, telecommand):
         super(SetTimeData, self).__init__(telecommand, 2)
+
+class PingTelecommandData(SimpleTelecommandData):
+    def __init__(self, telecommand):
+        super(PingTelecommandData, self).__init__(telecommand, 4)
 
 class TelecommandDataFactory(object):
     telecommands_map = dict({
@@ -469,7 +578,8 @@ class TelecommandDataFactory(object):
         tc.GetPersistentState: GetPersistentStateData,
         tc.GetSunSDataSets: GetSunSDataSetsData,
         tc.SetTimeCorrectionConfig: SetTimeCorrectionConfigData,
-        tc.SetTime: SetTimeData
+        tc.SetTime: SetTimeData,
+        tc.PingTelecommand: PingTelecommandData
     })
 
     def get_telecommand_data(self, telecommand):

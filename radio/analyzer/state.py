@@ -5,7 +5,7 @@ class State(object):
     def __init__(self):
         self.corelation_ids = []
         self.downlink_bitrate = State.DEFAULT_DOWNLINK_BIT_RATE
-        self.uplink_bitrage = State.DEFAULT_UPLINK_BIT_RATE
+        self.uplink_bitrate = State.DEFAULT_UPLINK_BIT_RATE
 
     def add_corelation_id(self, id, notes):
         if id is None:
@@ -30,5 +30,7 @@ class State(object):
         return self.downlink_bitrate
     
     def current_uplink_bitrate(self):
-        return self.uplink_bitrage
+        return self.uplink_bitrate
 
+    def reset_satellite(self):
+        self.reset_transmitter()

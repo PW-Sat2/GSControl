@@ -2,6 +2,7 @@ import os
 import sys
 
 from datetime import datetime
+from task_actions import WaitMode
 
 if __name__ == '__main__':
     sys.path.append(os.path.join(os.path.dirname(__file__), '../PWSat2OBC/integration_tests'))
@@ -126,9 +127,9 @@ if __name__ == '__main__':
         """
         Performs list of tasks.
 
-        Each task is defined as list: [<telecommand object>, Send|SendReceive, "Wait|NoWait"]
+        Each task is defined as list: [<telecommand object>, Send|SendReceive|Print|Sleep, WaitMode.Wait|WaitMode.NoWait]
 
-        When using "Wait" it is necessary to type 'n<ENTER>' to continue running tasks
+        When using WaitMode.Wait it is necessary to type 'n<ENTER>' to continue running tasks
         """
         import pprint
         from prompt_toolkit.shortcuts import print_tokens
@@ -167,7 +168,7 @@ if __name__ == '__main__':
 
             action_type(telecommand).do(__import__(__name__))
 
-            if wait is "NoWait":
+            if wait is WaitMode.NoWait:
                 print_tokens([
                     (Token.String, "Done"),
                     (Token.String, "\n")
