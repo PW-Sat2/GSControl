@@ -299,6 +299,9 @@ class PerformSailExperimentData(SimpleTelecommandData):
     @set_correlation_id
     def __init__(self, telecommand):
         super(PerformSailExperimentData, self).__init__(telecommand, 2)
+    
+    def is_scheduled(self):
+        return True
 
     def process(self, state, notes, send_mode, wait_mode, limits):
         self.process_common_command(state, notes, send_mode, wait_mode, limits)

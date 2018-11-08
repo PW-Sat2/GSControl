@@ -106,3 +106,10 @@ class Sads:
 
     # Wh (source: PWSat2-SVN\system\tests_and_reports\39 - SADS with load)
     EXPERIMENT_ENERGY_CONSUMPTION = 0.1293 
+
+class Sail:
+    SAIL_TK_POWER = 2  # W
+    CAMERA_POWER = 0.2618  # W
+    SAIL_EXP_DURATION = 240  # s (source: OBC code)
+    SUNS_REF_AVERAGE_POWER_5V0 = 0.05
+    PLD_SENS_AVERAGE_POWER_5V0 = 5.0*0.0243

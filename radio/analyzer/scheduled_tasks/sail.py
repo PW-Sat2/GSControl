@@ -1,86 +1,60 @@
 import math
+import os
+import sys
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
-# INFO: results are cross-checked with data from experiment:
-# PWSat2-SVN\system\tests_and_reports\38 - Sail experiment radio
-
-# EPS constants
-
-EFFICIENCY_3V3 = 0.7  # (source: @pkuligowski)
-EFFICIENCY_5V0 = 0.7  # (source: @pkuligowski)
+from resources import *
+from subsystems import *
 
 
-# OBC constants
+class SailExperiment:
+    @classmethod
+    def task_duration(self):
+        return Duration(Sail.SAIL_EXP_DURATION)
 
-FILE_FRAME_PAYLOAD = 232  # bytes (source: https://team.pw-sat.pl/w/obc/frames_format/)
+    @classmethod
+    def downlink_frames_count(self):
+        return self.photo_frames_count() + self.data_frames_count()
 
+    @classmethod
+    def storage_usage(self):
+        return Storage((self.downlink_frames_count() * Comm.FULL_FRAME) / 1024.0)
 
-# COMM constants
+    @classmethod
+    def data_frames_count(self):
+        return 22
 
-TX_POWER_CONSUMPTION = 3  # W
-TX_MAX_PREAMBLE = 0.4  # s
-FULL_FRAME = 235  # bytes
+    @classmethod
+    def photo_frames_count(self):
+        SMALL_PHOTO_QTY = 64
+        FINAL_PHOTO_QTY = 2
+        return Camera.PHOTO_128_MAX_FULL_FRAMES * SMALL_PHOTO_QTY + FINAL_PHOTO_QTY * Camera.PHOTO_480_MAX_FULL_FRAMES
 
-# Sail
+    @classmethod
+    def downlink_frames_count(self):
+        return self.data_frames_count() + self.photo_frames_count()
 
-SUNS_REF_AVERAGE_POWER_5V0 = 0.05  # W (source: datasheet)
-PLD_SENS_AVERAGE_POWER_5V0 = 5.0*0.0243  # W (source: https://team.pw-sat.pl/w/system/power-budget/experiments/#payload-commisioning - PLD SENS @ idle state)
+    @classmethod
+    def experiment_energy_consumption(self):
+        themal_knives_energy = 120 * 2 * Sail.SAIL_TK_POWER / 3600.0
+        pld_board_energy = Sail.SAIL_EXP_DURATION * (Sail.PLD_SENS_AVERAGE_POWER_5V0 + Sail.SUNS_REF_AVERAGE_POWER_5V0) / Eps.EFFICIENCY_5V0 / 3600.0
+        cameras_energy = Sail.SAIL_EXP_DURATION * 2 * Sail.CAMERA_POWER / Eps.EFFICIENCY_3V3 / 3600.0
 
-SAIL_TK_POWER = 2  # W
-CAMERA_POWER = 0.2618  # W
+        return Energy((themal_knives_energy + pld_board_energy + cameras_energy) * 1000.0)
 
+    @classmethod
+    def downlink_energy_consumption(self, bitrate):
+        transmission_time = Comm.downlink_frames_duration(self.downlink_frames_count(), bitrate)
+        return Comm.downlink_energy_consumption(transmission_time)
 
-def sail_experiment_duration():
-    SAIL_EXP_DURATION = 240  # s (source: OBC code)
+    @classmethod
+    def energy_consumptions(self):
+        energy_1200 = float(self.experiment_energy_consumption() + self.downlink_energy_consumption(1200))
+        energy_2400 = float(self.experiment_energy_consumption() + self.downlink_energy_consumption(2400))
+        energy_4800 = float(self.experiment_energy_consumption() + self.downlink_energy_consumption(4800))
+        energy_9600 = float(self.experiment_energy_consumption() + self.downlink_energy_consumption(9600))
+        return Energys([energy_1200, energy_2400, energy_4800, energy_9600])
 
-    return SAIL_EXP_DURATION
-
-
-def sail_experiment_energy_consumption():
-    themal_knives_energy = 120 * 2 * SAIL_TK_POWER / 3600.0
-    pld_board_energy = sail_experiment_duration() * (PLD_SENS_AVERAGE_POWER_5V0 + SUNS_REF_AVERAGE_POWER_5V0) / EFFICIENCY_5V0 / 3600.0
-    cameras_energy = sail_experiment_duration() * 2 * CAMERA_POWER / EFFICIENCY_3V3 / 3600.0
-    comm_energy = comm_energy_usage(comm_transmission_time(sail_data_file_storage_usage()))[1200]
-
-    return themal_knives_energy + pld_board_energy + cameras_energy + comm_energy
-
-
-PHOTO_128_MAX_SIZE = 12  # z dupy
-PHOTO_240_MAX_SIZE = 20  # z dupy
-PHOTO_480_MAX_SIZE = 80  # z dupy
-
-
-def sail_data_file_storage_usage():
-    return 22
-
-
-def sail_photos_storage_usage():
-    SMALL_PHOTO_QTY = 64
-    FINAL_PHOTO_QTY = 2
-    return PHOTO_128_MAX_SIZE * SMALL_PHOTO_QTY + FINAL_PHOTO_QTY * PHOTO_480_MAX_SIZE
-
-
-def comm_transmission_time(full_frames_qty):
-    preambles_time = math.ceil(full_frames_qty/10)*TX_MAX_PREAMBLE
-    time_1200 = round(full_frames_qty * (FULL_FRAME * 8)/1200.0 + preambles_time, 2)
-    time_2400 = round(full_frames_qty * (FULL_FRAME * 8) / 2400.0 + preambles_time, 2)
-    time_4800 = round(full_frames_qty * (FULL_FRAME * 8) / 4800.0 + preambles_time, 2)
-    time_9600 = round(full_frames_qty * (FULL_FRAME * 8) / 9600.0 + preambles_time, 2)
-
-    return {1200: time_1200, 2400: time_2400, 4800: time_4800, 9600: time_9600}
-
-
-def comm_energy_usage(transmission_time):
-    comm_energy = {}
-    for key in transmission_time:
-        comm_energy[key] = round(TX_POWER_CONSUMPTION * transmission_time[key] / 3600.0, 4)
-    return comm_energy
-
-
-if __name__ == '__main__':
-    print "Experiment duration:", sail_experiment_duration(), "s"
-    print "Energy consumption from BP:", sail_experiment_energy_consumption(), "Wh"
-    print "Storage usage:", sail_data_file_storage_usage(), "frames,", sail_photos_storage_usage(), "frames"
-    print "TX time - data file, photos:", comm_transmission_time(sail_data_file_storage_usage()), "s,",\
-                                          comm_transmission_time(sail_photos_storage_usage()), "s"
-    print "TX power usage - data file, photos:", comm_energy_usage(comm_transmission_time(sail_data_file_storage_usage())), "Wh,",\
-                                                 comm_energy_usage(comm_transmission_time(sail_photos_storage_usage())), "Wh"
+    @classmethod
+    def downlink_durations(self):
+        return Comm.downlink_durations(self.downlink_frames_count())

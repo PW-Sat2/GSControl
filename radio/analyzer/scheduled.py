@@ -5,6 +5,7 @@ from scheduled_tasks.camera_commissioning import *
 from scheduled_tasks.radfet import *
 from scheduled_tasks.suns import *
 from scheduled_tasks.sads import *
+from scheduled_tasks.sail import *
 import telecommand as tc
 from commands import TelecommandDataFactory
 
@@ -40,6 +41,13 @@ class PerformSailExperiment:
     @classmethod
     def process(self, frame_payload):
         resources_utilization = Resources.init_with_zeros()
+        sail_experiment = SailExperiment()
+
+        resources_utilization.scheduled.task_duration = sail_experiment.task_duration()
+        resources_utilization.scheduled.storage = sail_experiment.storage_usage()
+        resources_utilization.scheduled.power_budget.energy = sail_experiment.energy_consumptions()
+        resources_utilization.scheduled.downlink.frames_count = sail_experiment.downlink_frames_count()
+        resources_utilization.scheduled.downlink.duration = sail_experiment.downlink_durations()
         return resources_utilization
 
 
@@ -102,7 +110,8 @@ class ScheduledTaskDataFactory(object):
         tc.PerformPayloadCommissioningExperiment: PerformPayloadCommissioningExperiment,
         tc.PerformCameraCommissioningExperiment:  PerformCameraCommissioningExperiment,
         tc.TakePhotoTelecommand:                  TakePhotoTelecommand,
-        tc.PerformSADSExperiment:                 PerformSADSExperiment
+        tc.PerformSADSExperiment:                 PerformSADSExperiment,
+        tc.PerformSailExperiment:                 PerformSailExperiment
     })
 
     def get_process(self, task):
