@@ -156,6 +156,35 @@ def _gyro_data_points(timestamp, telemetry):
 
     return points
 
+def _mppt_data_points(timestamp, telemetry):
+    points = []
+
+    ctrl_a = telemetry['14: Controller A']
+
+    mppts = [
+        ('X', '0793: MPPT_X.SOL_VOLT', '0805: MPPT_X.SOL_CURR', '0817: MPPT_X.SOL_OUT_VOLT', '0829: MPPT_X.Temperature','0841: MPPT_X.State'),
+        ('Y+', '0844: MPPT_Y+.SOL_VOLT', '0856: MPPT_Y+.SOL_CURR', '0868: MPPT_Y+.SOL_OUT_VOLT', '0880: MPPT_Y+.Temperature', '0892: MPPT_Y+.State'),
+        ('Y-', '0895: MPPT_Y-.SOL_VOLT','0907: MPPT_Y-.SOL_CURR','0919: MPPT_Y-.SOL_OUT_VOLT','0931: MPPT_Y-.Temperature','0943: MPPT_Y-.State')
+    ]
+
+    for (name, volt, curr, out_volt, temp, state) in mppts:
+        points.append(_data_point(
+            timestamp=timestamp,
+            measurement="mppt",
+            tags={
+                "name": name
+            },
+            fields={
+                "voltage": float(ctrl_a[volt].converted),
+                "current": float(ctrl_a[curr].converted),
+                "out_voltage": float(ctrl_a[out_volt].converted),
+                "temperature": float(ctrl_a[temp].converted),
+                "state": int(ctrl_a[state]),
+            }
+        ))
+
+    return points
+
 def generate_data_points(timestamp, telemetry, extra_tags):
     tags = {
         "source": "comm",
@@ -174,8 +203,9 @@ def generate_data_points(timestamp, telemetry, extra_tags):
     lcl = _lcl_data_points(timestamp, telemetry)
     temperatures = _temperate_data_points(timestamp, telemetry)
     gyro = _gyro_data_points(timestamp, telemetry)
+    mppt = _mppt_data_points(timestamp, telemetry)
 
-    points = telemetry_point + error_counters + lcl + temperatures + gyro
+    points = telemetry_point + error_counters + lcl + temperatures + gyro + mppt
 
     for p in points:
         p['tags'].update(tags)
