@@ -322,6 +322,9 @@ class PerformSADSExperimentData(SimpleTelecommandData):
     @set_correlation_id
     def __init__(self, telecommand):
         super(PerformSADSExperimentData, self).__init__(telecommand, 2)
+    
+    def is_scheduled(self):
+        return True
 
 class PerformCameraCommissioningExperimentData(SimpleTelecommandData):
     @set_correlation_id

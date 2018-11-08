@@ -1,67 +1,49 @@
 import math
+import os
+import sys
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
-# EPS constants
-
-EFFICIENCY_3V3 = 0.7  # (source: @pkuligowski)
-EFFICIENCY_5V0 = 0.7  # (source: @pkuligowski)
-
-
-# OBC constants
-
-FILE_FRAME_PAYLOAD = 232  # bytes (source: https://team.pw-sat.pl/w/obc/frames_format/)
+from resources import *
+from subsystems import *
 
 
-# COMM constants
+class SadsExperiment:
+    def task_duration(self):
+        return Duration(Sads.EXPERIMENT_DURATION)
 
-TX_POWER_CONSUMPTION = 3  # W
-TX_MAX_PREAMBLE = 0.4  # s
-FULL_FRAME = 235  # bytes
+    @classmethod
+    def experiment_energy_consumption(self):
+        return Energy(Sads.EXPERIMENT_ENERGY_CONSUMPTION)
 
+    @classmethod
+    def data_frames_count(self):
+        return 21
 
-def sads_experiment_duration():
-    SADS_EXP_DURATION = 290  # s (source: PWSat2-SVN\system\tests_and_reports\39 - SADS with load)
+    @classmethod
+    def photo_frames_count(self):
+        return Camera.PHOTO_480_MAX_FULL_FRAMES
 
-    return SADS_EXP_DURATION
+    @classmethod
+    def total_frames_count(self):
+        return self.photo_frames_count() + self.data_frames_count()
 
+    def downlink_frames_count(self):
+        return self.total_frames_count()
 
-def sads_experiment_energy_consumption():
-    SADS_ENERGY_CONSUMPTION = 0.1293  # Wh (source: PWSat2-SVN\system\tests_and_reports\39 - SADS with load)
-    return SADS_ENERGY_CONSUMPTION
+    def downlink_durations(self):
+        return Comm.downlink_durations(self.total_frames_count())
 
+    @classmethod
+    def downlink_energy_consumption(self, bitrate):
+        transmission_time = Comm.downlink_frames_duration(self.total_frames_count(), bitrate)
+        return Comm.downlink_energy_consumption(transmission_time)
 
-def sads_data_file_storage_usage():
-    return 21
+    def energy_consumptions(self):
+        energy_1200 = float(self.experiment_energy_consumption() + self.downlink_energy_consumption(1200))
+        energy_2400 = float(self.experiment_energy_consumption() + self.downlink_energy_consumption(2400))
+        energy_4800 = float(self.experiment_energy_consumption() + self.downlink_energy_consumption(4800))
+        energy_9600 = float(self.experiment_energy_consumption() + self.downlink_energy_consumption(9600))
+        return Energys([energy_1200, energy_2400, energy_4800, energy_9600])
 
-
-PHOTO_480_MAX_SIZE = 80  # z dupy
-
-
-def sads_photo_storage_usage():
-    return PHOTO_480_MAX_SIZE
-
-
-def comm_transmission_time(full_frames_qty):
-    preambles_time = math.ceil(full_frames_qty/10)*TX_MAX_PREAMBLE
-    time_1200 = round(full_frames_qty * (FULL_FRAME * 8)/1200.0 + preambles_time, 2)
-    time_2400 = round(full_frames_qty * (FULL_FRAME * 8) / 2400.0 + preambles_time, 2)
-    time_4800 = round(full_frames_qty * (FULL_FRAME * 8) / 4800.0 + preambles_time, 2)
-    time_9600 = round(full_frames_qty * (FULL_FRAME * 8) / 9600.0 + preambles_time, 2)
-
-    return {1200: time_1200, 2400: time_2400, 4800: time_4800, 9600: time_9600}
-
-
-def comm_energy_usage(transmission_time):
-    comm_energy = {}
-    for key in transmission_time:
-        comm_energy[key] = round(TX_POWER_CONSUMPTION * transmission_time[key] / 3600.0, 4)
-    return comm_energy
-
-
-if __name__ == '__main__':
-    print "Experiment duration:", sads_experiment_duration(), "s"
-    print "Energy consumption from BP:", sads_experiment_energy_consumption(), "Wh"
-    print "Storage usage:", sads_data_file_storage_usage(), "frames,", sads_photo_storage_usage(), "frames"
-    print "TX time - data file, photo:", comm_transmission_time(sads_data_file_storage_usage()), "s,",\
-                                         comm_transmission_time(sads_photo_storage_usage()), "s"
-    print "TX power usage - data file, photo:", comm_energy_usage(comm_transmission_time(sads_data_file_storage_usage())), "Wh,",\
-                                                comm_energy_usage(comm_transmission_time(sads_photo_storage_usage())), "Wh"
+    def storage_usage(self):
+        return Storage((self.downlink_frames_count() * Comm.FULL_FRAME) / 1024.0)

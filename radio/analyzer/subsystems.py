@@ -100,3 +100,9 @@ class Radfet:
     RADFET_MEAN_POWER_5V0 = 0.2  # W (source PWSat2-SVN\system\tests_and_reports\23 - Power budget measurements\payload\SENS_5V)
     SUNS_REF_AVERAGE_POWER_5V0 = 0.05  # W (source: datasheet)
 
+class Sads:
+     # s (source: PWSat2-SVN\system\tests_and_reports\39 - SADS with load)
+    EXPERIMENT_DURATION = 290 
+
+    # Wh (source: PWSat2-SVN\system\tests_and_reports\39 - SADS with load)
+    EXPERIMENT_ENERGY_CONSUMPTION = 0.1293 
