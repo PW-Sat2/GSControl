@@ -8,6 +8,7 @@ from subsystems import *
 
 
 class SunsExperimentParameters:
+    CORRELATION_ID_OFFSET = 0
     GAIN_OFFSET = 1
     ITIME_OFFSET = 2
     SAMPLES_COUNT_OFFSET = 3
@@ -16,6 +17,7 @@ class SunsExperimentParameters:
     LONG_DELAY_OFFSET = 6
 
     def __init__(self, frame_payload):
+        self.correlation_id = self.get_parameters(frame_payload)[self.CORRELATION_ID_OFFSET]
         self.gain = self.get_parameters(frame_payload)[self.GAIN_OFFSET]
         self.itime = self.get_parameters(frame_payload)[self.ITIME_OFFSET]
         self.samples_count = self.get_parameters(frame_payload)[self.SAMPLES_COUNT_OFFSET]

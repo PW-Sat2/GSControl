@@ -253,7 +253,7 @@ class MeanPowers:
 
 
 class Storage:
-    STR_PRECISION = 0
+    STR_PRECISION = 1
     UNIT = 'kB'
 
     def __init__(self, storage_usage):

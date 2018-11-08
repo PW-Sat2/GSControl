@@ -95,3 +95,8 @@ class Suns:
 
     # W (source: https://team.pw-sat.pl/w/system/power-budget/experiments/#payload-commisioning - PLD SENS @ idle state)
     PLD_SENS_AVERAGE_POWER_5V0 = 5.0*0.0243  
+
+class Radfet:
+    RADFET_MEAN_POWER_5V0 = 0.2  # W (source PWSat2-SVN\system\tests_and_reports\23 - Power budget measurements\payload\SENS_5V)
+    SUNS_REF_AVERAGE_POWER_5V0 = 0.05  # W (source: datasheet)
+

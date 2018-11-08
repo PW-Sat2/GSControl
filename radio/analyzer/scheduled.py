@@ -2,6 +2,7 @@ from task import *
 from resources import *
 from scheduled_tasks.payload_commissioning import *
 from scheduled_tasks.camera_commissioning import *
+from scheduled_tasks.radfet import *
 from scheduled_tasks.suns import *
 import telecommand as tc
 from commands import TelecommandDataFactory
@@ -24,6 +25,13 @@ class PerformRadFETExperiment:
     @classmethod
     def process(self, frame_payload):
         resources_utilization = Resources.init_with_zeros()
+        redfet_experiment = RadfetExperiment(frame_payload)
+
+        resources_utilization.scheduled.task_duration = redfet_experiment.task_duration()
+        resources_utilization.scheduled.storage = redfet_experiment.storage_usage()
+        resources_utilization.scheduled.power_budget.energy = redfet_experiment.energy_consumptions()
+        resources_utilization.scheduled.downlink.frames_count = redfet_experiment.downlink_frames_count()
+        resources_utilization.scheduled.downlink.duration = redfet_experiment.downlink_durations()
         return resources_utilization
 
 
@@ -82,6 +90,7 @@ class TakePhotoTelecommand:
 class ScheduledTaskDataFactory(object):
     map = dict({
         tc.PerformSunSExperiment:                 PerformSunSExperiment,
+        tc.PerformRadFETExperiment:               PerformRadFETExperiment,
         tc.PerformPayloadCommissioningExperiment: PerformPayloadCommissioningExperiment,
         tc.PerformCameraCommissioningExperiment:  PerformCameraCommissioningExperiment,
         TakePhotoTelecommand:                     TakePhotoTelecommand

@@ -292,6 +292,9 @@ class PerformRadFETExperimentData(SimpleTelecommandData):
         if len(path) + 1 > 30:
             notes.error("Path is too long: {0}. 30 characters including null terminator are allowed.".format(len(path) + 1))
 
+    def is_scheduled(self):
+        return True
+
 class PerformSailExperimentData(SimpleTelecommandData):
     @set_correlation_id
     def __init__(self, telecommand):
