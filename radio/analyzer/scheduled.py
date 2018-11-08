@@ -8,8 +8,15 @@ from commands import TelecommandDataFactory
 
 class PerformSunSExperiment:
     @classmethod
-    def process(self):
+    def process(self, frame_payload):
         resources_utilization = Resources.init_with_zeros()
+        suns_experiment = SunsExperiment(frame_payload)
+
+        resources_utilization.scheduled.task_duration = suns_experiment.task_duration()
+        resources_utilization.scheduled.storage = suns_experiment.storage_usage()
+        resources_utilization.scheduled.power_budget.energy = suns_experiment.energy_consumptions()
+        resources_utilization.scheduled.downlink.frames_count = suns_experiment.downlink_frames_count()
+        resources_utilization.scheduled.downlink.duration = suns_experiment.downlink_durations()
         return resources_utilization
 
 

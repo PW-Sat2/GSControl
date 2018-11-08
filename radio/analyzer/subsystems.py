@@ -84,8 +84,8 @@ class Pld:
     PLD_3V3_ENERGY_CONSUMPTION = 0.0178 # Wh
 
 class Suns:
-    EQUIPMENT_TURN_ON_TIME = Duration(3)  # s
-    ESTIMATED_OBC_DELAY_PER_SAMPLE = Duration(0.01)  # s
+    EQUIPMENT_TURN_ON_TIME = 3  # s
+    ESTIMATED_OBC_DELAY_PER_SAMPLE = 0.01  # s
 
     # W (source: https://team.pw-sat.pl/w/suns/suns_fm/power_consumption/)
     SUNS_EXP_AVERAGE_POWER_3V3 = 0.0701 
