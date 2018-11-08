@@ -11,6 +11,7 @@ import telecommand as tc
 from resources import *
 from subsystems import *
 from task_actions import *
+from devices.adcs import AdcsMode
 
 class TelecommandData(object):
     uplink_header_bytes_count = 3
@@ -123,20 +124,79 @@ class SetBuiltinDetumblingBlockMaskTelecommandData(SimpleTelecommandData):
     def __init__(self, telecommand):
         super(SetBuiltinDetumblingBlockMaskTelecommandData, self).__init__(telecommand, 2)
 
+    def process(self, state, notes, send_mode, wait_mode, limits):
+        self.process_common_command(state, notes, send_mode, wait_mode, limits)
+        mask = self.telecommand._mask
+        if mask != 0:
+            notes.warning("Disabling detumbling is not recommended")
+
+
 class SetAdcsModeTelecommandData(SimpleTelecommandData):
+    ALLOWED_MODES = [-2, -1, 0, 1, 2]
     @set_correlation_id
     def __init__(self, telecommand):
         super(SetAdcsModeTelecommandData, self).__init__(telecommand, 2)
+
+    def process(self, state, notes, send_mode, wait_mode, limits):
+        self.process_common_command(state, notes, send_mode, wait_mode, limits)
+        mode = self.telecommand._mode
+        if mode not in self.ALLOWED_MODES:
+            notes.error("Invalid adcs mode requested: {0}".format(mode))
+        
+        if mode == AdcsMode.ExperimentalDetumbling:
+            notes.error("DO NOT ENABLE Experimental Detumbling. It is unstable.")
+        elif mode == AdcsMode.ExperimentalSunpointing:
+            notes.error("Do not enable Experimental Sunpointing. It is not implemented.")
+        elif mode == AdcsMode.Disabled:
+            notes.warning("Disabling adcs is dangerous")
 
 class SetAntennaDeploymentData(SimpleTelecommandData):
     @set_correlation_id
     def __init__(self, telecommand):
         super(SetAntennaDeploymentData, self).__init__(telecommand, 2)
 
+    def process(self, state, notes, send_mode, wait_mode, limits):
+        self.process_common_command(state, notes, send_mode, wait_mode, limits)
+        disabled = int(self.telecommand._deployment_disabled)
+        if not disabled:
+            notes.warning("Why are you trying to enable antenna deployment?")
+
 class SetBootSlotsData(SimpleTelecommandData):
+    UPPER_BOOT_SLOTS = 0x80
+    SAFE_MOD_BOOT_SLOT = 0x40
     @set_correlation_id
     def __init__(self, telecommand):
         super(SetBootSlotsData, self).__init__(telecommand, 4)
+
+    def process(self, state, notes, send_mode, wait_mode, limits):
+        self.process_common_command(state, notes, send_mode, wait_mode, limits)
+        primary = self.telecommand._primary
+        failsafe = self.telecommand._failsafe
+        if primary == failsafe:
+            notes.error("Primary and failsafe boot slots should not be the same")
+        if (primary & self.SAFE_MOD_BOOT_SLOT) == self.SAFE_MOD_BOOT_SLOT:
+            notes.warning("Setting primary boot slots to safe mode is dangerous. It will also erase all data from flash memories")
+        if (primary & self.UPPER_BOOT_SLOTS) == self.UPPER_BOOT_SLOTS or (failsafe & self.UPPER_BOOT_SLOTS) == self.UPPER_BOOT_SLOTS:
+            notes.error("Upper boot slot should not be used for booting satellite")
+        primary_slots = self.extract_slots(primary)
+        failsafe_slots = self.extract_slots(failsafe)
+        common = primary_slots.intersection(failsafe_slots)
+        if (primary & failsafe) != 0:
+            notes.error("there is at least one boot slot used as primary and failsafe boot slot")
+
+        if len(primary_slots) != 3:
+            notes.error("There should be 3 primary boot slots. There are {0} now".format(len(primary_slots)))
+
+        if len(failsafe_slots) != 3:
+            notes.error("There should be 3 failsafe boot slots. There are {0} now".format(len(failsafe_slots)))
+
+    def extract_slots(self, mask):
+        list = []
+        for i in range(0, 6, 1):
+            if (mask & (1 << i)) != 0:
+                list.append(i)
+        return set(list)
+
 
 class EnterIdleStateData(SimpleTelecommandData):
     @set_correlation_id
@@ -274,9 +334,35 @@ class CopyBootSlotsData(SimpleTelecommandData):
         super(CopyBootSlotsData, self).__init__(telecommand, 2)
 
 class SetErrorCounterConfigData(SimpleTelecommandData):
+    KNOWN_ERROR_COUNTERS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
     @set_correlation_id
     def __init__(self, telecommand):
         super(SetErrorCounterConfigData, self).__init__(telecommand, 2)
+
+    def process(self, state, notes, send_mode, wait_mode, limits):
+        self.process_common_command(state, notes, send_mode, wait_mode, limits)
+        configs = self.telecommand._configs
+        if len(configs) == 0:
+            notes.warning("Error counter configurations are missing")
+        if len(configs) > 14:
+            notes.errors("Too many error counter configurations")
+
+        devices = set([])
+        for entry in configs:
+            if entry.device not in self.KNOWN_ERROR_COUNTERS:
+                notes.error("Invalid error counter identifier: {0}".format(entry.device))
+            if entry.limit <= entry.increment:
+                notes.warning("Error counter for device: {0} will hit limit with single error".format(entry.device))
+            if entry.increment <= entry.decrement:
+                notes.warning("Error counter for device {0} is set to be too forgiving for errors".format(entry.device))
+            if entry.increment == 0:
+                notes.warning("Error counter for device {0} is disabled".format(entry.device))
+            if entry.decrement == 0:
+                notes.warning("Device {0} is not allowed to recover from errors".format(entry.device))
+            devices.add(entry.device)
+
+        if len(devices) != len(configs):
+            notes.error("There are multiple configurations for single device")
 
 class GetErrorCounterConfigData(SimpleTelecommandData):
     def __init__(self, telecommand):

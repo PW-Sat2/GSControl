@@ -82,6 +82,7 @@ if __name__ == '__main__':
     import telecommand as tc
     import datetime
     from devices import camera
+    from devices.adcs import *
 
     parser = argparse.ArgumentParser()
     parser.add_argument("-f", "--file", required=True,

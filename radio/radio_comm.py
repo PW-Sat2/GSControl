@@ -13,6 +13,7 @@ if __name__ == '__main__':
     from tools.remote_files import *
     from analyzer import *
     import response_frames
+    from devices.adcs import *
 
     import argparse
     from IPython.terminal.embed import InteractiveShellEmbed
