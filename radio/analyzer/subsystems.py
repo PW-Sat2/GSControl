@@ -71,6 +71,12 @@ class Camera:
     COMMISSIONING_EXP_DURATION = Duration(230)
     COMMISSIONING_3V3_ENERGY_CONSUMPTION = Energy(0.0178 * 1000.0)
 
+    CAMERA_POWER = 0.2618  # W
+
+    PHOTO_128_TIME = 1.25  # s (max. val, about 25% greater than min)
+    PHOTO_240_TIME = 4.7   # s (max. val, about 25% greater than min)
+    PHOTO_480_TIME = 19    # s (max. val, about 25% greater than min)
+
 
 class Pld:
     '''
@@ -109,7 +115,6 @@ class Sads:
 
 class Sail:
     SAIL_TK_POWER = 2  # W
-    CAMERA_POWER = 0.2618  # W
     SAIL_EXP_DURATION = 240  # s (source: OBC code)
     SUNS_REF_AVERAGE_POWER_5V0 = 0.05
     PLD_SENS_AVERAGE_POWER_5V0 = 5.0*0.0243

@@ -6,6 +6,7 @@ from scheduled_tasks.radfet import *
 from scheduled_tasks.suns import *
 from scheduled_tasks.sads import *
 from scheduled_tasks.sail import *
+from scheduled_tasks.photo_tc import *
 import telecommand as tc
 from commands import TelecommandDataFactory
 
@@ -100,6 +101,14 @@ class TakePhotoTelecommand:
     @classmethod
     def process(self, frame_payload):
         resources_utilization = Resources.init_with_zeros()
+        take_photo = TakePhoto(frame_payload)
+
+        resources_utilization.scheduled.task_duration = take_photo.task_duration()
+        resources_utilization.scheduled.storage = take_photo.storage_usage()
+        resources_utilization.scheduled.power_budget.energy = take_photo.energy_consumptions()
+        resources_utilization.scheduled.downlink.frames_count = take_photo.downlink_frames_count()
+        resources_utilization.scheduled.downlink.duration = take_photo.downlink_durations()
+        #print TakePhotoParameters.get_parameters(frame_payload)
         return resources_utilization
 
 
@@ -122,6 +131,9 @@ class ScheduledTaskDataFactory(object):
 
 
 class Scheduled(object):
+    '''
+    Processes scheduled tasks and returns scheduled resources utilization.
+    '''
     @classmethod
     def process(self, task):
         resources_utilization = Resources.init_with_zeros()

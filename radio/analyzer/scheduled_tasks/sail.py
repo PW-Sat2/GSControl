@@ -38,7 +38,7 @@ class SailExperiment:
     def experiment_energy_consumption(self):
         themal_knives_energy = 120 * 2 * Sail.SAIL_TK_POWER / 3600.0
         pld_board_energy = Sail.SAIL_EXP_DURATION * (Sail.PLD_SENS_AVERAGE_POWER_5V0 + Sail.SUNS_REF_AVERAGE_POWER_5V0) / Eps.EFFICIENCY_5V0 / 3600.0
-        cameras_energy = Sail.SAIL_EXP_DURATION * 2 * Sail.CAMERA_POWER / Eps.EFFICIENCY_3V3 / 3600.0
+        cameras_energy = Sail.SAIL_EXP_DURATION * 2 * Camera.CAMERA_POWER / Eps.EFFICIENCY_3V3 / 3600.0
 
         return Energy((themal_knives_energy + pld_board_energy + cameras_energy) * 1000.0)
 
