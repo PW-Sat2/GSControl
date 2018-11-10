@@ -5,35 +5,19 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 from resources import *
 from subsystems import *
+from parameters import *
 
 
-class RadfetExperimentParameters:
+class RadfetExperimentParameters(Parameters):
     CORRELATION_ID_OFFSET = 0
     DELAY_OFFSET = 1
     SAMPLES_COUNT_OFFSET = 2
+    END_OF_PARAMS_OFFSET = 3
 
     def __init__(self, frame_payload):
         self.correlation_id = self.get_parameters(frame_payload)[self.CORRELATION_ID_OFFSET]
         self.delay = self.get_parameters(frame_payload)[self.DELAY_OFFSET]
         self.samples_count = self.get_parameters(frame_payload)[self.SAMPLES_COUNT_OFFSET]
-
-    @classmethod
-    def get_parameters(self, frame_payload):
-        END_OF_PARAMS_OFFSET = 3
-        END_OF_PATH_BYTE = 0
-
-        experiment_params = []
-        for index in range(0, END_OF_PARAMS_OFFSET):
-            experiment_params.append(ord(frame_payload[index]))
-
-        experiment_path = ""
-        for index in range(END_OF_PARAMS_OFFSET, len(frame_payload)):
-            if ord(frame_payload[index]) == END_OF_PATH_BYTE:
-                break
-            experiment_path = experiment_path + frame_payload[index]
-
-        experiment_params.append(experiment_path)
-        return experiment_params
 
 
 class RadfetExperiment:

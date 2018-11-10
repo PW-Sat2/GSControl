@@ -5,9 +5,10 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 from resources import *
 from subsystems import *
+from parameters import *
 
 
-class SunsExperimentParameters:
+class SunsExperimentParameters(Parameters):
     CORRELATION_ID_OFFSET = 0
     GAIN_OFFSET = 1
     ITIME_OFFSET = 2
@@ -15,6 +16,7 @@ class SunsExperimentParameters:
     SHORT_DELAY_OFFSET = 4
     SAMPLING_SESSION_COUNT_OFFSET = 5
     LONG_DELAY_OFFSET = 6
+    END_OF_PARAMS_OFFSET = 7
 
     def __init__(self, frame_payload):
         self.correlation_id = self.get_parameters(frame_payload)[self.CORRELATION_ID_OFFSET]
@@ -24,24 +26,6 @@ class SunsExperimentParameters:
         self.short_delay = self.get_parameters(frame_payload)[self.SHORT_DELAY_OFFSET]
         self.sampling_session_count = self.get_parameters(frame_payload)[self.SAMPLING_SESSION_COUNT_OFFSET]
         self.long_delay = self.get_parameters(frame_payload)[self.LONG_DELAY_OFFSET]
-
-    @classmethod
-    def get_parameters(self, frame_payload):
-        END_OF_PARAMS_OFFSET = 7
-        END_OF_PATH_BYTE = 0
-
-        experiment_params = []
-        for index in range(0, END_OF_PARAMS_OFFSET):
-            experiment_params.append(ord(frame_payload[index]))
-
-        experiment_path = ""
-        for index in range(END_OF_PARAMS_OFFSET, len(frame_payload)):
-            if ord(frame_payload[index]) == END_OF_PATH_BYTE:
-                break
-            experiment_path = experiment_path + frame_payload[index]
-
-        experiment_params.append(experiment_path)
-        return experiment_params
 
 
 class SunsExperiment:

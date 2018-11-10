@@ -25,9 +25,9 @@ class Comm:
         if bitrate == 9600:
             single_preamble = self.DOWNLINK_MAX_PREAMBLE_9600
 
-        preambles_duration = Duration(math.ceil(frames_count / 10) * float(single_preamble))
+        preambles_duration = Duration(math.ceil(frames_count / 10.0) * float(single_preamble))
 
-        duration = Duration(frames_count * (Comm.FULL_FRAME * 8) / bitrate)
+        duration = Duration(math.ceil(frames_count * (Comm.FULL_FRAME * 8.0) / bitrate))
         return duration + preambles_duration
 
     @classmethod
