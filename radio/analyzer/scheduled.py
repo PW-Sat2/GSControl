@@ -9,6 +9,7 @@ from scheduled_tasks.sail import *
 from scheduled_tasks.adcs import *
 from scheduled_tasks.periodic_message import *
 from scheduled_tasks.photo_tc import *
+from scheduled_tasks.idle_state import *
 import telecommand as tc
 from commands import TelecommandDataFactory
 
@@ -134,6 +135,15 @@ class SetPeriodicMessageTelecommand:
         resources_utilization.scheduled.power_budget.mean_power = set_periodic.mean_powers()
         return resources_utilization
 
+class EnterIdleState:
+    @classmethod
+    def process(self, frame_payload):
+        resources_utilization = Resources.init_with_zeros()
+        enter_idle_state = IdleState(frame_payload)
+
+        resources_utilization.scheduled.task_duration = enter_idle_state.task_duration()
+        resources_utilization.scheduled.power_budget.energy = enter_idle_state.energy_consumptions()
+        return resources_utilization
 
 class ScheduledTaskDataFactory(object):
     map = dict({
@@ -145,7 +155,8 @@ class ScheduledTaskDataFactory(object):
         tc.PerformSADSExperiment:                 PerformSADSExperiment,
         tc.PerformSailExperiment:                 PerformSailExperiment,
         tc.SetAdcsModeTelecommand:                SetAdcsModeTelecommand,
-        tc.SetPeriodicMessageTelecommand:         SetPeriodicMessageTelecommand
+        tc.SetPeriodicMessageTelecommand:         SetPeriodicMessageTelecommand,
+        tc.EnterIdleState:                        EnterIdleState
     })
 
     def get_process(self, task):

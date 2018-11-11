@@ -216,6 +216,9 @@ class EnterIdleStateData(SimpleTelecommandData):
         if self.telecommand._duration > 100:
             notes.warning('Prolonged COMM Idle state with significant power consumption (>= 100mWh)')
 
+    def is_scheduled(self):
+        return True
+
 class SendBeaconData(SimpleTelecommandData):
     def __init__(self, telecommand):
         super(SendBeaconData, self).__init__(telecommand, 235)
