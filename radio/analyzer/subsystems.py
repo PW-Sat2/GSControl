@@ -10,6 +10,7 @@ class Eps:
 class Obc:
     FILE_FRAME_PAYLOAD = 232  # bytes (source: https://team.pw-sat.pl/w/obc/frames_format/)
 
+    FLASH_POWER_CONSUMPTION = 0.1 # W
 
 class Comm:
     DOWNLINK_POWER_CONSUMPTION = 3.0  # W

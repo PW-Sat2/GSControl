@@ -10,6 +10,7 @@ from scheduled_tasks.adcs import *
 from scheduled_tasks.periodic_message import *
 from scheduled_tasks.photo_tc import *
 from scheduled_tasks.idle_state import *
+from scheduled_tasks.copy_boot_slots import *
 import telecommand as tc
 from commands import TelecommandDataFactory
 
@@ -93,10 +94,14 @@ class PerformCameraCommissioningExperiment:
         return resources_utilization
 
 
-class PerformCopyBootSlotsExperiment:
+class CopyBootSlots:
     @classmethod
     def process(self, frame_payload):
         resources_utilization = Resources.init_with_zeros()
+        copy_boot_slots = PerformCopyBootSlots()
+
+        resources_utilization.scheduled.task_duration = copy_boot_slots.task_duration()
+        resources_utilization.scheduled.power_budget.energy = copy_boot_slots.energy_consumptions()
         return resources_utilization
 
 
@@ -156,7 +161,8 @@ class ScheduledTaskDataFactory(object):
         tc.PerformSailExperiment:                 PerformSailExperiment,
         tc.SetAdcsModeTelecommand:                SetAdcsModeTelecommand,
         tc.SetPeriodicMessageTelecommand:         SetPeriodicMessageTelecommand,
-        tc.EnterIdleState:                        EnterIdleState
+        tc.EnterIdleState:                        EnterIdleState,
+        tc.CopyBootSlots:                         CopyBootSlots
     })
 
     def get_process(self, task):
