@@ -4,5 +4,5 @@ Kfazi Analyzer is a telecommand analyzer for PW-Sat2. It validates syntax, value
 # How to run
 Run a test session script:
 ```
-python analyzer.py -f test_sessions/session_1.py
+python analyzer.py -f test_sessions/first_session.py
 ```
