@@ -118,3 +118,6 @@ class Sail:
     SAIL_EXP_DURATION = 240  # s (source: OBC code)
     SUNS_REF_AVERAGE_POWER_5V0 = 0.05
     PLD_SENS_AVERAGE_POWER_5V0 = 5.0*0.0243
+
+class Adcs:
+    MEAN_POWER_CONSUMPTION = 0.3 # W

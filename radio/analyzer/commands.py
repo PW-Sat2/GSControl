@@ -141,14 +141,21 @@ class SetAdcsModeTelecommandData(SimpleTelecommandData):
         self.process_common_command(state, notes, send_mode, wait_mode, limits)
         mode = self.telecommand._mode
         if mode not in self.ALLOWED_MODES:
-            notes.error("Invalid adcs mode requested: {0}".format(mode))
+            notes.error("Invalid ADCS mode requested: {0}".format(mode))
         
         if mode == AdcsMode.ExperimentalDetumbling:
             notes.error("DO NOT ENABLE Experimental Detumbling. It is unstable.")
         elif mode == AdcsMode.ExperimentalSunpointing:
-            notes.error("Do not enable Experimental Sunpointing. It is not implemented.")
+            notes.error("Do NOT ENABLE Experimental Sunpointing. It is not implemented.")
+        elif mode == AdcsMode.BuiltinDetumbling:
+            notes.warning("ADCS is power-on till next power cycle or till mode will be changed to stopped/disabled.")
+            notes.info("First, set stopped mode before setting to built-in-detumbling mode.")
         elif mode == AdcsMode.Disabled:
-            notes.warning("Disabling adcs is dangerous")
+            notes.warning("Disabling ADCS may be dangerous.")
+    
+    def is_scheduled(self):
+        return True
+
 
 class SetAntennaDeploymentData(SimpleTelecommandData):
     @set_correlation_id
