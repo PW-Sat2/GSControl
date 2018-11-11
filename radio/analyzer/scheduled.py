@@ -7,6 +7,7 @@ from scheduled_tasks.suns import *
 from scheduled_tasks.sads import *
 from scheduled_tasks.sail import *
 from scheduled_tasks.adcs import *
+from scheduled_tasks.periodic_message import *
 from scheduled_tasks.photo_tc import *
 import telecommand as tc
 from commands import TelecommandDataFactory
@@ -123,6 +124,17 @@ class SetAdcsModeTelecommand:
         return resources_utilization
 
 
+class SetPeriodicMessageTelecommand:
+    @classmethod
+    def process(self, frame_payload):
+        resources_utilization = Resources.init_with_zeros()
+        set_periodic = SetPeriodicMessage(frame_payload)
+
+        resources_utilization.scheduled.task_duration = set_periodic.task_duration()
+        resources_utilization.scheduled.power_budget.mean_power = set_periodic.mean_powers()
+        return resources_utilization
+
+
 class ScheduledTaskDataFactory(object):
     map = dict({
         tc.PerformSunSExperiment:                 PerformSunSExperiment,
@@ -132,7 +144,8 @@ class ScheduledTaskDataFactory(object):
         tc.TakePhotoTelecommand:                  TakePhotoTelecommand,
         tc.PerformSADSExperiment:                 PerformSADSExperiment,
         tc.PerformSailExperiment:                 PerformSailExperiment,
-        tc.SetAdcsModeTelecommand:                SetAdcsModeTelecommand
+        tc.SetAdcsModeTelecommand:                SetAdcsModeTelecommand,
+        tc.SetPeriodicMessageTelecommand:         SetPeriodicMessageTelecommand
     })
 
     def get_process(self, task):

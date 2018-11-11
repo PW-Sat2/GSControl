@@ -20,9 +20,14 @@ class Parameters:
         if self.PATH_INCLUDED:
             path = ""
             for index in range(self.END_OF_PARAMS_OFFSET, len(frame_payload)):
-                if ord(frame_payload[index]) == self.END_OF_PATH_BYTE:
+                value = 0
+                try:
+                    value = ord(frame_payload[index])
+                except TypeError:
+                    value = frame_payload[index]
+                if value == self.END_OF_PATH_BYTE:
                     break
-                path = path + frame_payload[index]
+                path = path + str(frame_payload[index])
 
             params.append(path)
         return params

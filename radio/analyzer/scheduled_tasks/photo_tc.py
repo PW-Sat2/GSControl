@@ -9,7 +9,6 @@ from parameters import *
 
 
 class TakePhotoParameters(Parameters):
-    CORRELATION_ID_OFFSET = 0
     CAMERA_LOCATION_OFFSET = 1
     PHOTO_RESOLUTION_OFFSET = 2
     COUNT_OFFSET = 3

@@ -112,19 +112,27 @@ class Uplink:
 class Duration:
     STR_PRECISION = 2
     UNIT = 's'
+    TILL_POWERCYCLE = -1
+    PERSISTENT = -2
 
     def __init__(self, duration):
         self.duration = duration
 
     def __add__(self, other):
-        return Duration(self.duration + other.duration)
+        return Duration(self.__float__() + other.duration)
 
     def __str__(self):
         if self.duration == 0:
             return 'N/A'
+        if self.duration == self.TILL_POWERCYCLE:
+            return 'Till power cycle!'
+        if self.duration == self.PERSISTENT:
+            return 'Persistent!'
         return '{}'.format(str(round(self.duration, self.STR_PRECISION)))
 
     def __float__(self):
+        if self.duration == self.TILL_POWERCYCLE or self.duration == self.PERSISTENT:
+            return 0
         return self.duration
 
 

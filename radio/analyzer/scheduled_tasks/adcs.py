@@ -26,7 +26,7 @@ class SetAdcsMode:
     def task_duration(self):
         duration = 0
         if self.is_adcs_power_on(self.parameters):
-            duration = 23 * 60 * 60
+            duration = Duration.TILL_POWERCYCLE
         return Duration(duration)
     
     def mean_powers(self):
