@@ -71,6 +71,7 @@ class Analyzer:
 
 
     def load(self, tasks_file_path):
+        import datetime
         if not File.valid(tasks_file_path):
             raise SyntaxError('File: {} has a wrong syntax. This file should contain a tasks = [...] list only with session tasks. Examples in test_sessions dir.'.format(tasks_file_path))
 
