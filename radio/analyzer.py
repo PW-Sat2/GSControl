@@ -71,27 +71,29 @@ class Analyzer:
 
 
     def load(self, tasks_file_path):
+        import os
+        import sys
+        
+
+        sys.path.append(os.path.join(os.path.dirname(__file__), '../PWSat2OBC/integration_tests'))
+        sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+    
+        import telecommand as tc
         import datetime
+        from devices import camera
+        from devices.adcs import AdcsMode
+        
         if not File.valid(tasks_file_path):
             raise SyntaxError('File: {} has a wrong syntax. This file should contain a tasks = [...] list only with session tasks. Examples in test_sessions dir.'.format(tasks_file_path))
 
         with open(tasks_file_path) as tasks_file:
             exec(tasks_file)
             tasks_file.close()
+
         return tasks
 
 if __name__ == '__main__':
-    import os
-    import sys
     import argparse
-
-    sys.path.append(os.path.join(os.path.dirname(__file__), '../PWSat2OBC/integration_tests'))
-    sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
-
-    import telecommand as tc
-    import datetime
-    from devices import camera
-    from devices.adcs import *
 
     parser = argparse.ArgumentParser()
     parser.add_argument("-f", "--file", required=True,
