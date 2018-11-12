@@ -1,14 +1,14 @@
 from tabulate import tabulate
 from colorama import init, Fore, Style
 from task_actions import *
-from analyzer.resources import *
-from analyzer.task import *
-from analyzer.results import *
-from analyzer.file import *
-from analyzer.scheduled import *
-from analyzer.commands import TelecommandDataFactory
-from analyzer.state import State
-from analyzer.limits import Limits
+from analyzer_engine.resources import *
+from analyzer_engine.task import *
+from analyzer_engine.results import *
+from analyzer_engine.file import *
+from analyzer_engine.scheduled import *
+from analyzer_engine.commands import TelecommandDataFactory
+from analyzer_engine.state import State
+from analyzer_engine.limits import Limits
 
 init()
 
