@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<?grc format='1' created='3.7.12'?>
+<?grc format='1' created='3.7.13'?>
 <flow_graph>
   <timestamp>Mon Aug 21 11:43:56 2017</timestamp>
   <block>
@@ -18,10 +18,6 @@
     </param>
     <param>
       <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>copyright</key>
       <value></value>
     </param>
     <param>
@@ -222,7 +218,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(3112, 512)</value>
+      <value>(3288, 432)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1108,7 +1104,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(3136, 312)</value>
+      <value>(3288, 288)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1170,7 +1166,7 @@ class frames_counter(gr.sync_block):
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(3128, 448)</value>
+      <value>(3288, 392)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1256,7 +1252,7 @@ class frames_counter(gr.sync_block):
     </param>
     <param>
       <key>w</key>
-      <value>0.1</value>
+      <value>0.08</value>
     </param>
     <param>
       <key>maxoutbuf</key>
@@ -1350,7 +1346,7 @@ class frames_counter(gr.sync_block):
     </param>
     <param>
       <key>ted_gain</key>
-      <value>1</value>
+      <value>2</value>
     </param>
     <param>
       <key>nfilters</key>
@@ -1378,7 +1374,7 @@ class frames_counter(gr.sync_block):
     </param>
     <param>
       <key>loop_bw</key>
-      <value>0.045</value>
+      <value>0.05</value>
     </param>
     <param>
       <key>maxoutbuf</key>
@@ -1488,7 +1484,7 @@ class frames_counter(gr.sync_block):
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(3136, 196)</value>
+      <value>(3288, 180)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1497,6 +1493,41 @@ class frames_counter(gr.sync_block):
     <param>
       <key>id</key>
       <value>frame_sink_1</value>
+    </param>
+  </block>
+  <block>
+    <key>frame_sink</key>
+    <param>
+      <key>addr</key>
+      <value>tcp://*:7011</value>
+    </param>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>affinity</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>1</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(3048, 332)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>frame_sink_1_0</value>
     </param>
   </block>
   <block>
@@ -1559,6 +1590,53 @@ class frames_counter(gr.sync_block):
     </param>
   </block>
   <block>
+    <key>kiss_check_address</key>
+    <param>
+      <key>address</key>
+      <value>PWSAT2-0</value>
+    </param>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>affinity</key>
+      <value></value>
+    </param>
+    <param>
+      <key>direction</key>
+      <value>"from"</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(3048, 184)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>kiss_check_address_0</value>
+    </param>
+    <param>
+      <key>maxoutbuf</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>minoutbuf</key>
+      <value>0</value>
+    </param>
+  </block>
+  <block>
     <key>kiss_hdlc_deframer</key>
     <param>
       <key>alias</key>
@@ -1582,7 +1660,7 @@ class frames_counter(gr.sync_block):
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(2808, 180)</value>
+      <value>(2800, 184)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -4239,7 +4317,7 @@ class frames_counter(gr.sync_block):
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(3136, 244)</value>
+      <value>(3288, 228)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -4248,6 +4326,45 @@ class frames_counter(gr.sync_block):
     <param>
       <key>id</key>
       <value>save_frame_0</value>
+    </param>
+  </block>
+  <block>
+    <key>save_frame</key>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>affinity</key>
+      <value></value>
+    </param>
+    <param>
+      <key>direction</key>
+      <value>Downlink</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>1</value>
+    </param>
+    <param>
+      <key>file</key>
+      <value>downlink_all_frames</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(3048, 380)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>save_frame_0_0</value>
     </param>
   </block>
   <block>
@@ -4428,26 +4545,44 @@ class frames_counter(gr.sync_block):
     <sink_key>0</sink_key>
   </connection>
   <connection>
-    <source_block_id>kiss_hdlc_deframer_0</source_block_id>
+    <source_block_id>kiss_check_address_0</source_block_id>
     <sink_block_id>blocks_message_debug_0</sink_block_id>
-    <source_key>out</source_key>
+    <source_key>ok</source_key>
     <sink_key>print_pdu</sink_key>
   </connection>
   <connection>
-    <source_block_id>kiss_hdlc_deframer_0</source_block_id>
+    <source_block_id>kiss_check_address_0</source_block_id>
     <sink_block_id>count_frames</sink_block_id>
-    <source_key>out</source_key>
+    <source_key>ok</source_key>
     <sink_key>in</sink_key>
   </connection>
   <connection>
-    <source_block_id>kiss_hdlc_deframer_0</source_block_id>
+    <source_block_id>kiss_check_address_0</source_block_id>
     <sink_block_id>frame_sink_1</sink_block_id>
+    <source_key>ok</source_key>
+    <sink_key>in</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>kiss_check_address_0</source_block_id>
+    <sink_block_id>save_frame_0</sink_block_id>
+    <source_key>ok</source_key>
+    <sink_key>in</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>kiss_hdlc_deframer_0</source_block_id>
+    <sink_block_id>frame_sink_1_0</sink_block_id>
     <source_key>out</source_key>
     <sink_key>in</sink_key>
   </connection>
   <connection>
     <source_block_id>kiss_hdlc_deframer_0</source_block_id>
-    <sink_block_id>save_frame_0</sink_block_id>
+    <sink_block_id>kiss_check_address_0</sink_block_id>
+    <source_key>out</source_key>
+    <sink_key>in</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>kiss_hdlc_deframer_0</source_block_id>
+    <sink_block_id>save_frame_0_0</sink_block_id>
     <source_key>out</source_key>
     <sink_key>in</sink_key>
   </connection>
