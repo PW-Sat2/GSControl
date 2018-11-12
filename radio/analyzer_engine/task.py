@@ -22,10 +22,9 @@ class TaskAnalyzer:
 
         task_resources = Resources.init_with_zeros()
 
-        task_resources.session.uplink.frames_count += 1
-        task_resources.session.downlink.frames_count += 1
-
         command_data = self.telecommand_data_factory.get_telecommand_data(frame)
+        task_resources.session.uplink.frames_count += command_data.get_uplink_frames_count()
+        task_resources.session.downlink.frames_count += command_data.get_downlink_frames_count()
         command_data.process(state, notes, send_mode, wait_mode, limits)
 
         task_resources.session.uplink.duration = command_data.get_uplink_duration(state.current_uplink_bitrate())

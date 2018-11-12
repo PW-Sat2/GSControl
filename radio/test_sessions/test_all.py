@@ -148,4 +148,8 @@ tasks = [
     [tc.TakePhotoTelecommand(10, CameraLocation.Wing, PhotoResolution.p128, 29, datetime.timedelta(seconds = 0), ""), SendReceive, WaitMode.NoWait],
     [tc.TakePhotoTelecommand(10, CameraLocation.Wing, PhotoResolution.p128, 29, datetime.timedelta(seconds = 0), "a" * 31), SendReceive, WaitMode.NoWait],
     [tc.EraseFlash(0xBC), SendReceive, WaitMode.NoWait],
+    ["Message", Print, WaitMode.NoWait],
+    ["Message", Print, WaitMode.Wait],
+    [100, Sleep, WaitMode.Wait],
+    [100, Sleep, WaitMode.NoWait],
 ]

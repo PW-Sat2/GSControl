@@ -101,6 +101,34 @@ class TelecommandData(object):
     def process(self, state, notes, send_mode, wait_mode, limits):
         self.process_common_command(state, notes, send_mode, wait_mode, limits)
 
+class NoTelecommand(object):
+    def telecommand_name(self, *args, **kwargs):
+        return ''
+
+    def get_payload_size(self, *args, **kwargs):
+        return 0
+
+    def get_uplink_duration(self, bitrate):
+        return Duration(0)
+
+    def get_uplink_frames_count(self):
+        return 0
+
+    def get_downlink_duration(self, *args, **kwargs):
+        return Duration(0)
+    
+    def get_downlink_energy_consumption(self, *args, **kwargs):
+        return Energy(0)
+
+    def get_downlink_frames_count(self, *args, **kwargs):
+        return 0
+
+    def is_scheduled(self):
+        return False
+
+    def process(self, *args, **kwargs):
+        pass
+
 class SimpleTelecommandData(TelecommandData):
     def __init__(self, telecommand, response_bytes_count):
         super(SimpleTelecommandData, self).__init__(telecommand)
@@ -850,5 +878,9 @@ class TelecommandDataFactory(object):
     })
 
     def get_telecommand_data(self, telecommand):
-        telecommand_data_type = self.telecommands_map[type(telecommand)]
-        return telecommand_data_type(telecommand)
+        command_type = type(telecommand)
+        if command_type in self.telecommands_map:
+            telecommand_data_type = self.telecommands_map[type(telecommand)]
+            return telecommand_data_type(telecommand)
+        else:
+            return NoTelecommand()
