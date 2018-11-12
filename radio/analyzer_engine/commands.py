@@ -8,10 +8,12 @@ sys.path.append(os.path.join(os.path.dirname(__file__),
 
 import math
 import telecommand as tc
+from datetime import timedelta
 from resources import *
 from subsystems import *
 from task_actions import *
 from devices.adcs import AdcsMode
+from devices import CameraLocation, PhotoResolution
 
 class TelecommandData(object):
     uplink_header_bytes_count = 3
@@ -273,6 +275,20 @@ class PerformDetumblingExperimentData(SimpleTelecommandData):
     def __init__(self, telecommand):
         super(PerformDetumblingExperimentData, self).__init__(telecommand, 2)
 
+    def process(self, state, notes, send_mode, wait_mode, limits):
+        self.process_common_command(state, notes, send_mode, wait_mode, limits)
+        notes.error('DO NOT START Detumbling experiment. It is unstable and will result in uncontrollable spinning')
+        duration = self.telecommand._duration
+        sampling_interval = self.telecommand.sampling_interval
+    
+        if duration.total_seconds() == 0:
+            notes.error('Experiment duration is set to 0')
+        elif duration > timedelta(hours = 12):
+            notes.error('Experiment duration is too long: {}'.format(duration))
+
+        if sampling_interval.total_seconds() == 0:
+            notes.error('sampling interval is set to 0')        
+
 class AbortExperimentData(SimpleTelecommandData):
     @set_correlation_id
     def __init__(self, telecommand):
@@ -301,6 +317,8 @@ class PerformRadFETExperimentData(SimpleTelecommandData):
         path = self.telecommand.output_file_name
         if len(path) + 1 > 30:
             notes.error("Path is too long: {0}. 30 characters including null terminator are allowed.".format(len(path) + 1))
+        elif len(path) == 0:
+            notes.error("Experiment file path is empty")
 
     def is_scheduled(self):
         return True
@@ -330,6 +348,8 @@ class PerformPayloadCommissioningExperimentData(SimpleTelecommandData):
         path = self.telecommand.file_name
         if len(path) + 1 > 30:
             notes.error("Path is too long: {0}. 30 characters including null terminator are allowed.".format(len(path) + 1))
+        elif len(path) == 0:
+            notes.error("Experiment file path is empty")
 
 class PerformSADSExperimentData(SimpleTelecommandData):
     @set_correlation_id
@@ -366,7 +386,7 @@ class SetErrorCounterConfigData(SimpleTelecommandData):
         configs = self.telecommand._configs
         if len(configs) == 0:
             notes.warning("Error counter configurations are missing")
-        if len(configs) > 14:
+        elif len(configs) > 14:
             notes.errors("Too many error counter configurations")
 
         devices = set([])
@@ -412,12 +432,24 @@ class DownloadFileData(TelecommandData):
     def process(self, state, notes, send_mode, wait_mode, limits):
         self.process_common_command(state, notes, send_mode, wait_mode, limits)
         path = self.telecommand._path
-        if len(path) > self.MAX_PATH_LENGTH:
-            notes.error('Path too long: {0} characters. Only {1} characters are allowed'.format(len(path), self.MAX_PATH_LENGTH))
+        if len(path) == 0:
+            notes.error('File path is empty')
+
         seqs = self.telecommand._seqs
         if len(seqs) > limits.max_response_frames():
             notes.error('Too many sequences are requested for download: {0}'.format(len(seqs)))
+        elif len(seqs) == 0:
+            notes.error('List of file blocks is empty')
+
+        ids = set([])
+        for e in seqs:
+            ids.add(e)
+            if e > 600 * 1024 / limits.max_correlated_frame_payload_size():
+                notes.warning('This file block id is suspiciously big: {}'.format(e))
         
+        if len(ids) != len(seqs):
+            notes.error('There are duplicated block identifiers')
+
 class RemoveFileData(TelecommandData):
     MAX_PATH_LENGTH = 192
     @set_correlation_id
@@ -440,6 +472,8 @@ class RemoveFileData(TelecommandData):
         path = self.telecommand._path
         if len(path) > self.MAX_PATH_LENGTH:
             notes.error('Path too long: {0} characters. Only {1} characters are allowed'.format(len(path), self.MAX_PATH_LENGTH))
+        elif len(path) == 0:
+            notes.error("Experiment file path is empty")
         if path == 'telemetry.current' or path == '/telemetry.current' or path == './telemetry.current':
             notes.warning("Removing current telemetry file is not recommended")
         if path == 'telemetry.previous' or path == '/telemetry.previous' or path == './telemetry.previous':
@@ -465,11 +499,18 @@ class ListFilesData(TelecommandData):
         path = self.telecommand._path
         if (len(path) + 1) > self.MAX_PATH_LENGTH:
             notes.error('Path too long: {0} 194 characters including null terminator are allowed'.format(len(path) + 1))
+        elif len(path) == 0:
+            notes.error("Experiment file path is empty")
 
 class EraseFlashData(SimpleTelecommandData):
     @set_correlation_id
     def __init__(self, telecommand):
         super(EraseFlashData, self).__init__(telecommand, 3)
+
+    def process(self, state, notes, send_mode, wait_mode, limits):
+        self.process_common_command(state, notes, send_mode, wait_mode, limits)
+        notes.warning('Do you really intend to erase entire filesystem?')
+    
 
 class RawI2CData(SimpleTelecommandData):
     BUS_DEVICES = [
@@ -522,8 +563,8 @@ class ReadMemoryData(TelecommandData):
 
     def get_response_bytes_count(self):
         payload = self.get_payload()
-        offset = int(payload[1:4])
-        size = int(payload[5:8])
+        size = self.telecommand.size
+        offset = self.telecommand.offset
         size = min(size, 2^31 - 1 - offset)
         return size * self.downlink_frame_bytes_count
 
@@ -533,14 +574,49 @@ class ReadMemoryData(TelecommandData):
     def get_requires_send_receive(self):
         return False
 
+    def process(self, state, notes, send_mode, wait_mode, limits):
+        self.process_common_command(state, notes, send_mode, wait_mode, limits)
+        size = self.telecommand.size
+        offset = self.telecommand.offset
+        maxSize = limits.max_correlated_frame_payload_size() * limits.max_response_frames()
+        if size > maxSize:
+            notes.error('Too many response frames are requested')
+        elif size == 0:
+            notes.error('Empty memory block requested')
+
+        if (size + offset) > (pow(2, 32) - 1):
+            notes.error('Wrapping around memory space is not allowed')
+        
+        
+
 # --------------------------
 class SetPeriodicMessageTelecommandData(SimpleTelecommandData):
+    INTERVAL_LIMIT = {
+        0: 0,
+        1: 1,
+        2: 2,
+        3: 3,
+        4: 4,
+        5: 4,
+        6: 5
+    }
     @set_correlation_id
     def __init__(self, telecommand):
         super(SetPeriodicMessageTelecommandData, self).__init__(telecommand, 2)
     
     def is_scheduled(self):
         return True
+
+    def process(self, state, notes, send_mode, wait_mode, limits):
+        self.process_common_command(state, notes, send_mode, wait_mode, limits)
+        interval = self.telecommand._interval_minutes
+        count = self.telecommand._repeat_count
+        if count in self.INTERVAL_LIMIT:
+            if interval < self.INTERVAL_LIMIT[count]:
+                notes.error('Power budget strain is too big')
+        else:
+            notes.error('Too many periodic messages are scheduled. Power budget strain is too big')
+            
 
 class SendPeriodicMessageTelecommandData(SimpleTelecommandData):
     def __init__(self, telecommand):
@@ -555,12 +631,38 @@ class SendPeriodicMessageTelecommandData(SimpleTelecommandData):
         
 
 class TakePhotoTelecommandData(SimpleTelecommandData):
+    ALLOWED_LOCATIONS = [CameraLocation.Nadir, CameraLocation.Wing]
+    ALLOWED_RESOLUTIONS = [PhotoResolution.p128, PhotoResolution.p240, PhotoResolution.p480]
+    MAX_PICTURE_COUNT = 30
+    MAX_PICTURE_PATH_LENGTH = 30
     @set_correlation_id
     def __init__(self, telecommand):
         super(TakePhotoTelecommandData, self).__init__(telecommand, 2)
 
     def is_scheduled(self):
         return True
+
+    def process(self, state, notes, send_mode, wait_mode, limits):
+        self.process_common_command(state, notes, send_mode, wait_mode, limits)
+        camera_location = self.telecommand._camera_id
+        resolution = self.telecommand._resolution
+        count = self.telecommand._picture_count
+        path = self.telecommand._picture_path
+
+        if not camera_location in self.ALLOWED_LOCATIONS:
+            notes.error('Invalid camera location: {}'.format(camera_location))
+
+        if not resolution in self.ALLOWED_RESOLUTIONS:
+            notes.error('Invalid photo resolution: {}'.format(resolution))
+
+        if count >= self.MAX_PICTURE_COUNT:
+             notes.error('Too many pictures requested: {}'.format(count))
+
+        if len(path) == 0:
+            notes.error('Photo path is empty')
+        elif len(path) > self.MAX_PICTURE_PATH_LENGTH:
+            notes.error('Too long photo path')
+
 
 class PurgePhotoTelecommandData(SimpleTelecommandData):
     @set_correlation_id
@@ -586,15 +688,16 @@ class EraseBootTableEntryData(SimpleTelecommandData):
     def process(self, state, notes, send_mode, wait_mode, limits):
         self.process_common_command(state, notes, send_mode, wait_mode, limits)
         length = len(self.telecommand._entries)
-        if length > 3:
-            notes.error("Too many boot entries will be erased: {0}. At most 3 should be erased".format(length))
-
-        if length > 5:
+        if length == 0:
+            notes.error('Boot slot list is empty')
+        elif length > 5:
             notes.error("Are you trying to brick the satellite?")
+        elif length > 3:
+            notes.error("Too many boot entries will be erased: {0}. At most 3 should be erased".format(length))      
 
         groups = set([])
         for e in self.telecommand._entries:
-            if e > 6 or e < 0:
+            if e >= 6 or e < 0:
                 notes.error("Invalid boot entry id: {0}.".format(e))
             groups.add(e / 3)
 
@@ -604,6 +707,32 @@ class EraseBootTableEntryData(SimpleTelecommandData):
 class WriteProgramPartData(SimpleTelecommandData):
     def __init__(self, telecommand):
         super(WriteProgramPartData, self).__init__(telecommand, 2)
+
+    def process(self, state, notes, send_mode, wait_mode, limits):
+        self.process_common_command(state, notes, send_mode, wait_mode, limits)
+        length = len(self.telecommand._entries)
+        offset = self.telecommand._offset
+        if length == 0:
+            notes.error('Boot slot list is empty')
+        elif length > 5:
+            notes.error("Are you trying to brick the satellite?")
+        elif length > 3:
+            notes.error("Too many boot entries will be updated: {0}. At most 3 should be written".format(length))
+
+        groups = set([])
+        for e in self.telecommand._entries:
+            if e >= 6 or e < 0:
+                notes.error("Invalid boot entry id: {0}.".format(e))
+            groups.add(e / 3)
+
+        if len(groups) > 1:
+            notes.error("Writing to boot entries from more than one set is an error")  
+
+        if offset > 511 * 1024:
+            notes.error('Invalid program offset: {}'.format(offset))
+
+        elif offset > 230 * 1024:
+            notes.warning('Are you sure this offset is correct: {}?'.format(offset))
 
 class FinalizeProgramEntryData(SimpleTelecommandData):
     def __init__(self, telecommand):
@@ -624,6 +753,10 @@ class StopSailDeploymentData(SimpleTelecommandData):
     def __init__(self, telecommand):
         super(StopSailDeploymentData, self).__init__(telecommand, 2)
 
+    def process(self, state, notes, send_mode, wait_mode, limits):
+        self.process_common_command(state, notes, send_mode, wait_mode, limits)
+        notes.warning('This telecommand disables automatic sail deployment in OBC')
+
 class GetPersistentStateData(SimpleTelecommandData):
     def __init__(self, telecommand):
         super(GetPersistentStateData, self).__init__(telecommand, 2)
@@ -638,10 +771,33 @@ class SetTimeCorrectionConfigData(SimpleTelecommandData):
     def __init__(self, telecommand):
         super(SetTimeCorrectionConfigData, self).__init__(telecommand, 2)
 
+    def process(self, state, notes, send_mode, wait_mode, limits):
+        self.process_common_command(state, notes, send_mode, wait_mode, limits)
+        mission_time_weight = self.telecommand._missionTimeWeight
+        external_time_weight = self.telecommand._externalTimeWeight
+        if mission_time_weight == 0 and external_time_weight == 0:
+            notes.error('Both weights cannot be zero at the same time')
+        if mission_time_weight == 0:
+           notes.warning('Disabling mission time as time correction source')
+        if external_time_weight == 0:
+           notes.warning('Disabling external time as time correction source')
+
 class SetTimeData(SimpleTelecommandData):
     @set_correlation_id
     def __init__(self, telecommand):
         super(SetTimeData, self).__init__(telecommand, 2)
+
+    def process(self, state, notes, send_mode, wait_mode, limits):
+        self.process_common_command(state, notes, send_mode, wait_mode, limits)
+        newTime = self.telecommand._newTime
+        
+        if newTime < timedelta(minutes = 40):
+            notes.error('New time is in mission silent period')
+        elif newTime < timedelta(hours = 4):
+            notes.warning('new time is in LEOP mission phase')
+        elif newTime >= timedelta(days = 40):
+            notes.error('New time is after mission active phase. Are you trying to end mission? Did you mean: OpenSail?')
+
 
 class PingTelecommandData(SimpleTelecommandData):
     def __init__(self, telecommand):

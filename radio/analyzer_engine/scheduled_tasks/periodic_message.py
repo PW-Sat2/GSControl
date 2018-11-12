@@ -16,6 +16,8 @@ class SetPeriodicMessageParameters(Parameters):
         self.interval_minutes = self.get_parameters(frame_payload)[self.INTERVAL_MINUTES_OFFSET]
         self.repeat_count = self.get_parameters(frame_payload)[self.REPEAT_COUNT_OFFSET]
         self.message = self.get_parameters(frame_payload)[self.END_OF_PARAMS_OFFSET]
+        if self.interval_minutes == 0:
+            self.interval_minutes = 0.5
 
 class SetPeriodicMessage:
     def __init__(self, frame_payload):
@@ -42,4 +44,3 @@ class SetPeriodicMessage:
             preamble = float(Comm.DOWNLINK_MAX_PREAMBLE_9600)
         tx_time = (((Comm.FULL_FRAME * 8.0) / bitrate) + preamble) * parameters.repeat_count
         return ((tx_time / (parameters.interval_minutes * 60.0)) * Comm.DOWNLINK_POWER_CONSUMPTION) * 1000.0
-
