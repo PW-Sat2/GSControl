@@ -18,3 +18,8 @@ if [ ! -d ${PWSAT_GS_GNURADIO} ]; then
 	echo "GnuRadio directory '${PWSAT_GS_GNURADIO}' not found"
 	exit 1
 fi
+
+if [ -z ${PWSAT_GS_NAME} ]; then
+	echo "GS name not defined"
+	exit 1
+fi
