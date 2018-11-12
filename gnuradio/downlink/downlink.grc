@@ -4352,7 +4352,7 @@ class frames_counter(gr.sync_block):
     </param>
     <param>
       <key>file</key>
-      <value>downlink_frames_invalid</value>
+      <value>downlink_all_frames</value>
     </param>
     <param>
       <key>_coordinate</key>
