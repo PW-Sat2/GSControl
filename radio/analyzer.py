@@ -14,11 +14,10 @@ init()
 
 
 class Analyzer:
-    def __init__(self, tasks):
-        self.tasks = tasks
+    def __init__(self):
         self.overall_resources_utilization = Resources.init_with_zeros()
 
-    def run(self):
+    def run(self, tasks):
         session_results = [[]]
         scheduled_results = [[]]
 
@@ -27,7 +26,7 @@ class Analyzer:
         notes = Notes()
         limits = Limits()
         analyzer = TaskAnalyzer()
-        for task in self.tasks:
+        for task in tasks:
             task_data = analyzer.process(task, state, limits)
 
             if task_data.is_scheduled:
@@ -96,5 +95,5 @@ if __name__ == '__main__':
         exec(tasks_file)
         tasks_file.close()
 
-    analyzer = Analyzer(tasks)
-    analyzer.run()
+    analyzer = Analyzer()
+    analyzer.run(tasks)

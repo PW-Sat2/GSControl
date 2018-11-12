@@ -50,7 +50,7 @@
     </param>
     <param>
       <key>id</key>
-      <value>top_block</value>
+      <value>iq_to_pluto_nogui</value>
     </param>
     <param>
       <key>max_nouts</key>

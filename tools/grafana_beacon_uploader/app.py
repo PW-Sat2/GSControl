@@ -25,6 +25,9 @@ class BeaconUploaderApp(object):
         parser.add_argument('-d', '--influx', required=False,
                             help="InfluxDB url", default='http://localhost:8086/pwsat2')
 
+        parser.add_argument('-g', '--gs', required=True,
+                            help="Ground Station tag")
+
         BeaconUploaderApp(parser.parse_args(args))._run()
 
     def __init__(self, args):
@@ -43,17 +46,25 @@ class BeaconUploaderApp(object):
 
         while True:
             data = self._receiver.decode_kiss(self._receiver.receive())
-            frame = self._frame_decoder.decode(data)
+            try:
+                self._process_single_frame(data)
+            except Exception as e:
+                self._log.error('Error processing received frame: %s', str(e))
 
-            if not isinstance(frame, BeaconFrame):
-                continue
+    def _process_single_frame(self, raw_frame):
+        frame = self._frame_decoder.decode(raw_frame)
 
-            self._log.info("Received beacon frame")
-            self._process_single_beacon(datetime.utcnow(), frame)
+        if not isinstance(frame, BeaconFrame):
+            return
+
+        self._log.info("Received beacon frame")
+        self._process_single_beacon(datetime.utcnow(), frame)
 
     def _process_single_beacon(self, timestamp, beacon):
         telemetry = ParseBeacon.parse(beacon)
 
-        points = generate_data_points(timestamp, telemetry)
+        points = generate_data_points(timestamp, telemetry, {
+            'ground_station': self._args.gs
+        })
 
         self._db.write_points(points)
