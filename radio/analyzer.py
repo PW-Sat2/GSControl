@@ -70,6 +70,15 @@ class Analyzer:
             print Fore.CYAN + '[Info] No scheduled experiments or tasks.' + Style.RESET_ALL
 
 
+    def load(self, tasks_file_path):
+        if not File.valid(tasks_file_path):
+            raise SyntaxError('File: {} has a wrong syntax. This file should contain a tasks = [...] list only with session tasks. Examples in test_sessions dir.'.format(tasks_file_path))
+
+        with open(tasks_file_path) as tasks_file:
+            exec(tasks_file)
+            tasks_file.close()
+        return tasks
+
 if __name__ == '__main__':
     import os
     import sys
@@ -88,12 +97,5 @@ if __name__ == '__main__':
 	                    help="Path to *.py file with session tasks (tasks = [...]). Examples in test_sessions dir.")
     args = vars(parser.parse_args())
 
-    if not File.valid(args["file"]):
-        raise SyntaxError('File: {} has a wrong syntax. This file should contain a tasks = [...] list only with session tasks. Examples in test_sessions dir.'.format(args["file"]))
-
-    with open(args["file"]) as tasks_file:
-        exec(tasks_file)
-        tasks_file.close()
-
     analyzer = Analyzer()
-    analyzer.run(tasks)
+    analyzer.run(analyzer.load(args["file"]))

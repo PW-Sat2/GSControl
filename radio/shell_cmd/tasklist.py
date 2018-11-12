@@ -79,8 +79,14 @@ def build(sender, rcv, frame_decoder, analyzer, ns):
     
     def analyze(tasks):
         analyzer.run(tasks)
+    
+    def load(tasks_file_path):
+        tasks = analyzer.load(tasks_file_path)
+        analyzer.run(tasks)
+        return tasks
 
     return {
         'run': run,
-        'analyze': analyze
+        'analyze': analyze,
+        'load': load
     }
