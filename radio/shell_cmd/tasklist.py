@@ -2,7 +2,7 @@ from datetime import datetime
 from task_actions import WaitMode
 import sys
 
-def raw_input(text=""):
+def custom_raw_input(text=""):
     sys.stdout.write(text)
     return sys.stdin.readline().strip()
 
@@ -80,7 +80,7 @@ def build(sender, rcv, frame_decoder, analyzer, ns):
 
                 user = ""
                 while user[:1] != "n":
-                    user = raw_input()
+                    user = custom_raw_input()
     
     def analyze(tasks):
         analyzer.run(tasks)
