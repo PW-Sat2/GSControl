@@ -198,6 +198,13 @@ class SetAntennaDeploymentData(SimpleTelecommandData):
         if not disabled:
             notes.warning("Why are you trying to enable antenna deployment?")
 
+def extract_boot_slots(mask):
+    list = []
+    for i in range(0, 8, 1):
+        if (mask & (1 << i)) != 0:
+            list.append(i)
+    return set(list)
+
 class SetBootSlotsData(SimpleTelecommandData):
     UPPER_BOOT_SLOTS = 0x80
     SAFE_MOD_BOOT_SLOT = 0x40
@@ -215,8 +222,8 @@ class SetBootSlotsData(SimpleTelecommandData):
             notes.warning("Setting primary boot slots to safe mode is dangerous. It will also erase all data from flash memories")
         if (primary & self.UPPER_BOOT_SLOTS) == self.UPPER_BOOT_SLOTS or (failsafe & self.UPPER_BOOT_SLOTS) == self.UPPER_BOOT_SLOTS:
             notes.error("Upper boot slot should not be used for booting satellite")
-        primary_slots = self.extract_slots(primary)
-        failsafe_slots = self.extract_slots(failsafe)
+        primary_slots = extract_boot_slots(primary)
+        failsafe_slots = extract_boot_slots(failsafe)
         common = primary_slots.intersection(failsafe_slots)
         if (primary & failsafe) != 0:
             notes.error("there is at least one boot slot used as primary and failsafe boot slot")
@@ -226,14 +233,6 @@ class SetBootSlotsData(SimpleTelecommandData):
 
         if len(failsafe_slots) != 3:
             notes.error("There should be 3 failsafe boot slots. There are {0} now".format(len(failsafe_slots)))
-
-    def extract_slots(self, mask):
-        list = []
-        for i in range(0, 6, 1):
-            if (mask & (1 << i)) != 0:
-                list.append(i)
-        return set(list)
-
 
 class EnterIdleStateData(SimpleTelecommandData):
     @set_correlation_id
@@ -335,6 +334,15 @@ class PerformSunSExperimentData(SimpleTelecommandData):
     def is_scheduled(self):
         return True
 
+    def process(self, state, notes, send_mode, wait_mode, limits):
+        self.process_common_command(state, notes, send_mode, wait_mode, limits)
+        path = self.telecommand.file_name
+
+        if len(path) + 1 > 30:
+            notes.error("Path is too long: {0} characters. 30 characters including null terminator are allowed.".format(len(path) + 1))
+        elif len(path) == 0:
+            notes.error("Experiment file path is empty")
+
 class PerformRadFETExperimentData(SimpleTelecommandData):
     @set_correlation_id
     def __init__(self, telecommand):
@@ -344,7 +352,7 @@ class PerformRadFETExperimentData(SimpleTelecommandData):
         self.process_common_command(state, notes, send_mode, wait_mode, limits)
         path = self.telecommand.output_file_name
         if len(path) + 1 > 30:
-            notes.error("Path is too long: {0}. 30 characters including null terminator are allowed.".format(len(path) + 1))
+            notes.error("Path is too long: {0} characters. 30 characters including null terminator are allowed.".format(len(path) + 1))
         elif len(path) == 0:
             notes.error("Experiment file path is empty")
 
@@ -375,7 +383,7 @@ class PerformPayloadCommissioningExperimentData(SimpleTelecommandData):
         self.process_common_command(state, notes, send_mode, wait_mode, limits)
         path = self.telecommand.file_name
         if len(path) + 1 > 30:
-            notes.error("Path is too long: {0}. 30 characters including null terminator are allowed.".format(len(path) + 1))
+            notes.error("Path is too long: {0} characters. 30 characters including null terminator are allowed.".format(len(path) + 1))
         elif len(path) == 0:
             notes.error("Experiment file path is empty")
 
@@ -395,6 +403,14 @@ class PerformCameraCommissioningExperimentData(SimpleTelecommandData):
     def is_scheduled(self):
         return True
 
+    def process(self, state, notes, send_mode, wait_mode, limits):
+        self.process_common_command(state, notes, send_mode, wait_mode, limits)
+        path = self.telecommand.file_name
+        if len(path) + 1 > 30:
+            notes.error("Path is too long: {0} characters. 30 characters including null terminator are allowed.".format(len(path) + 1))
+        elif len(path) == 0:
+            notes.error("Experiment file path is empty")
+
 class CopyBootSlotsData(SimpleTelecommandData):
     @set_correlation_id
     def __init__(self, telecommand):
@@ -402,6 +418,34 @@ class CopyBootSlotsData(SimpleTelecommandData):
     
     def is_scheduled(self):
         return True
+
+    def process(self, state, notes, send_mode, wait_mode, limits):
+        self.process_common_command(state, notes, send_mode, wait_mode, limits)
+        source = self.telecommand.source_mask
+        target = self.telecommand.target_mask
+        source_list = extract_boot_slots(source)
+        target_list = extract_boot_slots(target)
+
+        if (source & target) != 0:
+            notes.error('Boot slot cannot be source and target at the same time')
+
+        if len(target_list) == 0:
+            notes.error('Target boot slots are not specified')
+
+        if len(source_list) != 3:
+            notes.error('Invalid number of source boot slots: {0}. There should be {1}'.format(len(source_list), 3))
+        
+        if len(target_list) > 3:
+            notes.error('Too many target boot slots: {}'.format(len(target_list)))
+
+        for e in source_list:
+            if e > 5:
+                notes.error('Invalid source boot slot number: {}'.format(e))
+
+        for e in target_list:
+            if e > 5:
+                notes.error('Invalid target boot slot number: {}'.format(e))
+
 
 class SetErrorCounterConfigData(SimpleTelecommandData):
     KNOWN_ERROR_COUNTERS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
@@ -499,7 +543,7 @@ class RemoveFileData(TelecommandData):
         self.process_common_command(state, notes, send_mode, wait_mode, limits)
         path = self.telecommand._path
         if len(path) > self.MAX_PATH_LENGTH:
-            notes.error('Path too long: {0} characters. Only {1} characters are allowed'.format(len(path), self.MAX_PATH_LENGTH))
+            notes.error('Path is too long: {0} characters. {1} characters are allowed'.format(len(path), self.MAX_PATH_LENGTH))
         elif len(path) == 0:
             notes.error("Experiment file path is empty")
         if path == 'telemetry.current' or path == '/telemetry.current' or path == './telemetry.current':
@@ -526,7 +570,7 @@ class ListFilesData(TelecommandData):
         self.process_common_command(state, notes, send_mode, wait_mode, limits)
         path = self.telecommand._path
         if (len(path) + 1) > self.MAX_PATH_LENGTH:
-            notes.error('Path too long: {0} 194 characters including null terminator are allowed'.format(len(path) + 1))
+            notes.error('Path is too long: {0} characters. {1} characters including null terminator are allowed'.format(len(path) + 1, self.MAX_PATH_LENGTH))
         elif len(path) == 0:
             notes.error("Experiment file path is empty")
 
@@ -688,7 +732,7 @@ class TakePhotoTelecommandData(SimpleTelecommandData):
         if len(path) == 0:
             notes.error('Photo path is empty')
         elif len(path) > self.MAX_PICTURE_PATH_LENGTH:
-            notes.error('Too long photo path')
+            notes.error('Photo path is too long: {0} characters. {1} characters are allowed.'.format(len(path), self.MAX_PICTURE_PATH_LENGTH))
 
 
 class PurgePhotoTelecommandData(SimpleTelecommandData):
@@ -765,6 +809,28 @@ class FinalizeProgramEntryData(SimpleTelecommandData):
     def __init__(self, telecommand):
         super(FinalizeProgramEntryData, self).__init__(telecommand, 2)
 
+    def process(self, state, notes, send_mode, wait_mode, limits):
+        self.process_common_command(state, notes, send_mode, wait_mode, limits)
+        entries = self.telecommand._entries
+        length = self.telecommand._length
+        name = self.telecommand._name
+
+        if len(entries) == 0 or len(entries) > 3:
+            notes.error('Invalid number of finalized boot slots: {}'.format(len(entries)))
+
+        if len(name) > 30:
+            notes.error('Too long boot slot name: {}'.format(len(name))) 
+
+        if length < 10 * 1024:
+            notes.error('Invalid program length: {}'.format(length))
+        elif length < 50 * 1024:
+            notes.warning('Suspiciously short program length: {}'.format(length))
+
+        for e in entries:
+            if e > 5:
+                notes.error('Invalid boot slot number: {}'.format(e))
+
+
 class OpenSailTelecommandData(SimpleTelecommandData):
     @set_correlation_id
     def __init__(self, telecommand):
@@ -791,7 +857,7 @@ class GetPersistentStateData(SimpleTelecommandData):
 class GetSunSDataSetsData(SimpleTelecommandData):
     @set_correlation_id
     def __init__(self, telecommand):
-        super(GetSunSDataSetsData, self).__init__(telecommand, 2)
+        super(GetSunSDataSetsData, self).__init__(telecommand, 89)
 
 class SetTimeCorrectionConfigData(SimpleTelecommandData):
     @set_correlation_id
