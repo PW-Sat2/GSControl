@@ -1,5 +1,10 @@
 from datetime import datetime
 from task_actions import WaitMode
+import sys
+
+def raw_input(text=""):
+    sys.stdout.write(text)
+    return sys.stdin.readline().strip()
 
 class DictWrapper(object):
     def __init__(self, d):
