@@ -1,4 +1,10 @@
 from datetime import datetime
+from task_actions import WaitMode
+import sys
+
+def custom_raw_input(text=""):
+    sys.stdout.write(text)
+    return sys.stdin.readline().strip()
 
 class DictWrapper(object):
     def __init__(self, d):
@@ -7,12 +13,12 @@ class DictWrapper(object):
     def __getattr__(self, name):
         return self._d[name]
 
-def build(sender, rcv, frame_decoder, ns):
+def build(sender, rcv, frame_decoder, analyzer, ns):
     def run(tasks):
         """
         Performs list of tasks.
 
-        Each task is defined as list: [<arg>, Send|SendReceive|Sleep|Print, "Wait|NoWait"]
+        Each task is defined as list: [<arg>, Send|SendReceive|Sleep|Print, WaitMode.Wait|WaitMode.NoWait]
         
         For Send <arg> is a telecommand object
         For SendReceive <arg> is a telecommand object
@@ -26,6 +32,7 @@ def build(sender, rcv, frame_decoder, ns):
         from prompt_toolkit.shortcuts import print_tokens
         from prompt_toolkit.styles import style_from_dict
         from pygments.token import Token
+        
 
         style = style_from_dict({
             Token.Timestamp: '#fdf6e3',
@@ -61,7 +68,7 @@ def build(sender, rcv, frame_decoder, ns):
 
             action_type(telecommand).do(ns_wrapper)
 
-            if wait is "NoWait":
+            if wait is WaitMode.NoWait:
                 print_tokens([
                     (Token.String, "Done"),
                     (Token.String, "\n")
@@ -73,8 +80,18 @@ def build(sender, rcv, frame_decoder, ns):
 
                 user = ""
                 while user[:1] != "n":
-                    user = raw_input()
+                    user = custom_raw_input()
     
+    def analyze(tasks):
+        analyzer.run(tasks)
+    
+    def load(tasks_file_path):
+        tasks = analyzer.load(tasks_file_path)
+        analyzer.run(tasks)
+        return tasks
+
     return {
-        'run': run
+        'run': run,
+        'analyze': analyze,
+        'load': load
     }

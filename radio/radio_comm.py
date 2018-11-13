@@ -10,7 +10,9 @@ if __name__ == '__main__':
     from radio_receiver import *
     from radio_sender import *
     from tools.remote_files import *
+    from analyzer import *
     import response_frames
+    from devices.adcs import *
 
     import argparse
     from IPython.terminal.embed import InteractiveShellEmbed
@@ -46,7 +48,8 @@ if __name__ == '__main__':
 
     sender = Sender(args.uplink_host, args.uplink_port)
     rcv = Receiver(args.downlink_host, args.downlink_port)
-
+    analyzer = Analyzer()
+    
     def get_file(file_dict):
         downloader = RemoteFile(sender, rcv)
         data = downloader.download(file_dict)
@@ -63,7 +66,7 @@ if __name__ == '__main__':
 
     from shell_cmd import build_shell_commands
 
-    shell_cmds = build_shell_commands(sender, rcv, frame_decoder, user_ns)
+    shell_cmds = build_shell_commands(sender, rcv, frame_decoder, analyzer, user_ns)
 
     user_ns.update(shell_cmds)
 
