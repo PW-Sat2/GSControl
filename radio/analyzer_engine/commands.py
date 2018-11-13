@@ -9,6 +9,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__),
 import math
 import telecommand as tc
 from datetime import timedelta
+from limits import Limits
 from resources import *
 from subsystems import *
 from task_actions import *
@@ -31,8 +32,7 @@ class TelecommandData(object):
         return self.telecommand.payload()
 
     def get_payload_size(self):
-        payload = self.get_payload()
-        return len(payload)
+        return len(self.get_payload())
 
     def get_uplink_duration(self, bitrate):
         return Comm.uplink_bytes_duration(self.uplink_header_bytes_count +
@@ -52,7 +52,7 @@ class TelecommandData(object):
     def get_downlink_frames_count(self):
         response_bytes_count = self.get_response_bytes_count()
         bytes_count = self.downlink_header_bytes_count + response_bytes_count
-        return int(math.ceil(bytes_count / self.downlink_frame_bytes_count))
+        return int((bytes_count + self.downlink_frame_bytes_count - 1) / self.downlink_frame_bytes_count)
 
     def get_correlation_id(self):
         return self.correlation_id
@@ -251,7 +251,7 @@ class EnterIdleStateData(SimpleTelecommandData):
 
 class SendBeaconData(SimpleTelecommandData):
     def __init__(self, telecommand):
-        super(SendBeaconData, self).__init__(telecommand, 235)
+        super(SendBeaconData, self).__init__(telecommand, Limits().max_frame_payload_size())
 
 class ResetTransmitterTelecommandData(SimpleTelecommandData):
     def __init__(self, telecommand):
@@ -449,7 +449,7 @@ class DownloadFileData(TelecommandData):
         path_length = payload[1]
         seqs = payload[(path_length + 3):]
         seqs_count = len(seqs) / 4
-        return seqs_count * self.downlink_frame_bytes_count
+        return seqs_count * Limits().max_frame_payload_size()
 
     def get_requires_wait(self):
         return True
@@ -514,7 +514,7 @@ class ListFilesData(TelecommandData):
         super(ListFilesData, self).__init__(telecommand)
 
     def get_response_bytes_count(self):
-        return 5 * self.downlink_frame_bytes_count # big unknown
+        return 5 * Limits().max_frame_payload_size()
 
     def get_requires_wait(self):
         return False
@@ -560,7 +560,7 @@ class RawI2CData(SimpleTelecommandData):
 
     @set_correlation_id
     def __init__(self, telecommand):
-        super(RawI2CData, self).__init__(telecommand, self.downlink_frame_bytes_count)
+        super(RawI2CData, self).__init__(telecommand, Limits().max_frame_payload_size())
 
     def process(self, state, notes, send_mode, wait_mode, limits):
         self.process_common_command(state, notes, send_mode, wait_mode, limits)
@@ -590,11 +590,10 @@ class ReadMemoryData(TelecommandData):
         super(ReadMemoryData, self).__init__(telecommand)
 
     def get_response_bytes_count(self):
-        payload = self.get_payload()
         size = self.telecommand.size
         offset = self.telecommand.offset
-        size = min(size, 2^31 - 1 - offset)
-        return size * self.downlink_frame_bytes_count
+        size = min(size, pow(2, 32) - 1 - offset)
+        return size * Limits().max_frame_payload_size()
 
     def get_requires_wait(self):
         return True

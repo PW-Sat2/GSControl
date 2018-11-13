@@ -14,5 +14,8 @@ class Limits(object):
     def max_response_frames(self):
         return self.response_frames_limit
 
+    def max_frame_payload_size(self):
+        return self.DOWNLINK_MAX_FRAME_SIZE - self.DOWNLINK_HEADER_SIZE
+        
     def max_correlated_frame_payload_size(self):
-        return self.DOWNLINK_MAX_FRAME_SIZE - self.DOWNLINK_HEADER_SIZE - self.DOWNLINK_CORRELATED_FRAME_HEADER_SIZE
+        return self.max_frame_payload_size() - self.DOWNLINK_CORRELATED_FRAME_HEADER_SIZE
