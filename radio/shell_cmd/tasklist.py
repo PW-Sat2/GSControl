@@ -87,7 +87,8 @@ def build(sender, rcv, frame_decoder, analyzer, ns):
     
     def load(tasks_file_path):
         tasks = analyzer.load(tasks_file_path)
-        analyzer.run(tasks)
+        with open(tasks_file_path, 'r') as input_file:
+            print input_file.read()
         return tasks
 
     return {
