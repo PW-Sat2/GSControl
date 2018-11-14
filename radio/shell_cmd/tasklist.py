@@ -74,7 +74,7 @@ def build(sender, rcv, frame_decoder, analyzer, ns):
                 ], style=style)
             else:
                 print_tokens([
-                    (Token.String, "Wait ('n'/'r' next/retry, next <Enter>)")
+                    (Token.String, "Wait ('n'/'r' for next/retry, then <Enter>)")
                 ], style=style)
 
                 user = ""
