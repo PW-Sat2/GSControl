@@ -42,19 +42,18 @@ def build(sender, rcv, frame_decoder, analyzer, ns):
             Token.Telecommand: '#268bd2',
         })
 
-        step_no = 0
-
         ns_wrapper = DictWrapper(ns)
 
-        for [telecommand, action_type, wait] in tasks:
-            step_no += 1
+        step_no = 0
+        while step_no < len(tasks):
+            [telecommand, action_type, wait] = tasks[step_no]
 
             tokens = [
                 (Token.String, "["),
                 (Token.Timestamp, datetime.now().strftime('%Y-%m-%d %H:%M:%S:%f')),
                 (Token.String, "] "),
                 (Token.String, "Step "),
-                (Token.CurrentStep, str(step_no)),
+                (Token.CurrentStep, str(step_no + 1)),
                 (Token.String, "/"),
                 (Token.TotalSteps, str(len(tasks))),
                 (Token.String, ": "),
@@ -75,12 +74,16 @@ def build(sender, rcv, frame_decoder, analyzer, ns):
                 ], style=style)
             else:
                 print_tokens([
-                    (Token.String, "Wait (type 'n' and press <Enter>)")
+                    (Token.String, "Wait ('n'/'r' next/retry, next <Enter>)")
                 ], style=style)
 
                 user = ""
-                while user[:1] != "n":
+                while user[:1] != "n" and user[:1] != "r":
                     user = custom_raw_input()
+                if user == 'r':
+                    step_no -= 1
+
+            step_no += 1
     
     def analyze(tasks):
         analyzer.run(tasks)
