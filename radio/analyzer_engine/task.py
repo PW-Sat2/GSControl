@@ -27,14 +27,14 @@ class TaskAnalyzer:
         return False
 
     def process(self, task, state, limits):
-        frame = task[0]
+        argument = task[0]
         send_mode = task[1]
         wait_mode = task[2]
         notes = Notes()
 
         task_resources = Resources.init_with_zeros()
 
-        command_data = self.telecommand_data_factory.get_telecommand_data(frame)
+        command_data = self.telecommand_data_factory.get_analyzer(send_mode, argument)
         task_resources.session.uplink.frames_count += command_data.get_uplink_frames_count()
         task_resources.session.downlink.frames_count += command_data.get_downlink_frames_count()
         command_data.process(state, notes, send_mode, wait_mode, limits)

@@ -88,10 +88,13 @@ class TelecommandData(object):
 
     def process_common_command(self, state, notes, send_mode, wait_mode, limits):
         state.add_corelation_id(self.get_correlation_id(), notes)
-        self.check_frame_size(notes, limits)       
+        self.check_frame_size(notes, limits)
 
         for extra_note in self.get_extra_notes():
             notes.info(extra_note)
+
+        if send_mode != SendReceive and send_mode != Send:
+            notes.error("Unsupported send mode")
 
         if self.get_requires_send_receive() and send_mode != SendReceive:
             notes.warning('SendReceive suggested')
@@ -102,14 +105,19 @@ class TelecommandData(object):
         self.process_common_command(state, notes, send_mode, wait_mode, limits)
 
 class NoTelecommand(object):
+    def __init__(self, name, duration, info):
+        self._name = name
+        self._duration = duration
+        self._info = info
+
     def telecommand_name(self, *args, **kwargs):
-        return ''
+        return self._name
 
     def get_payload_size(self, *args, **kwargs):
         return 0
 
     def get_uplink_duration(self, bitrate):
-        return Duration(0)
+        return self._duration
 
     def get_uplink_frames_count(self):
         return 0
@@ -126,8 +134,9 @@ class NoTelecommand(object):
     def is_scheduled(self):
         return False
 
-    def process(self, *args, **kwargs):
-        pass
+    def process(self, state, notes, *args, **kwargs):
+        if self._info:
+            notes.info(self._info)
 
 class SimpleTelecommandData(TelecommandData):
     def __init__(self, telecommand, response_bytes_count):
@@ -943,9 +952,26 @@ class TelecommandDataFactory(object):
     })
 
     def get_telecommand_data(self, telecommand):
-        command_type = type(telecommand)
-        if command_type in self.telecommands_map:
-            telecommand_data_type = self.telecommands_map[type(telecommand)]
-            return telecommand_data_type(telecommand)
-        else:
-            return NoTelecommand()
+        telecommand_data_type = self.telecommands_map[type(telecommand)]
+        return telecommand_data_type(telecommand)
+
+    def handle_print(self, message):
+        if not isinstance(message, basestring):
+            raise Exception('Print command requires string argument. Got: "{}"'.format(type(message)))
+        return NoTelecommand('Print', Duration(0), 'Print: "{}"'.format(message))
+
+    def handle_sleep(self, time):
+        if not isinstance(time, int):
+            raise Exception('Sleep command requires integer argument. Got: "{}"'.format(type(time)))
+        return NoTelecommand('Sleep', Duration(int(time)), 'Sleep for {} seconds'.format(int(time)))
+
+    def get_analyzer(self, mode, argument):
+        generator = TelecommandDataFactory.mode_map[mode]
+        return generator(self, argument)
+
+    mode_map = dict({
+        Send: get_telecommand_data,
+        SendReceive: get_telecommand_data,
+        Print: handle_print,
+        Sleep: handle_sleep
+    })
