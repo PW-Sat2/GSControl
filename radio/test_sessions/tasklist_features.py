@@ -1,4 +1,5 @@
 tasks = [
+    [tc.SendBeacon(), SendLoop(2), WaitMode.NoWait],
     [tc.SendBeacon(), SendReceive, WaitMode.NoWait],
     [tc.SendBeacon(), Print("It shows how the Print() action works. It does not send any telecommand. It just prints a message."), WaitMode.NoWait],
     [tc.ListFiles(1, '/'), Send, WaitMode.NoWait],
