@@ -1,5 +1,5 @@
 from datetime import datetime
-from task_actions import WaitMode
+from task_actions import *
 import sys
 
 def custom_raw_input(text=""):
@@ -65,7 +65,10 @@ def build(sender, rcv, frame_decoder, analyzer, ns):
 
             print_tokens(tokens, style=style)
 
-            action_type(telecommand).do(ns_wrapper)
+            if (action_type.__name__ != Print.__name__) and (action_type.__name__ != Sleep.__name__):
+                action_type(telecommand).do(ns_wrapper)
+            else:
+                action_type.do(ns_wrapper)
 
             if wait is WaitMode.NoWait:
                 print_tokens([
