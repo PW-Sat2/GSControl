@@ -1,10 +1,10 @@
 tasks = [
-    [tc.SendBeacon(), SendLoop(2), WaitMode.NoWait],
+    [[tc.SendBeacon(), 3], SendLoop, WaitMode.NoWait],
     [tc.SendBeacon(), SendReceive, WaitMode.NoWait],
-    [tc.SendBeacon(), Print("It shows how the Print() action works. It does not send any telecommand. It just prints a message."), WaitMode.NoWait],
+    ["It just prints a message.", Print, WaitMode.NoWait],
     [tc.ListFiles(1, '/'), Send, WaitMode.NoWait],
-    [tc.SendBeacon(), Print("Print a message, again. But the next action sleeps for 5s. It also does not send any telecommand."), WaitMode.NoWait],
-    [tc.SendBeacon(), Sleep(5), WaitMode.NoWait],
+    ["The next action sleeps for 5s.", Print, WaitMode.NoWait],
+    [5, Sleep, WaitMode.NoWait],
     [tc.DownloadFile(17, '/telemetry.current', [i for i in range(0, 240, 7)]), Send, WaitMode.Wait],
     [tc.SendBeacon(), Send, WaitMode.NoWait],
     [tc.SendBeacon(), Send, WaitMode.NoWait]

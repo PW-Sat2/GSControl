@@ -959,6 +959,26 @@ class TelecommandDataFactory(object):
         if not isinstance(message, basestring):
             raise Exception('Print command requires string argument. Got: "{}"'.format(type(message)))
         return NoTelecommand('Print', Duration(0), 'Print: "{}"'.format(message))
+    
+    def handle_send_loop(self, loop_arguments):
+        REQUIRED_NO_ARGUMENTS = 2
+
+        try:
+            telecommand = loop_arguments[0]
+
+            if not len(loop_arguments) == REQUIRED_NO_ARGUMENTS:
+                raise Exception('SendLoop command requires two arguments in a list [telecommand, iteration_seconds]. Got: {} arguments.'.format(len(loop_arguments)))
+        
+            iteration_seconds = loop_arguments[1]
+        except TypeError:
+            raise Exception('SendLoop command requires two arguments in a list [telecommand, iteration_seconds]. It is not a list.')
+        
+        if not isinstance(iteration_seconds, int):
+            raise Exception('SendLoop command requires two arguments in a list [telecommand, iteration_seconds]. Got wrong iteration_seconds: "{}"'.format(type(iteration_seconds)))
+
+        telecommand_data = TelecommandData(telecommand)
+
+        return NoTelecommand(telecommand_data.telecommand_name() + ' in SendLoop', Duration(0), 'SendLoop repeats a telecommand in every {} seconds'.format(iteration_seconds))
 
     def handle_sleep(self, time):
         if not isinstance(time, int):
@@ -972,6 +992,7 @@ class TelecommandDataFactory(object):
     mode_map = dict({
         Send: get_telecommand_data,
         SendReceive: get_telecommand_data,
+        SendLoop: handle_send_loop,
         Print: handle_print,
         Sleep: handle_sleep
     })
