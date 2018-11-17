@@ -171,4 +171,5 @@ tasks = [
     [tc.PerformSunSExperiment(11, 1, 2, 3, datetime.timedelta(seconds = 4), 5, datetime.timedelta(seconds = 6), ''), SendReceive, WaitMode.NoWait],
     [tc.PerformSunSExperiment(11, 1, 2, 3, datetime.timedelta(seconds = 4), 5, datetime.timedelta(seconds = 6), '1' * 30), SendReceive, WaitMode.NoWait],
     [tc.PerformSunSExperiment(11, 1, 2, 3, datetime.timedelta(seconds = 4), 5, datetime.timedelta(seconds = 6), '1' * 29), SendReceive, WaitMode.NoWait],
+    [[tc.SendBeacon(), 3], SendLoop, WaitMode.NoWait],
 ]

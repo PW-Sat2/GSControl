@@ -93,8 +93,11 @@ class TelecommandData(object):
         for extra_note in self.get_extra_notes():
             notes.info(extra_note)
 
-        if send_mode != SendReceive and send_mode != Send:
+        if send_mode != SendReceive and send_mode != Send and send_mode != SendLoop:
             notes.error("Unsupported send mode")
+        
+        if send_mode == SendLoop:
+            notes.info("In SendLoop mode - a telecommand in every <iteration_seconds>.")
 
         if self.get_requires_send_receive() and send_mode != SendReceive:
             notes.warning('SendReceive suggested')
@@ -959,6 +962,24 @@ class TelecommandDataFactory(object):
         if not isinstance(message, basestring):
             raise Exception('Print command requires string argument. Got: "{}"'.format(type(message)))
         return NoTelecommand('Print', Duration(0), 'Print: "{}"'.format(message))
+    
+    def handle_send_loop(self, loop_arguments):
+        REQUIRED_NO_ARGUMENTS = 2
+
+        try:
+            telecommand = loop_arguments[0]
+
+            if not len(loop_arguments) == REQUIRED_NO_ARGUMENTS:
+                raise Exception('SendLoop command requires two arguments in a list [telecommand, iteration_seconds]. Got: {} arguments.'.format(len(loop_arguments)))
+        
+            iteration_seconds = loop_arguments[1]
+        except TypeError:
+            raise Exception('SendLoop command requires two arguments in a list [telecommand, iteration_seconds]. It is not a list.')
+        
+        if not isinstance(iteration_seconds, int):
+            raise Exception('SendLoop command requires two arguments in a list [telecommand, iteration_seconds]. Got wrong iteration_seconds: "{}"'.format(type(iteration_seconds)))
+
+        return self.get_telecommand_data(telecommand)
 
     def handle_sleep(self, time):
         if not isinstance(time, int):
@@ -972,6 +993,7 @@ class TelecommandDataFactory(object):
     mode_map = dict({
         Send: get_telecommand_data,
         SendReceive: get_telecommand_data,
+        SendLoop: handle_send_loop,
         Print: handle_print,
         Sleep: handle_sleep
     })
