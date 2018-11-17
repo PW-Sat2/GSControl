@@ -2,6 +2,7 @@ from datetime import datetime
 from task_actions import WaitMode
 import sys
 
+
 def custom_raw_input(text=""):
     sys.stdout.write(text)
     return sys.stdin.readline().strip()
@@ -88,14 +89,22 @@ def build(sender, rcv, frame_decoder, analyzer, ns):
     def analyze(tasks):
         analyzer.run(tasks)
     
-    def load(tasks_file_path):
+    def load(tasks_file_path, silent=False):
         tasks = analyzer.load(tasks_file_path)
         with open(tasks_file_path, 'r') as input_file:
-            print input_file.read()
+            if not silent:
+                print input_file.read()
+            else:
+                pass
         return tasks
+
+    power_cycle = load('panic/power_cycle.py', silent=True)
+    detumbling = load('panic/detumbling.py', silent=True)
 
     return {
         'run': run,
         'analyze': analyze,
-        'load': load
+        'load': load,
+        'power_cycle': power_cycle,
+        'detumbling': detumbling
     }
