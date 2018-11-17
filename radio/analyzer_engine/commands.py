@@ -93,8 +93,11 @@ class TelecommandData(object):
         for extra_note in self.get_extra_notes():
             notes.info(extra_note)
 
-        if send_mode != SendReceive and send_mode != Send:
+        if send_mode != SendReceive and send_mode != Send and send_mode != SendLoop:
             notes.error("Unsupported send mode")
+        
+        if send_mode == SendLoop:
+            notes.info("In SendLoop mode - a telecommand in every <iteration_seconds>.")
 
         if self.get_requires_send_receive() and send_mode != SendReceive:
             notes.warning('SendReceive suggested')
@@ -976,9 +979,7 @@ class TelecommandDataFactory(object):
         if not isinstance(iteration_seconds, int):
             raise Exception('SendLoop command requires two arguments in a list [telecommand, iteration_seconds]. Got wrong iteration_seconds: "{}"'.format(type(iteration_seconds)))
 
-        telecommand_data = TelecommandData(telecommand)
-
-        return NoTelecommand(telecommand_data.telecommand_name() + ' in SendLoop', Duration(0), 'SendLoop repeats a telecommand in every {} seconds'.format(iteration_seconds))
+        return self.get_telecommand_data(telecommand)
 
     def handle_sleep(self, time):
         if not isinstance(time, int):
