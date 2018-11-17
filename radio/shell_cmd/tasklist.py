@@ -98,13 +98,18 @@ def build(sender, rcv, frame_decoder, analyzer, ns):
                 pass
         return tasks
 
-    power_cycle = load('panic/power_cycle.py', silent=True)
-    detumbling = load('panic/detumbling.py', silent=True)
+    def panic_detumbling():
+        detumbling = load('panic/detumbling.py', silent=True)
+        run(detumbling)
+
+    def panic_power_cycle():
+        power_cycle = load('panic/power_cycle.py', silent=True)
+        run(power_cycle)
 
     return {
         'run': run,
         'analyze': analyze,
         'load': load,
-        'power_cycle': power_cycle,
-        'detumbling': detumbling
+        'panic_power_cycle': panic_power_cycle,
+        'panic_detumbling': panic_detumbling
     }
