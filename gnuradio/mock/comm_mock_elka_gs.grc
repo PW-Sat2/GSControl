@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<?grc format='1' created='3.7.12'?>
+<?grc format='1' created='3.7.13'?>
 <flow_graph>
   <timestamp>Fri Jul  6 14:46:53 2018</timestamp>
   <block>
@@ -18,10 +18,6 @@
     </param>
     <param>
       <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>copyright</key>
       <value></value>
     </param>
     <param>
@@ -238,7 +234,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>-120</value>
+      <value>-156</value>
     </param>
     <param>
       <key>_enabled</key>
@@ -1083,7 +1079,7 @@
     <key>frame_sink</key>
     <param>
       <key>addr</key>
-      <value>tcp://*:7002</value>
+      <value>tcp://*:7004</value>
     </param>
     <param>
       <key>alias</key>
@@ -1118,7 +1114,7 @@
     <key>frame_source</key>
     <param>
       <key>addr</key>
-      <value>tcp://*:7003</value>
+      <value>tcp://*:7005</value>
     </param>
     <param>
       <key>alias</key>
@@ -5149,7 +5145,7 @@
     </param>
     <param>
       <key>args</key>
-      <value></value>
+      <value>rtl=0</value>
     </param>
     <param>
       <key>_enabled</key>
