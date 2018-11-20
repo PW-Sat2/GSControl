@@ -25,7 +25,7 @@ class Wrap:
 
 
 class Sender:
-    def __init__(self, target="localhost", port=7000, source_callsign='SP3SAT', destination_callsign='PWSAT2-0'):
+    def __init__(self, target="localhost", port=7000, source_callsign='SQ5PUI', destination_callsign='PWSAT2-0'):
         self.context = zmq.Context.instance()
         self.sock = self.context.socket(zmq.PUB)
         self.sock.connect("tcp://%s:%d" % (target, port))
@@ -74,6 +74,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
     imp.load_source('config', args.config)
+    from config import config
 
     class MyPrompt(Prompts):
         def in_prompt_tokens(self, cli=None):
@@ -81,7 +82,7 @@ if __name__ == '__main__':
                     (Token.Prompt, '> ')]
 
     cfg = Config()
-    sender = Sender(args.target, args.port)
+    sender = Sender(args.target, args.port, source_callsign=config['COMM_UPLINK_CALLSIGN'])
     sender.connect()
 
     shell = InteractiveShellEmbed(config=cfg, user_ns={'send': sender.send},
