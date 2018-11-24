@@ -15,3 +15,8 @@ Content of the repository:
     - remote_files.py: tools for remote files (i.e. satellite files) handling, decoding photos, etc.
     - upload_software.py: script to upload software via radio
 
+
+## Dependencies
+
+GnuRadio Companion flow graphs:
+ - gr-bruninga
