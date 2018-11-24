@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<?grc format='1' created='3.7.12'?>
+<?grc format='1' created='3.7.13'?>
 <flow_graph>
   <timestamp>Thu Sep  7 00:45:57 2017</timestamp>
   <block>
@@ -153,132 +153,6 @@
     </param>
   </block>
   <block>
-    <key>variable_qtgui_range</key>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>value</key>
-      <value>2200</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(536, 12)</value>
-    </param>
-    <param>
-      <key>gui_hint</key>
-      <value>4,0,1,2</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>audio_higher</value>
-    </param>
-    <param>
-      <key>label</key>
-      <value></value>
-    </param>
-    <param>
-      <key>min_len</key>
-      <value>200</value>
-    </param>
-    <param>
-      <key>orient</key>
-      <value>Qt.Horizontal</value>
-    </param>
-    <param>
-      <key>start</key>
-      <value>1500</value>
-    </param>
-    <param>
-      <key>step</key>
-      <value>1</value>
-    </param>
-    <param>
-      <key>stop</key>
-      <value>3000</value>
-    </param>
-    <param>
-      <key>rangeType</key>
-      <value>float</value>
-    </param>
-    <param>
-      <key>widget</key>
-      <value>counter_slider</value>
-    </param>
-  </block>
-  <block>
-    <key>variable_qtgui_range</key>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>value</key>
-      <value>1200</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(392, 12)</value>
-    </param>
-    <param>
-      <key>gui_hint</key>
-      <value>3,0,1,2</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>audio_lower</value>
-    </param>
-    <param>
-      <key>label</key>
-      <value></value>
-    </param>
-    <param>
-      <key>min_len</key>
-      <value>200</value>
-    </param>
-    <param>
-      <key>orient</key>
-      <value>Qt.Horizontal</value>
-    </param>
-    <param>
-      <key>start</key>
-      <value>1000</value>
-    </param>
-    <param>
-      <key>step</key>
-      <value>1</value>
-    </param>
-    <param>
-      <key>stop</key>
-      <value>1500</value>
-    </param>
-    <param>
-      <key>rangeType</key>
-      <value>float</value>
-    </param>
-    <param>
-      <key>widget</key>
-      <value>counter_slider</value>
-    </param>
-  </block>
-  <block>
     <key>variable_config</key>
     <param>
       <key>comment</key>
@@ -298,7 +172,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(880, 492)</value>
+      <value>(859, 491)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -345,7 +219,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(368, 492)</value>
+      <value>(347, 491)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -392,7 +266,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(200, 492)</value>
+      <value>(184, 491)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -431,6 +305,100 @@
     </param>
     <param>
       <key>value</key>
+      <value>2200</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(225, 757)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>config_uplink_audio_tone_high</value>
+    </param>
+    <param>
+      <key>option</key>
+      <value>uplink_audio_tone_high</value>
+    </param>
+    <param>
+      <key>section</key>
+      <value>main</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>int</value>
+    </param>
+    <param>
+      <key>writeback</key>
+      <value>None</value>
+    </param>
+  </block>
+  <block>
+    <key>variable_config</key>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>config_file</key>
+      <value>gr_config</value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>1200</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(20, 757)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>config_uplink_audio_tone_low</value>
+    </param>
+    <param>
+      <key>option</key>
+      <value>uplink_audio_tone_low</value>
+    </param>
+    <param>
+      <key>section</key>
+      <value>main</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>int</value>
+    </param>
+    <param>
+      <key>writeback</key>
+      <value>None</value>
+    </param>
+  </block>
+  <block>
+    <key>variable_config</key>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>config_file</key>
+      <value>gr_config</value>
+    </param>
+    <param>
+      <key>value</key>
       <value>uplink_frames</value>
     </param>
     <param>
@@ -439,7 +407,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(536, 492)</value>
+      <value>(511, 491)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -486,7 +454,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(24, 492)</value>
+      <value>(0, 491)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -533,7 +501,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(712, 492)</value>
+      <value>(695, 491)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -634,7 +602,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(24, 644)</value>
+      <value>(0, 644)</value>
     </param>
     <param>
       <key>gui_hint</key>
@@ -665,6 +633,92 @@
     </param>
     <param>
       <key>value</key>
+      <value>config_uplink_audio_tone_low</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>formatter</key>
+      <value>None</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(30, 910)</value>
+    </param>
+    <param>
+      <key>gui_hint</key>
+      <value>(3,0)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>variable_qtgui_label_0_0</value>
+    </param>
+    <param>
+      <key>label</key>
+      <value>Audio LOW</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>int</value>
+    </param>
+  </block>
+  <block>
+    <key>variable_qtgui_label</key>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>config_uplink_audio_tone_high</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>formatter</key>
+      <value>None</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(225, 910)</value>
+    </param>
+    <param>
+      <key>gui_hint</key>
+      <value>(4,0)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>variable_qtgui_label_0_0_0</value>
+    </param>
+    <param>
+      <key>label</key>
+      <value>Audio HIGH</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>int</value>
+    </param>
+  </block>
+  <block>
+    <key>variable_qtgui_label</key>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>value</key>
       <value>config_uplink_audio_output_device</value>
     </param>
     <param>
@@ -677,7 +731,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(208, 644)</value>
+      <value>(184, 644)</value>
     </param>
     <param>
       <key>gui_hint</key>
@@ -720,7 +774,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(376, 644)</value>
+      <value>(358, 644)</value>
     </param>
     <param>
       <key>gui_hint</key>
@@ -763,7 +817,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(536, 644)</value>
+      <value>(511, 644)</value>
     </param>
     <param>
       <key>gui_hint</key>
@@ -806,7 +860,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(712, 644)</value>
+      <value>(695, 644)</value>
     </param>
     <param>
       <key>gui_hint</key>
@@ -849,7 +903,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(872, 644)</value>
+      <value>(849, 644)</value>
     </param>
     <param>
       <key>gui_hint</key>
@@ -896,7 +950,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1088, 268)</value>
+      <value>(1105, 250)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -943,7 +997,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(56, 388)</value>
+      <value>(51, 373)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -998,7 +1052,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(888, 268)</value>
+      <value>(890, 250)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1053,7 +1107,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(232, 268)</value>
+      <value>(470, 250)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1202,7 +1256,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(56, 252)</value>
+      <value>(286, 235)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1257,7 +1311,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1096, 316)</value>
+      <value>(1105, 307)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1332,7 +1386,7 @@
     </param>
     <param>
       <key>symbol_table</key>
-      <value>[audio_lower, audio_higher]</value>
+      <value>[config_uplink_audio_tone_low, config_uplink_audio_tone_high]</value>
     </param>
   </block>
   <block>
@@ -1492,7 +1546,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(456, 260)</value>
+      <value>(655, 245)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1559,7 +1613,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1112, 396)</value>
+      <value>(1105, 399)</value>
     </param>
     <param>
       <key>gui_hint</key>
@@ -1926,7 +1980,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1104, 484)</value>
+      <value>(1105, 491)</value>
     </param>
     <param>
       <key>gui_hint</key>
@@ -2149,7 +2203,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(256, 372)</value>
+      <value>(266, 358)</value>
     </param>
     <param>
       <key>gui_hint</key>
