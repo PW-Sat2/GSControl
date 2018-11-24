@@ -30,7 +30,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(8, 8)</value>
+      <value>(0, 143)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -90,6 +90,327 @@
     </param>
   </block>
   <block>
+    <key>variable_config</key>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>config_file</key>
+      <value>gr_config</value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>"watchdog_saved_frames_{0}.frames".format(datetime.now().strftime('%Y-%m-%d %H %M %S'))</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(614, 767)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>config_frames_filename</value>
+    </param>
+    <param>
+      <key>option</key>
+      <value>frames_filename</value>
+    </param>
+    <param>
+      <key>section</key>
+      <value>uplink_watchdog</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>string</value>
+    </param>
+    <param>
+      <key>writeback</key>
+      <value>1</value>
+    </param>
+  </block>
+  <block>
+    <key>variable_qtgui_label</key>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>config_frames_filename</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>formatter</key>
+      <value>None</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(358, 40)</value>
+    </param>
+    <param>
+      <key>gui_hint</key>
+      <value>2,0</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>config_frames_filename_gui</value>
+    </param>
+    <param>
+      <key>label</key>
+      <value>Filename</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>string</value>
+    </param>
+  </block>
+  <block>
+    <key>variable_config</key>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>config_file</key>
+      <value>gr_config</value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>-30000</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(808, 767)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>config_frequency_offset</value>
+    </param>
+    <param>
+      <key>option</key>
+      <value>frequency_offset</value>
+    </param>
+    <param>
+      <key>section</key>
+      <value>uplink_watchdog</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>int</value>
+    </param>
+    <param>
+      <key>writeback</key>
+      <value>1</value>
+    </param>
+  </block>
+  <block>
+    <key>variable_qtgui_label</key>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>config_frequency_offset</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>formatter</key>
+      <value>None</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(552, 40)</value>
+    </param>
+    <param>
+      <key>gui_hint</key>
+      <value>1,0</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>config_frequency_offset_gui</value>
+    </param>
+    <param>
+      <key>label</key>
+      <value>Frequency offset</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>int</value>
+    </param>
+  </block>
+  <block>
+    <key>variable_config</key>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>config_file</key>
+      <value>gr_config</value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>rtl=0</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(71, 869)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>config_rtl_index</value>
+    </param>
+    <param>
+      <key>option</key>
+      <value>g_rtl_index</value>
+    </param>
+    <param>
+      <key>section</key>
+      <value>uplink_watchdog</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>string</value>
+    </param>
+    <param>
+      <key>writeback</key>
+      <value>1</value>
+    </param>
+  </block>
+  <block>
+    <key>variable_config</key>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>config_file</key>
+      <value>gr_config</value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>145930000</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(440, 767)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>config_rtl_sdr_frequency</value>
+    </param>
+    <param>
+      <key>option</key>
+      <value>rtl_sdr_frequency</value>
+    </param>
+    <param>
+      <key>section</key>
+      <value>uplink_watchdog</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>int</value>
+    </param>
+    <param>
+      <key>writeback</key>
+      <value>1</value>
+    </param>
+  </block>
+  <block>
+    <key>variable_config</key>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>config_file</key>
+      <value>gr_config</value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>-156</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(276, 767)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>config_rtl_sdr_ppm</value>
+    </param>
+    <param>
+      <key>option</key>
+      <value>rtl_sdr_ppm</value>
+    </param>
+    <param>
+      <key>section</key>
+      <value>uplink_watchdog</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>int</value>
+    </param>
+    <param>
+      <key>writeback</key>
+      <value>1</value>
+    </param>
+  </block>
+  <block>
     <key>variable_function_probe</key>
     <param>
       <key>block_id</key>
@@ -113,7 +434,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(798, 470)</value>
+      <value>(788, 603)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -148,11 +469,11 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(153, 486)</value>
+      <value>(143, 619)</value>
     </param>
     <param>
       <key>gui_hint</key>
-      <value></value>
+      <value>4,0</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -215,7 +536,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(8, 316)</value>
+      <value>(0, 450)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -243,6 +564,49 @@
     </param>
   </block>
   <block>
+    <key>variable_qtgui_label</key>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>config_rtl_sdr_frequency</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>formatter</key>
+      <value>None</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(173, 40)</value>
+    </param>
+    <param>
+      <key>gui_hint</key>
+      <value>0,0</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>label_center_freq</value>
+    </param>
+    <param>
+      <key>label</key>
+      <value>Center Frequency</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>int</value>
+    </param>
+  </block>
+  <block>
     <key>variable</key>
     <param>
       <key>comment</key>
@@ -254,7 +618,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(286, 10)</value>
+      <value>(276, 143)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -285,11 +649,11 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(286, 486)</value>
+      <value>(276, 619)</value>
     </param>
     <param>
       <key>gui_hint</key>
-      <value></value>
+      <value>3,0</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -344,7 +708,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(184, 10)</value>
+      <value>(173, 143)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -371,7 +735,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(419, 10)</value>
+      <value>(409, 143)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -402,11 +766,11 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(10, 486)</value>
+      <value>(0, 619)</value>
     </param>
     <param>
       <key>gui_hint</key>
-      <value></value>
+      <value>5,0</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -469,11 +833,11 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(10, 624)</value>
+      <value>(0, 757)</value>
     </param>
     <param>
       <key>gui_hint</key>
-      <value></value>
+      <value>6,0</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -512,7 +876,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(706, 148)</value>
+      <value>(695, 281)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -555,7 +919,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1136, 624)</value>
+      <value>(1125, 757)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -586,7 +950,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(614, 383)</value>
+      <value>(603, 516)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -660,7 +1024,7 @@ class frames_counter(gr.sync_block):
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1136, 388)</value>
+      <value>(1125, 521)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -695,7 +1059,7 @@ class frames_counter(gr.sync_block):
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1136, 557)</value>
+      <value>(1125, 690)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -714,7 +1078,7 @@ class frames_counter(gr.sync_block):
     </param>
     <param>
       <key>center_freq</key>
-      <value>-30000</value>
+      <value>config_frequency_offset</value>
     </param>
     <param>
       <key>comment</key>
@@ -734,7 +1098,7 @@ class frames_counter(gr.sync_block):
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(337, 102)</value>
+      <value>(327, 235)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -766,6 +1130,37 @@ class frames_counter(gr.sync_block):
     </param>
   </block>
   <block>
+    <key>import</key>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(204, 475)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>import_1</value>
+    </param>
+    <param>
+      <key>import</key>
+      <value>from datetime import datetime</value>
+    </param>
+  </block>
+  <block>
     <key>kiss_hdlc_deframer</key>
     <param>
       <key>alias</key>
@@ -789,7 +1184,7 @@ class frames_counter(gr.sync_block):
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(798, 368)</value>
+      <value>(788, 501)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -864,11 +1259,11 @@ class frames_counter(gr.sync_block):
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1105, 40)</value>
+      <value>(1095, 173)</value>
     </param>
     <param>
       <key>gui_hint</key>
-      <value></value>
+      <value>9,0</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1163,11 +1558,11 @@ class frames_counter(gr.sync_block):
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(337, 225)</value>
+      <value>(327, 358)</value>
     </param>
     <param>
       <key>gui_hint</key>
-      <value></value>
+      <value>8,0</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1450,11 +1845,11 @@ class frames_counter(gr.sync_block):
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1105, 133)</value>
+      <value>(1095, 266)</value>
     </param>
     <param>
       <key>gui_hint</key>
-      <value></value>
+      <value>10,0</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1817,11 +2212,11 @@ class frames_counter(gr.sync_block):
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(706, 30)</value>
+      <value>(695, 163)</value>
     </param>
     <param>
       <key>gui_hint</key>
-      <value></value>
+      <value>7,0</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -2040,11 +2435,11 @@ class frames_counter(gr.sync_block):
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1105, 225)</value>
+      <value>(1095, 358)</value>
     </param>
     <param>
       <key>gui_hint</key>
-      <value></value>
+      <value>11,0</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -2251,11 +2646,11 @@ class frames_counter(gr.sync_block):
     </param>
     <param>
       <key>corr0</key>
-      <value>ppm</value>
+      <value>config_rtl_sdr_ppm</value>
     </param>
     <param>
       <key>freq0</key>
-      <value>145930000</value>
+      <value>config_rtl_sdr_frequency</value>
     </param>
     <param>
       <key>gain_mode0</key>
@@ -3523,7 +3918,7 @@ class frames_counter(gr.sync_block):
     </param>
     <param>
       <key>args</key>
-      <value>rtl=0</value>
+      <value>config_rtl_index</value>
     </param>
     <param>
       <key>_enabled</key>
@@ -3531,7 +3926,7 @@ class frames_counter(gr.sync_block):
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(20, 97)</value>
+      <value>(10, 230)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -3658,11 +4053,11 @@ class frames_counter(gr.sync_block):
     </param>
     <param>
       <key>file</key>
-      <value>uplink_watchdog</value>
+      <value>config_frames_filename</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1136, 470)</value>
+      <value>(1125, 603)</value>
     </param>
     <param>
       <key>_rotation</key>
