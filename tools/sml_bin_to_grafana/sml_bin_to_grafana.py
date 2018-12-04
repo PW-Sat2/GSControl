@@ -12,7 +12,8 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..'))
 sys.path.append(os.path.join(os.path.dirname(__file__), '../grafana_beacon_uploader'))
 
 from utils import ensure_byte_list
-import response_frames
+from response_frames.frame_decoder import FrameDecoder
+from response_frames.beacon_factory import BeaconFrameFactory
 from radio.radio_frame_decoder import FallbackResponseDecorator
 from devices import BeaconFrame
 from data_point import generate_data_points
@@ -109,7 +110,7 @@ for i in all_frames:
     frame_body = i[1][17:-2]
     frame_body = str(frame_body)
 
-    frame_decoder = FallbackResponseDecorator(response_frames.FrameDecoder(response_frames.frame_factories))
+    frame_decoder = FallbackResponseDecorator(FrameDecoder([BeaconFrameFactory()]))
     frame = frame_decoder.decode(ensure_byte_list(frame_body))
 
     if not isinstance(frame, BeaconFrame):
