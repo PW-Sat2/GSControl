@@ -2,7 +2,8 @@ import base64
 import sys
 
 import argparse
-from datetime import datetime
+import time
+from datetime import datetime, timedelta
 from urlparse import urlparse
 
 import colorlog
@@ -66,13 +67,15 @@ LOG.info("Reading frames from {}".format(args.file.name))
 url = urlparse(args.influx)
 db = InfluxDBClient(host=url.hostname, port=url.port, database=url.path.strip('/'))
 
+tz_offset = timedelta(seconds=time.timezone)
+
 for l in args.file.readlines():
     (timestamp, direction, payload) = l.split(',')
 
     if direction != 'D':
         continue
 
-    timestamp = datetime.strptime(timestamp, '%Y-%m-%d_%H:%M:%S:%f')
+    timestamp = datetime.strptime(timestamp, '%Y-%m-%d_%H:%M:%S:%f') + tz_offset
     payload = base64.b64decode(payload)
     frame_body = payload[16:-2]
 
