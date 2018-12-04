@@ -771,7 +771,7 @@
     </param>
     <param>
       <key>file</key>
-      <value>config_iq_data_from_current_session_after_doppler_correction</value>
+      <value>config_iq_data_from_current_session_after_doppler_correction+"_{}.dat".format(datetime.now().strftime('%Y%m%d_%H%M%S'))</value>
     </param>
     <param>
       <key>_coordinate</key>
@@ -822,7 +822,7 @@
     </param>
     <param>
       <key>file</key>
-      <value>config_iq_data_from_current_session_raw</value>
+      <value>config_iq_data_from_current_session_raw+"_{}.dat".format(datetime.now().strftime('%Y%m%d_%H%M%S'))</value>
     </param>
     <param>
       <key>_coordinate</key>
@@ -1067,6 +1067,37 @@
     <param>
       <key>verbose</key>
       <value>True</value>
+    </param>
+  </block>
+  <block>
+    <key>import</key>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(351, 67)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>import_1</value>
+    </param>
+    <param>
+      <key>import</key>
+      <value>from datetime import datetime</value>
     </param>
   </block>
   <block>
