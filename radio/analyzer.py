@@ -81,6 +81,7 @@ class Analyzer:
         from devices import camera
         from devices.adcs import AdcsMode
         from devices.camera import CameraLocation, PhotoResolution
+        from devices.comm import BaudRate
         
         if not File.valid(tasks_file_path):
             raise SyntaxError('File: {} has a wrong syntax. This file should contain a tasks = [...] list only with session tasks. Examples in test_sessions dir.'.format(tasks_file_path))
