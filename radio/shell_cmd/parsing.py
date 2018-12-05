@@ -1,6 +1,9 @@
 from tools.remote_files import *
 from pprint import pprint, pformat
 
+from task_actions import *
+from collections import defaultdict
+
 def build(*args):
     def filter_file_chunks(frames, correlation_ids):
         import response_frames as rf
@@ -108,10 +111,62 @@ def build(*args):
         with open(path, 'w') as f:
             f.write(text)
 
+    def get_paths_and_cids_from_tasklist(tasklist_path):
+        """
+        Extracts file paths and their correlation ids dictionary from tasklist
+
+        tasklist_path - path to tasklist file
+        """
+
+        import sys
+        import os
+        sys.path.append(os.path.join(os.path.dirname(__file__), '../../PWSat2OBC/integration_tests'))
+
+        import telecommand as tc
+
+        with open(tasklist_path) as tasks_file:
+            exec(tasks_file) in globals(), locals()
+            tasks_file.close()
+
+        files_with_cids = defaultdict(list)
+        for task in tasks:
+            command = task[0]
+            if isinstance(command, tc.DownloadFile):
+                argument = task[0]
+                correlation_id = command.correlation_id()
+                
+                payload = command.payload()
+                path_length = payload[1]
+                path = ''.join(payload[2:(path_length + 2)])
+
+                files_with_cids[path].append(correlation_id)
+
+        return files_with_cids
+
+    def extract_and_save_files_from_tasklist(tasklist_path, target_folder_path, frames):
+        """
+        Extracts file chunks from frames list based on tasklist
+
+        tasklist_path - path to tasklist file
+        target_folder_path - path to folder for files that will be reconstructed from parts
+        frames - frames list
+
+        Only FileSendSuccess frames with correlation id matching DownloadFile commands are saved
+        """
+
+        files_with_cids = get_paths_and_cids_from_tasklist(tasklist_path)
+        for path in files_with_cids:
+            cids = files_with_cids[path]
+
+            full_path = target_folder_path + path
+
+            extract_and_save_file_chunks(full_path, frames, cids)
+        
     return {
         'extract_and_save_file_chunks': extract_and_save_file_chunks,
         'extract_and_save_photo_chunks': extract_and_save_photo_chunks,
         'extract_and_save_raw_and_photo': extract_and_save_raw_and_photo,
         'extract_and_save_beacons': extract_and_save_beacons,
-        'extract_and_save_file_list': extract_and_save_file_list
+        'extract_and_save_file_list': extract_and_save_file_list,
+        'extract_and_save_files_from_tasklist': extract_and_save_files_from_tasklist
     }
