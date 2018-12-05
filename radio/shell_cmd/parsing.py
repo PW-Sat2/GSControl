@@ -1,3 +1,5 @@
+from types import NoneType
+
 from tools.remote_files import *
 from pprint import pprint, pformat
 
@@ -14,7 +16,7 @@ def build(*args):
 
         return result
 
-    def extract_and_save_file_chunks(path, frames, correlation_ids):
+    def extract_and_save_file_chunks(path, frames, correlation_ids, preserve_offset=False):
         """
         Extracts file chunks from frames list
 
@@ -25,9 +27,13 @@ def build(*args):
         Only FileSendSuccess frames with matching correlation id are saved
         """
         part_response = filter_file_chunks(frames, correlation_ids)
-        part_response = map(lambda i: i.response, part_response)
-        
-        RemoteFileTools.save_chunks(path, part_response)
+
+        if preserve_offset:
+            part_response = map(lambda f: (f.seq(), f.response), part_response)
+            RemoteFileTools.save_chunks_with_offsets(path, part_response)
+        else:
+            part_response = map(lambda i: i.response, part_response)
+            RemoteFileTools.save_chunks(path, part_response)
 
     def extract_and_save_photo_chunks(path, frames, correlation_ids):
         """
@@ -143,13 +149,14 @@ def build(*args):
 
         return files_with_cids
 
-    def extract_and_save_files_from_tasklist(tasklist_path, target_folder_path, frames):
+    def extract_and_save_files_from_tasklist(tasklist_path, target_folder_path, frames, preserve_offset=None):
         """
         Extracts file chunks from frames list based on tasklist
 
         tasklist_path - path to tasklist file
         target_folder_path - path to folder for files that will be reconstructed from parts
         frames - frames list
+        preserve_offset - True to preserve offsets in files, False to concat tightly, None for default
 
         Only FileSendSuccess frames with correlation id matching DownloadFile commands are saved
         """
@@ -160,7 +167,12 @@ def build(*args):
 
             full_path = target_folder_path + path
 
-            extract_and_save_file_chunks(full_path, frames, cids)
+            if preserve_offset is None:
+                preserve_offset_in_file = path not in ['/telemetry.current', '/telemetry.previous', '/telemetry.leop']
+            else:
+                preserve_offset_in_file = preserve_offset
+
+            extract_and_save_file_chunks(full_path, frames, cids, preserve_offset_in_file)
         
     return {
         'extract_and_save_file_chunks': extract_and_save_file_chunks,

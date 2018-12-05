@@ -97,6 +97,15 @@ class RemoteFileTools:
             f.close()
 
     @staticmethod
+    def save_chunks_with_offsets(path, chunks):
+        with open(path, 'wb') as f:
+            for (seq, content) in chunks:
+                f.seek(seq * 230, 0)
+                f.write(ensure_string(content))
+
+            f.close()
+
+    @staticmethod
     def save_photo(path, chunks):
         data_string = ""
         for i in chunks:
