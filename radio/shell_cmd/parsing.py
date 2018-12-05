@@ -64,8 +64,8 @@ def build(*args):
         '<path>.jpg' - decoded photo
         '<path>.raw' - raw photo data (with CAM headers inside)
         """
-        parse_and_save_photo_chunks(path + '.jpg', frames, correlation_ids)
-        parse_and_save_file_chunks(path + '.raw', frames, correlation_ids)
+        extract_and_save_photo_chunks(path + '.jpg', frames, correlation_ids)
+        extract_and_save_file_chunks(path + '.raw', frames, correlation_ids)
 
     def extract_and_save_beacons(path, frames):
         """
