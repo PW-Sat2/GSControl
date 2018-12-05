@@ -81,4 +81,5 @@ if __name__ == '__main__':
     shell.run_code('from devices import camera')
     shell.run_code('from tools.remote_files import *')
     shell.run_code('from task_actions import *')
+    shell.run_code('import response_frames')
     shell()
