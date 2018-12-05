@@ -44,11 +44,14 @@ def build(sender, rcv, frame_decoder, *args):
         """
         import pprint
         frames = []
-        
+
         try:
+            counter = 0
             while True:
                 x = receive()
-                pprint.pprint(x)
+                counter_str = '{:3d}'.format(counter)
+                print counter_str, pprint.pformat(x)
+                counter += 1
                 frames.append(x)
         except KeyboardInterrupt:
             pass
