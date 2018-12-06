@@ -37,6 +37,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
     imp.load_source('config', args.config)
+    from config import config
 
     class MyPrompt(Prompts):
         def in_prompt_tokens(self, cli=None):
@@ -46,7 +47,7 @@ if __name__ == '__main__':
     cfg = Config()
     frame_decoder = FallbackResponseDecorator(response_frames.FrameDecoder(response_frames.frame_factories))
 
-    sender = Sender(args.uplink_host, args.uplink_port)
+    sender = Sender(args.uplink_host, args.uplink_port, source_callsign=config['COMM_UPLINK_CALLSIGN'])
     rcv = Receiver(args.downlink_host, args.downlink_port)
     analyzer = Analyzer()
     
