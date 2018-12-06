@@ -172,7 +172,10 @@ def build(*args):
             else:
                 preserve_offset_in_file = preserve_offset
 
-            extract_and_save_file_chunks(full_path, frames, cids, preserve_offset_in_file)
+            if path.endswith('.jpg'):
+                extract_and_save_raw_and_photo(full_path[:-4], frames, cids)
+            else:
+                extract_and_save_file_chunks(full_path, frames, cids, preserve_offset_in_file)
         
     return {
         'extract_and_save_file_chunks': extract_and_save_file_chunks,
