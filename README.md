@@ -15,3 +15,17 @@ Content of the repository:
     - remote_files.py: tools for remote files (i.e. satellite files) handling, decoding photos, etc.
     - upload_software.py: script to upload software via radio
 
+
+## Dependencies
+
+GnuRadio Companion flow graphs:
+ - gr-bruninga (https://github.com/tkuester/gr-bruninga)
+ - gr-kiss (https://github.com/PW-Sat2/gr-kiss)
+ - gr-pwsat2 (https://github.com/PW-Sat2/gr-pwsat2)
+ - gr-gpredict-doppler (https://github.com/PW-Sat2/gr-gpredict-doppler)
+ - gr-osmosdr (https://github.com/osmocom/gr-osmosdr)
+ - gr-iio (https://github.com/analogdevicesinc/gr-iio)
+ - gr-fcdproplus (https://github.com/dl1ksv/gr-fcdproplus)
+ - gr-ax25 (https://github.com/dl1ksv/gr-ax25)
+ - gr-mapper (https://github.com/gr-vt/gr-mapper)
+

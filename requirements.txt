@@ -9,3 +9,5 @@ influxdb
 colorlog
 hypothesis
 Pillow
+pyserial
+keyboard
