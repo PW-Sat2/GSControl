@@ -29,16 +29,18 @@ class Sender:
         self.context = zmq.Context.instance()
         self.sock = self.context.socket(zmq.PUB)
         self.sock.connect("tcp://%s:%d" % (target, port))
-        time.sleep(1)
-        
+
         self.aprs_frame = aprs.Frame()
-        self.aprs_frame.source = aprs.Callsign(source_callsign)
-        self.aprs_frame.destination = aprs.Callsign(destination_callsign)
+        self.source_callsign = source_callsign
+        self.destination_callsign = destination_callsign
 
     def connect(self):
         pass
 
     def send(self, frame):
+        self.aprs_frame.source = aprs.Callsign(self.source_callsign)
+        self.aprs_frame.destination = aprs.Callsign(self.destination_callsign)
+
         payload = frame.build()
         self.aprs_frame.text = Wrap(ensure_string(payload))
         buff = array.array('B', self.aprs_frame.encode_kiss())
