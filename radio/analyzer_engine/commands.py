@@ -286,8 +286,7 @@ class SetBitrateData(SimpleTelecommandData):
 
     def process(self, state, notes, send_mode, wait_mode, limits):
         self.process_common_command(state, notes, send_mode, wait_mode, limits)
-        payload = self.get_payload()
-        index = payload[1]
+        index = int(self.telecommand._bitrate)
         if index not in [1, 2, 4, 8]:
             notes.error('Wrong bitrate value: {0}'.format(index))
         else:
