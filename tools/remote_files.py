@@ -100,7 +100,7 @@ class RemoteFileTools:
     def save_photo(path, chunks):
         data_string = ""
         for i in chunks:
-            data_string += ensure_string(i)
+            data_string += ensure_string(i.payload()[2:])
         data_string = data_string[4:]
         result = ""
         
