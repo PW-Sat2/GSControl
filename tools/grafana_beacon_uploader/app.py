@@ -45,7 +45,18 @@ class BeaconUploaderApp(object):
                        self._args.influx)
 
         while True:
-            data = self._receiver.decode_kiss(self._receiver.receive())
+            frame = self._receiver.receive_no_wait()
+            if frame:
+                self._log.info("Got frame without wait")
+            else:
+                self._log.info("Waiting for frame")
+                frame = self._receiver.receive()
+
+            if not frame:
+                self._log.error('Nothing received')
+                continue
+
+            data = self._receiver.decode_kiss(frame)
             try:
                 self._process_single_frame(data)
             except Exception as e:

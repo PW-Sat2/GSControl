@@ -1,5 +1,6 @@
 import csv
 import base64
+import response_frames as rf
 
 def build(sender, rcv, frame_decoder, *args):
     def send_and_parse_beacon():
@@ -33,8 +34,13 @@ def build(sender, rcv, frame_decoder, *args):
 
         return parsed_frames
 
+    def merge_file_frames(frames1, frames2):        
+        all_chunks = [x for x in (frames1 + frames2) if isinstance(x, rf.common.FileSendSuccessFrame)]
+        unique_ids = set([(x.seq(),x.correlation_id) for x in all_chunks])
+        return map(lambda seq_cid: next((x for x in all_chunks if x.seq() == seq_cid[0] and x.correlation_id == seq_cid[1]), None), list(unique_ids))
 
     return {
         'send_and_parse_beacon': send_and_parse_beacon,
-        'load_downlink_frames_file': load_downlink_frames_file
+        'load_downlink_frames_file': load_downlink_frames_file,
+        'merge_file_frames': merge_file_frames
     }
