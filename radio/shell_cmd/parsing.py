@@ -117,11 +117,11 @@ def build(*args):
         with open(path, 'w') as f:
             f.write(text)
 
-    def get_paths_and_cids_from_tasklist(tasklist_path):
+    def get_paths_and_cids_from_tasklist(tasklist):
         """
         Extracts file paths and their correlation ids dictionary from tasklist
 
-        tasklist_path - path to tasklist file
+        tasklist - tasklist data
         """
 
         import sys
@@ -130,12 +130,8 @@ def build(*args):
 
         import telecommand as tc
 
-        with open(tasklist_path) as tasks_file:
-            exec(tasks_file) in globals(), locals()
-            tasks_file.close()
-
         files_with_cids = defaultdict(list)
-        for task in tasks:
+        for task in tasklist:
             command = task[0]
             if isinstance(command, tc.DownloadFile):
                 argument = task[0]
@@ -149,11 +145,11 @@ def build(*args):
 
         return files_with_cids
 
-    def extract_and_save_files_from_tasklist(tasklist_path, target_folder_path, frames, preserve_offset=None):
+    def extract_and_save_files_from_tasklist(tasklist, target_folder_path, frames, preserve_offset=None):
         """
         Extracts file chunks from frames list based on tasklist
 
-        tasklist_path - path to tasklist file
+        tasklist - tasklist data
         target_folder_path - path to folder for files that will be reconstructed from parts
         frames - frames list
         preserve_offset - True to preserve offsets in files, False to concat tightly, None for default
@@ -161,7 +157,16 @@ def build(*args):
         Only FileSendSuccess frames with correlation id matching DownloadFile commands are saved
         """
 
-        files_with_cids = get_paths_and_cids_from_tasklist(tasklist_path)
+        import os
+        import errno
+
+        try:
+            os.makedirs(target_folder_path)
+        except OSError as e:
+            if errno.EEXIST != e.errno:
+                raise
+
+        files_with_cids = get_paths_and_cids_from_tasklist(tasklist)
         for path in files_with_cids:
             cids = files_with_cids[path]
 
