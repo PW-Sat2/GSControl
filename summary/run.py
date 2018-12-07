@@ -40,19 +40,27 @@ def save_file_lists(session, frames):
         files = sorted(files, key=lambda f: f['File'])
         text = pformat(files)
 
-        print 'File list CorrelationID: {}'.format(cid)
-        print(text)
-
         session.write_artifact('file_list_{}.txt'.format(cid), text)
+
+
+def save_beacons(session, frames):
+    beacons = only_type(frames, response_frames.BeaconFrame)
+
+    texts = []
+
+    for beacon in beacons:
+        texts.append(str(beacon))
+
+    session.write_artifact('beacons.txt', '\n\n'.join(texts))
 
 
 def run_summary(store, current_session):
     session = store.get_session(current_session)
 
     frames = session.frames(['elka', 'gliwice'])
-    print len(frames)
 
     save_file_lists(session, frames)
+    save_beacons(session, frames)
 
 
 def main():
