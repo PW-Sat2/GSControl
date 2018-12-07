@@ -4305,7 +4305,7 @@ class frames_counter(gr.sync_block):
     </param>
     <param>
       <key>update_time</key>
-      <value>0.50</value>
+      <value>1.00</value>
     </param>
     <param>
       <key>wintype</key>
