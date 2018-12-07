@@ -20,6 +20,8 @@ class SessionView(object):
 
         self.tasklist = store.load_tasklist(self.tasklist_path)
 
+        self.all_frames = self.frames(['all'])
+
     def expand_path(self, relative_path):
         return path.join(self._root, relative_path)
 
@@ -41,6 +43,9 @@ class SessionView(object):
                 data = ensure_byte_list(data)
 
         return data
+
+    def read_artifact(self, file_path, binary=False, as_lines=False):
+        return self.get_file(path.join('artifacts', file_path), binary=binary, as_lines=as_lines)
 
     def open_artifact(self, file_path, mode):
         full_path = self.expand_path(path.join('artifacts', file_path))

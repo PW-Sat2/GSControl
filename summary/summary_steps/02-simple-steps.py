@@ -4,6 +4,7 @@ from pprint import pformat
 
 import response_frames
 from tools.remote_files import RemoteFileTools
+from summary.scope import session
 
 
 def only_type(frames, frame_type):
@@ -24,8 +25,8 @@ def unique_seqs(frames):
     return result
 
 
-def save_file_lists(session, frames):
-    list_files = only_type(frames, response_frames.FileListSuccessFrame)
+def save_file_lists():
+    list_files = only_type(session.all_frames, response_frames.FileListSuccessFrame)
     by_cid = defaultdict(list)
 
     for frame in list_files:
@@ -46,8 +47,8 @@ def save_file_lists(session, frames):
         session.write_artifact('file_list_{}.txt'.format(cid), text)
 
 
-def save_beacons(session, frames):
-    beacons = only_type(frames, response_frames.BeaconFrame)
+def save_beacons():
+    beacons = only_type(session.all_frames, response_frames.BeaconFrame)
 
     texts = []
 

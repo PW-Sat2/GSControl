@@ -47,6 +47,15 @@ def run_summary(store, current_session):
 
     session = store.get_session(current_session)
 
+    # create in-memory summary.scope so we can inject values into steps
+    # IDE will look in scope.py to detect variables and types
+    # try to keep these two in sync
+    scope_module = imp.new_module('summary.scope')
+    scope_module.session = session
+    scope_module.store = store
+
+    sys.modules['summary.scope'] = scope_module
+
     scope_globals = {
         'store': store,
         'session': session,
@@ -66,7 +75,7 @@ def run_summary(store, current_session):
 def main():
     mission_data = os.path.abspath('../mission')
     store = MissionStore(root=mission_data)
-    session = 22
+    session = 16
     run_summary(store, session)
 
 

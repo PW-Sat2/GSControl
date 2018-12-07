@@ -1,6 +1,6 @@
-save_file_lists(session, frames)
-save_beacons(session, frames)
+save_file_lists()
+save_beacons()
 
-list_requested_files(session)
+list_requested_files()
 
-extract_downloaded_files(session, frames)
+extract_downloaded_files()
