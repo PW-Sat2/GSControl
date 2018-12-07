@@ -3,6 +3,7 @@ import os
 import sys
 import logging
 
+import argparse
 import colorlog
 
 cfg_module = imp.new_module('config')
@@ -72,12 +73,20 @@ def run_summary(store, current_session):
         execfile(step, scope_globals)
 
 
-def main():
-    mission_data = os.path.abspath('../mission')
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('mission', help="Path to mission repository")
+    parser.add_argument('session', help="Session ID (number) to summarise", type=int)
+
+    return parser.parse_args()
+
+
+def main(args):
+    mission_data = os.path.abspath(args.mission)
     store = MissionStore(root=mission_data)
-    session = 16
+    session = args.session
     run_summary(store, session)
 
 
 setup_logging()
-main()
+main(parse_args())
