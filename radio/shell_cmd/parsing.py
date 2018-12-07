@@ -1,3 +1,5 @@
+from types import NoneType
+
 from tools.remote_files import *
 from pprint import pprint, pformat
 
@@ -14,7 +16,7 @@ def build(*args):
 
         return result
 
-    def extract_and_save_file_chunks(path, frames, correlation_ids):
+    def extract_and_save_file_chunks(path, frames, correlation_ids, preserve_offset=False):
         """
         Extracts file chunks from frames list
 
@@ -25,9 +27,13 @@ def build(*args):
         Only FileSendSuccess frames with matching correlation id are saved
         """
         part_response = filter_file_chunks(frames, correlation_ids)
-        part_response = map(lambda i: i.response, part_response)
-        
-        RemoteFileTools.save_chunks(path, part_response)
+
+        if preserve_offset:
+            part_response = map(lambda f: (f.seq(), f.response), part_response)
+            RemoteFileTools.save_chunks_with_offsets(path, part_response)
+        else:
+            part_response = map(lambda i: i.response, part_response)
+            RemoteFileTools.save_chunks(path, part_response)
 
     def extract_and_save_photo_chunks(path, frames, correlation_ids):
         """
@@ -58,8 +64,8 @@ def build(*args):
         '<path>.jpg' - decoded photo
         '<path>.raw' - raw photo data (with CAM headers inside)
         """
-        parse_and_save_photo_chunks(path + '.jpg', frames, correlation_ids)
-        parse_and_save_file_chunks(path + '.raw', frames, correlation_ids)
+        extract_and_save_photo_chunks(path + '.jpg', frames, correlation_ids)
+        extract_and_save_file_chunks(path + '.raw', frames, correlation_ids)
 
     def extract_and_save_beacons(path, frames):
         """
@@ -111,11 +117,11 @@ def build(*args):
         with open(path, 'w') as f:
             f.write(text)
 
-    def get_paths_and_cids_from_tasklist(tasklist_path):
+    def get_paths_and_cids_from_tasklist(tasklist):
         """
         Extracts file paths and their correlation ids dictionary from tasklist
 
-        tasklist_path - path to tasklist file
+        tasklist - tasklist data
         """
 
         import sys
@@ -124,12 +130,8 @@ def build(*args):
 
         import telecommand as tc
 
-        with open(tasklist_path) as tasks_file:
-            exec(tasks_file) in globals(), locals()
-            tasks_file.close()
-
         files_with_cids = defaultdict(list)
-        for task in tasks:
+        for task in tasklist:
             command = task[0]
             if isinstance(command, tc.DownloadFile):
                 argument = task[0]
@@ -143,24 +145,42 @@ def build(*args):
 
         return files_with_cids
 
-    def extract_and_save_files_from_tasklist(tasklist_path, target_folder_path, frames):
+    def extract_and_save_files_from_tasklist(tasklist, target_folder_path, frames, preserve_offset=None):
         """
         Extracts file chunks from frames list based on tasklist
 
-        tasklist_path - path to tasklist file
+        tasklist - tasklist data
         target_folder_path - path to folder for files that will be reconstructed from parts
         frames - frames list
+        preserve_offset - True to preserve offsets in files, False to concat tightly, None for default
 
         Only FileSendSuccess frames with correlation id matching DownloadFile commands are saved
         """
 
-        files_with_cids = get_paths_and_cids_from_tasklist(tasklist_path)
+        import os
+        import errno
+
+        try:
+            os.makedirs(target_folder_path)
+        except OSError as e:
+            if errno.EEXIST != e.errno:
+                raise
+
+        files_with_cids = get_paths_and_cids_from_tasklist(tasklist)
         for path in files_with_cids:
             cids = files_with_cids[path]
 
             full_path = target_folder_path + path
 
-            extract_and_save_file_chunks(full_path, frames, cids)
+            if preserve_offset is None:
+                preserve_offset_in_file = path not in ['/telemetry.current', '/telemetry.previous', '/telemetry.leop']
+            else:
+                preserve_offset_in_file = preserve_offset
+
+            if path.endswith('.jpg'):
+                extract_and_save_raw_and_photo(full_path[:-4], frames, cids)
+            else:
+                extract_and_save_file_chunks(full_path, frames, cids, preserve_offset_in_file)
         
     return {
         'extract_and_save_file_chunks': extract_and_save_file_chunks,
