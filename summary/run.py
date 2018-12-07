@@ -30,6 +30,8 @@ def run_summary(store, current_session):
         print 'Running step {}'.format(step)
         execfile(step, scope_globals)
 
+    execfile(sys.argv[1], scope_globals)
+
 
 def main():
     mission_data = os.path.abspath('../mission')

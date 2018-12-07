@@ -1,1 +1,1 @@
-frames = session.frames(['elka', 'gliwice'])
+frames = session.frames(['all'])

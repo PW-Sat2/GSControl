@@ -1,5 +1,6 @@
 import base64
 from os import path
+import os
 
 from radio import analyzer
 from utils import ensure_byte_list
@@ -22,6 +23,9 @@ class SessionView(object):
     def _expand_path(self, relative_path):
         return path.join(self._root, relative_path)
 
+    def expand_artifact_path(self, relative_path):
+        return self._expand_path(path.join('artifacts', relative_path))
+
     def get_file(self, file_path, binary=False, as_lines=False):
         full_path = self._expand_path(file_path)
         mode = 'r'
@@ -41,6 +45,11 @@ class SessionView(object):
     def open_artifact(self, file_path, mode):
         full_path = self._expand_path(path.join('artifacts', file_path))
 
+        directory = path.dirname(full_path)
+
+        if not path.isdir(directory):
+            os.mkdir(directory)
+
         return open(full_path, mode)
 
     def write_artifact(self, file_path, content, binary=False):
@@ -55,7 +64,11 @@ class SessionView(object):
         payloads = []
 
         for source in sources:
-            frames_file = self.get_file('artifacts/{}_downlink.frames'.format(source), as_lines=True)
+            file_name = 'artifacts/{}_downlink.frames'.format(source)
+            if source == 'all':
+                file_name = 'artifacts/all.frames'
+
+            frames_file = self.get_file(file_name, as_lines=True)
             for line in frames_file:
                 (ts, direction, payload) = line.split(',')
 
