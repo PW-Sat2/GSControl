@@ -12,7 +12,7 @@ from datetime import timedelta
 from limits import Limits
 from resources import *
 from subsystems import *
-from task_actions import *
+from radio.task_actions import *
 from devices.adcs import AdcsMode
 from devices import CameraLocation, PhotoResolution
 

@@ -1,5 +1,7 @@
 import base64
 from os import path
+
+from radio import analyzer
 from utils import ensure_byte_list
 from radio.radio_frame_decoder import FallbackResponseDecorator
 import response_frames
@@ -12,6 +14,10 @@ class SessionView(object):
         self._root = path.join(store.root, 'sessions', str(session_number))
 
         self._frame_decoder = FallbackResponseDecorator(response_frames.FrameDecoder(response_frames.frame_factories))
+
+        self.tasklist_path = self._expand_path('tasklist.py')
+
+        self.tasklist = store.load_tasklist(self.tasklist_path)
 
     def _expand_path(self, relative_path):
         return path.join(self._root, relative_path)
@@ -73,6 +79,10 @@ class SessionView(object):
 class MissionStore(object):
     def __init__(self, root):
         self.root = root
+        self.analyzer = analyzer.Analyzer()
 
     def get_session(self, session_number):
         return SessionView(self, session_number)
+
+    def load_tasklist(self, file_path):
+        return self.analyzer.load(file_path)
