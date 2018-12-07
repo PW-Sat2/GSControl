@@ -38,13 +38,17 @@ class SessionView(object):
 
         return data
 
-    def write_artifact(self, file_path, content, binary=False):
+    def open_artifact(self, file_path, mode):
         full_path = self._expand_path(path.join('artifacts', file_path))
+
+        return open(full_path, mode)
+
+    def write_artifact(self, file_path, content, binary=False):
         mode = 'w'
         if binary:
             mode += 'b'
 
-        with open(full_path, mode) as f:
+        with self.open_artifact(file_path, mode) as f:
             f.write(content)
 
     def frames(self, sources, unique_only=True):
