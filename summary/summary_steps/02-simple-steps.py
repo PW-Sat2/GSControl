@@ -1,6 +1,6 @@
 import logging
 from collections import defaultdict
-from pprint import pformat
+from pprint import pformat, pprint
 
 import response_frames
 from tools.remote_files import RemoteFileTools
@@ -58,3 +58,8 @@ def save_beacons():
     logging.info('Saving {} beacons (short form)'.format(len(beacons)))
     session.write_artifact('beacons.txt', '\n\n'.join(texts))
 
+
+def save_frames_list():
+    with session.open_artifact('downlink_frames.txt', 'w') as f:
+        for frame in session.all_frames:
+            pprint(frame, f)

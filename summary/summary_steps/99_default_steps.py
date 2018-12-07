@@ -1,3 +1,5 @@
+save_frames_list()
+
 save_file_lists()
 save_beacons()
 
