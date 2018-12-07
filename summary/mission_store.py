@@ -47,7 +47,7 @@ class SessionView(object):
         for source in sources:
             frames_file = self.get_file('artifacts/{}_downlink.frames'.format(source), as_lines=True)
             for line in frames_file:
-                (ts, direction, payload) = parts = line.split(',')
+                (ts, direction, payload) = line.split(',')
 
                 if direction != 'D':
                     continue
