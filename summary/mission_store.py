@@ -11,23 +11,23 @@ import response_frames
 class SessionView(object):
     def __init__(self, store, session_number):
         self._store = store
-        self._session_number = session_number
+        self.session_number = session_number
         self._root = path.join(store.root, 'sessions', str(session_number))
 
         self._frame_decoder = FallbackResponseDecorator(response_frames.FrameDecoder(response_frames.frame_factories))
 
-        self.tasklist_path = self._expand_path('tasklist.py')
+        self.tasklist_path = self.expand_path('tasklist.py')
 
         self.tasklist = store.load_tasklist(self.tasklist_path)
 
-    def _expand_path(self, relative_path):
+    def expand_path(self, relative_path):
         return path.join(self._root, relative_path)
 
     def expand_artifact_path(self, relative_path):
-        return self._expand_path(path.join('artifacts', relative_path))
+        return self.expand_path(path.join('artifacts', relative_path))
 
     def get_file(self, file_path, binary=False, as_lines=False):
-        full_path = self._expand_path(file_path)
+        full_path = self.expand_path(file_path)
         mode = 'r'
         if binary:
             mode += 'b'
@@ -43,7 +43,7 @@ class SessionView(object):
         return data
 
     def open_artifact(self, file_path, mode):
-        full_path = self._expand_path(path.join('artifacts', file_path))
+        full_path = self.expand_path(path.join('artifacts', file_path))
 
         directory = path.dirname(full_path)
 

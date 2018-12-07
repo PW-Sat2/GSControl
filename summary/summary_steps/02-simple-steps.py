@@ -1,3 +1,4 @@
+import logging
 from collections import defaultdict
 from pprint import pformat
 
@@ -41,6 +42,7 @@ def save_file_lists(session, frames):
         files = sorted(files, key=lambda f: f['File'])
         text = pformat(files)
 
+        logging.info('Saving file list with correlation id={}'.format(cid))
         session.write_artifact('file_list_{}.txt'.format(cid), text)
 
 
@@ -52,5 +54,6 @@ def save_beacons(session, frames):
     for beacon in beacons:
         texts.append(str(beacon))
 
+    logging.info('Saving {} beacons (short form)'.format(len(beacons)))
     session.write_artifact('beacons.txt', '\n\n'.join(texts))
 

@@ -1,3 +1,4 @@
+import logging
 from collections import defaultdict
 from os import path
 from pprint import pformat
@@ -102,6 +103,12 @@ def extract_downloaded_files(session, frames):
     files = get_downloaded_files(session.tasklist, frames)
 
     for file_name in files.keys():
+        logging.info('Saving extracted file (this session) {} ({} chunks requested, {} downloaded, {} missing)'.format(
+            file_name,
+            len(files[file_name]['RequestedChunks']),
+            len(files[file_name]['DownloadedChunks']),
+            len(files[file_name]['MissingChunks']),
+        ))
         write_file_from_description(session, file_name, files[file_name])
 
 
@@ -112,7 +119,7 @@ def extract_file(current_session, file_name, also=[]):
         sessions.append(store.get_session(id))
 
     file_frames = []
-    requested_chunks = []
+    requested_chunks = set()
 
     for session in sessions:
         session_frames = session.frames(['all'])
@@ -122,7 +129,7 @@ def extract_file(current_session, file_name, also=[]):
         file = files[file_name]
 
         file_frames.extend(file['ChunkFrames'])
-        requested_chunks.extend(file['RequestedChunks'])
+        requested_chunks.update(file['RequestedChunks'])
 
 
     file_frames = unique_seqs(file_frames)
@@ -132,7 +139,19 @@ def extract_file(current_session, file_name, also=[]):
 
     file = {
         'MissingChunks': list(set(requested_chunks).difference(dowloaded_chunk_ids)),
-        'ChunkFrames': file_frames
+        'ChunkFrames': file_frames,
+        'RequestedChunks': requested_chunks,
+        'DownloadedChunks': dowloaded_chunk_ids
     }
+
+    session_ids = sorted(map(lambda s: str(s.session_number), sessions))
+
+    logging.info('Saving extracted file (sessions: {}) {} ({} chunks requested, {} downloaded, {} missing)'.format(
+        ', '.join(session_ids),
+        file_name,
+        len(file['RequestedChunks']),
+        len(file['DownloadedChunks']),
+        len(file['MissingChunks']),
+    ))
 
     write_file_from_description(session, path.join('assembled', file_name.strip('/')), file)
