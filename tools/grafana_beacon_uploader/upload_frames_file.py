@@ -75,7 +75,7 @@ for l in args.file.readlines():
     if direction != 'D':
         continue
 
-    timestamp = datetime.strptime(timestamp, '%Y-%m-%d_%H:%M:%S:%f') + tz_offset
+    timestamp = datetime.strptime(timestamp, '%Y-%m-%d_%H:%M:%S:%f')
     payload = base64.b64decode(payload)
     frame_body = payload[16:-2]
 

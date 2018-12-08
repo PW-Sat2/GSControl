@@ -47,6 +47,7 @@ def build(sender, rcv, frame_decoder, *args):
 
         try:
             counter = 0
+            print 'Receiving....'
             while True:
                 x = receive()
                 counter_str = '{:3d}'.format(counter)

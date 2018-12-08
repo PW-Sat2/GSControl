@@ -145,7 +145,7 @@ def build(*args):
 
         return files_with_cids
 
-    def extract_and_save_files_from_tasklist(tasklist, target_folder_path, frames, preserve_offset=None):
+    def extract_and_save_files_from_tasklist(tasklist, target_folder_path, frames, preserve_offset=False):
         """
         Extracts file chunks from frames list based on tasklist
 
@@ -170,7 +170,7 @@ def build(*args):
         for path in files_with_cids:
             cids = files_with_cids[path]
 
-            full_path = target_folder_path + path
+            full_path = target_folder_path.rstrip('/') + '/' + path.lstrip('/')
 
             if preserve_offset is None:
                 preserve_offset_in_file = path not in ['/telemetry.current', '/telemetry.previous', '/telemetry.leop']
