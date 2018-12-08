@@ -37,6 +37,7 @@ def build(sender, rcv, frame_decoder, *args):
         return rcv
 
     def receiver_loop():
+        import datetime
         """
         Receives all incoming frames and decodes them.
         Use Ctrl+C to break the loop.
@@ -50,8 +51,9 @@ def build(sender, rcv, frame_decoder, *args):
             print 'Receiving....'
             while True:
                 x = receive()
-                counter_str = '{:3d}'.format(counter)
-                print counter_str, pprint.pformat(x)
+                timestamp_str = '\x1b[36m{}\x1b[0m'.format(datetime.datetime.now().time().strftime('%H:%M:%S'))
+                counter_str = '\x1b[90m{:3d}\x1b[0m'.format(counter)
+                print timestamp_str, counter_str, pprint.pformat(x)
                 counter += 1
                 frames.append(x)
         except KeyboardInterrupt:
