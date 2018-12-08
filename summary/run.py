@@ -74,8 +74,11 @@ def run_summary(store, current_session):
 
 
 def parse_args():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('mission', help="Path to mission repository")
+    parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+
+    mission_repo_default = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'mission'))
+
+    parser.add_argument('-m', '--mission', help="Path to mission repository", default=mission_repo_default)
     parser.add_argument('session', help="Session ID (number) to summarise", type=int)
 
     return parser.parse_args()
