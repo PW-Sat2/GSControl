@@ -40,9 +40,18 @@ if __name__ == '__main__':
     imp.load_source('config', args.config)
     from config import config
 
+    prompt = 'COMM'
+    banner = 'COMM Terminal'
+    try:
+        uplink_callsign_test = aprs.Callsign(config['COMM_UPLINK_CALLSIGN'])
+    except:
+        prompt = 'NO_UPLINK'
+        banner = 'COMM Terminal WITHOUT UPLINK'
+
+
     class MyPrompt(Prompts):
         def in_prompt_tokens(self, cli=None):
-            return [(Token.Prompt, 'COMM'),
+            return [(Token.Prompt, prompt),
                     (Token.Prompt, '> ')]
 
     cfg = Config()
@@ -73,7 +82,7 @@ if __name__ == '__main__':
     user_ns.update(shell_cmds)
 
     shell = InteractiveShellEmbed(config=cfg, user_ns=user_ns,
-                                  banner2='COMM Terminal')
+                                  banner2=banner)
     shell.prompts = MyPrompt(shell)
     shell.run_code('from tools.parse_beacon import ParseBeacon')
     shell.run_code('import telecommand as tc')
