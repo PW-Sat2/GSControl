@@ -94,7 +94,6 @@ class Analyzer:
 
 if __name__ == '__main__':
     import argparse
-    from task_actions import *
     parser = argparse.ArgumentParser()
     parser.add_argument("-f", "--file", required=True,
 	                    help="Path to *.py file with session tasks (tasks = [...]). Examples in test_sessions dir.")
