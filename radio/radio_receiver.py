@@ -17,7 +17,7 @@ except ImportError:
 
 
 class Receiver:
-    def __init__(self, target="localhost", port=7001):
+    def __init__(self, target="localhost", port=7001, on_stop=None):
         self.context = zmq.Context.instance()
         self.sock = self.context.socket(zmq.SUB)
         self.sock.connect("tcp://%s:%d" % (target, port))
@@ -28,6 +28,7 @@ class Receiver:
 
         self.abort_send.bind('inproc://receiver/abort')
         self.abort_recv.connect('inproc://receiver/abort')
+        self._on_stop = on_stop
 
     def connect(self):
         print "Connect not used. Remove!"
@@ -43,6 +44,9 @@ class Receiver:
 
         def stop():
             self.abort_send.send('QUIT')
+
+            if self._on_stop:
+                self._on_stop()
 
         self._flush_socket(self.abort_recv, -1)
 
