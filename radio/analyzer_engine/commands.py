@@ -621,8 +621,8 @@ class RawI2CData(SimpleTelecommandData):
         self.process_common_command(state, notes, send_mode, wait_mode, limits)
         notes.warning("This is last resort command do not use it recklessly")
 
-        address = self.telecommand._address[0]
-        bus = self.telecommand._busSelect[0]
+        address = self.telecommand._address
+        bus = self.telecommand._busSelect
         if bus != 0 and bus != 1:
             notes.error("Invalid i2c bus: {0}. 0 or 1 are allowed".format(bus))
 
@@ -633,9 +633,6 @@ class RawI2CData(SimpleTelecommandData):
             notes.error('There is no device at address {0} on payload i2c bus'.format(address))
 
         data = self.telecommand._data
-        if len(data) > 190:
-            notes.error("Too long payload size: {0}. At most 190 bytes are allowed".format(len(data)))
-
         if len(data) == 0:
             notes.warning("Empty i2c frame detected")
 

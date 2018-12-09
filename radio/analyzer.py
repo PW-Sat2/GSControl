@@ -1,6 +1,5 @@
 from tabulate import tabulate
 from colorama import init, Fore, Style
-from radio.task_actions import *
 from analyzer_engine.resources import *
 from analyzer_engine.task import *
 from analyzer_engine.results import *
@@ -78,6 +77,7 @@ class Analyzer:
     
         import telecommand as tc
         import datetime
+        from radio.task_actions import *
         from devices import camera
         from devices.adcs import AdcsMode
         from devices.camera import CameraLocation, PhotoResolution
@@ -94,7 +94,6 @@ class Analyzer:
 
 if __name__ == '__main__':
     import argparse
-
     parser = argparse.ArgumentParser()
     parser.add_argument("-f", "--file", required=True,
 	                    help="Path to *.py file with session tasks (tasks = [...]). Examples in test_sessions dir.")
