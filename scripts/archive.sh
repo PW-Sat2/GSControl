@@ -1,48 +1,50 @@
 #!/bin/bash
 
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
+
 if [ -z "$1" ]; then
     echo "Please specify session number"
     echo "Usage:"
     echo "./archive.sh <session_number> <session_date>"
     exit 1
 fi
-if [ -z "$2" ]; then
-    echo "Please specify session date"
-    echo "Usage:"
-    echo "./archive.sh <session_number> <session_date>"
+
+if [[ -z "${GS_NAME}" ]]; then
+    echo "Please specify GS_NAME in .bashrc"
     exit 1
 fi
 
-echo $1 $2
+SESSION=$1
+echo "SESSION: ${SESSION}"
+ARCHIVE_FOLDER=/archive/${SESSION}
 
-mkdir -v /archive/$1_$2
+mkdir -v ${ARCHIVE_FOLDER}
 
-cp -vp /gs/iq_data_from_current_session_after_doppler_correction.raw /archive/$1_$2/iq_data_from_current_session_after_doppler_correction.raw
-cp -vp /gs/iq_data_from_current_session_raw.raw /archive/$1_$2/iq_data_from_current_session_raw.raw
+mv /gs/iq_data_from_current_session_after_doppler_correction.raw ${ARCHIVE_FOLDER}/
+mv /gs/iq_data_from_current_session_raw.raw ${ARCHIVE_FOLDER}/
 
-cp -vp /gs/uplink_audio.wav /archive/$1_$2/uplink_audio.wav
-cp -vp /gs/uplink_frames /archive/$1_$2/gliwice_uplink.frames
-
-cp -vp /home/sat_user/downlink_frames /archive/$1_$2/gliwice_downlink.frames.bak
-cp -vp /home/sat_user/downlink_all_frames /archive/$1_$2/gliwice_downlink_all.frames.bak
-cp -vp /gs/downlink_frames /archive/$1_$2/gliwice_downlink.frames
-cp -vp /gs/downlink_all_frames /archive/$1_$2/gliwice_downlink_all.frames
-
-cp -vp /gs/iq_data_from_current_session_after_doppler_correction.raw /gs/iq_data_from_current_session_after_doppler_correction_$1_$2.raw
-cp -vp /gs/iq_data_from_current_session_raw.raw /gs/iq_data_from_current_session_raw_$1_$2.raw
-cp -vp /home/sat_user/downlink_frames /gs/gliwice_downlink_frames_$1_$2.frames.bak
-cp -vp /home/sat_user/downlink_all_frames /gs/gliwice_downlink_all_frames_$1_$2.frames.bak
-cp -vp /gs/downlink_frames /gs/gliwice_downlink_frames_$1_$2.frames
-cp -vp /gs/downlink_all_frames /gs/gliwice_downlink_all_frames_$1_$2.frames
-
-ls -l /archive/$1_$2
+mv /gs/uplink_audio.wav ${ARCHIVE_FOLDER}/
+mv /gs/uplink_frames ${ARCHIVE_FOLDER}/${GS_NAME}_uplink.frames
+mv /gs/downlink_frames ${ARCHIVE_FOLDER}/${GS_NAME}_downlink.frames
 
 # Save mission artifacts
 
-MISSION_FOLDER=/home/sat_user/gs/mission/sessions/$1
+ls -l ${ARCHIVE_FOLDER}
 
-mkdir -v $MISSION_FOLDER/artifacts
-cp -vp /gs/downlink_frames $MISSION_FOLDER/artifacts/gliwice_downlink.frames
-cp -vp /gs/uplink_frames $MISSION_FOLDER/artifacts/gliwice_uplink.frames
-ls -l $MISSION_FOLDER
+# Save mission artifacts
 
+REPOS_FOLDER=${DIR}/../../
+ARTIFACT_FOLDER=${REPOS_FOLDER}/mission/sessions/${SESSION}/artifacts
+
+mkdir -v ${ARTIFACT_FOLDER}
+
+cp -vp ${ARCHIVE_FOLDER}/${GS_NAME}_downlink.frames ${ARTIFACT_FOLDER}/
+cp -vp ${ARCHIVE_FOLDER}/${GS_NAME}_uplink.frames ${ARTIFACT_FOLDER}/
+
+cd ${ARTIFACT_FOLDER}
+ls -l
+
+git add ${GS_NAME}_downlink.frames ${GS_NAME}_uplink.frames
+git commit "${SESSION} - ${GS_NAME}"
+git log --stat
+git push
