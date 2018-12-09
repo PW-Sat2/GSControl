@@ -35,7 +35,7 @@ tasks = [
     [tc.RawI2C(11, 1, 49, 200, [1]), Send, WaitMode.NoWait],
     [tc.RawI2C(11, 2, 80, 200, []), Send, WaitMode.NoWait],
     [tc.RawI2C(11, 2, 80, 200, [i for i in range(0, 190, 1)]), Send, WaitMode.NoWait],
-    [tc.RawI2C(11, 2, 80, 200, [i for i in range(0, 191, 1)]), Send, WaitMode.NoWait],
+    [tc.RawI2C(11, 1, 80, 200, [i for i in range(0, 191, 1)]), Send, WaitMode.NoWait],
     [tc.RawI2C(11, 0, 0x10, 200, [1]), Send, WaitMode.NoWait],
     [tc.RawI2C(11, 0, 0x31, 200, [1]), Send, WaitMode.NoWait],
     [tc.RawI2C(11, 0, 0x35, 200, [1]), Send, WaitMode.NoWait],
