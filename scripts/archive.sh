@@ -9,8 +9,8 @@ if [ -z "$1" ]; then
     exit 1
 fi
 
-if [[ -z "${GS_NAME}" ]]; then
-    echo "Please specify GS_NAME in .bashrc"
+if [[ -z "${PWSAT_GS_NAME}" ]]; then
+    echo "Please specify PWSAT_GS_NAME in .bashrc"
     exit 1
 fi
 
@@ -24,8 +24,8 @@ mv /gs/iq_data_from_current_session_after_doppler_correction.raw ${ARCHIVE_FOLDE
 mv /gs/iq_data_from_current_session_raw.raw ${ARCHIVE_FOLDER}/
 
 mv /gs/uplink_audio.wav ${ARCHIVE_FOLDER}/
-mv /gs/uplink_frames ${ARCHIVE_FOLDER}/${GS_NAME}_uplink.frames
-mv /gs/downlink_frames ${ARCHIVE_FOLDER}/${GS_NAME}_downlink.frames
+mv /gs/uplink_frames ${ARCHIVE_FOLDER}/${PWSAT_GS_NAME}_uplink.frames
+mv /gs/downlink_frames ${ARCHIVE_FOLDER}/${PWSAT_GS_NAME}_downlink.frames
 
 # Save mission artifacts
 
@@ -38,13 +38,13 @@ ARTIFACT_FOLDER=${REPOS_FOLDER}/mission/sessions/${SESSION}/artifacts
 
 mkdir -v ${ARTIFACT_FOLDER}
 
-cp -vp ${ARCHIVE_FOLDER}/${GS_NAME}_downlink.frames ${ARTIFACT_FOLDER}/
-cp -vp ${ARCHIVE_FOLDER}/${GS_NAME}_uplink.frames ${ARTIFACT_FOLDER}/
+cp -vp ${ARCHIVE_FOLDER}/${PWSAT_GS_NAME}_downlink.frames ${ARTIFACT_FOLDER}/
+cp -vp ${ARCHIVE_FOLDER}/${PWSAT_GS_NAME}_uplink.frames ${ARTIFACT_FOLDER}/
 
 cd ${ARTIFACT_FOLDER}
 ls -l
 
-git add ${GS_NAME}_downlink.frames ${GS_NAME}_uplink.frames
-git commit "${SESSION} - ${GS_NAME}"
+git add ${PWSAT_GS_NAME}_downlink.frames ${PWSAT_GS_NAME}_uplink.frames
+git commit "${SESSION} - ${PWSAT_GS_NAME}"
 git log --stat
 git push
