@@ -15,7 +15,7 @@ class DictWrapper(object):
         return self._d[name]
 
 def build(sender, rcv, frame_decoder, analyzer, ns):
-    def run(tasks, start_from=0):
+    def run(tasks, start_from=1):
         """
         Performs list of tasks.
 
@@ -45,7 +45,7 @@ def build(sender, rcv, frame_decoder, analyzer, ns):
 
         ns_wrapper = DictWrapper(ns)
 
-        step_no = start_from
+        step_no = start_from - 1
         while step_no < len(tasks):
             [telecommand, action_type, wait] = tasks[step_no]
 
