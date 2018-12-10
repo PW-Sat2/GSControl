@@ -1,10 +1,18 @@
 import requests
 import time
 import fuckit
+import argparse
 from pprint import pformat
 from radio_pwsat_pl_common import *
 
-slack_url = ''
+
+parser = argparse.ArgumentParser()
+
+parser.add_argument('-u', '--url', required=True,
+                help="Slack URL to upload")
+args = parser.parse_args()
+
+slack_url = args.url
 
 def get_frames():
     all_frames = download_files()
