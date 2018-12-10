@@ -7,28 +7,32 @@ if [[ -z "$1" ]]; then
     exit 1
 fi
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
+SELF_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
+source "$SELF_DIR/_common.sh"
+
 SESSION=$1
 
-GS_REPOS=${DIR}/../../
+mkdir -p ${MISSION}/sessions/${SESSION}/artifacts/
 
-cd ${DIR}/../tools/radio_pwsat_pl/
-
-mkdir -p ${GS_REPOS}/mission/sessions/${SESSION}/artifacts/
+cd ${GSCONTROL}/tools/radio_pwsat_pl/
 
 python2 download_frame_files.py
 
-mv -i all.frames ${GS_REPOS}/mission/sessions/${SESSION}/artifacts/
-mv Turbo-Ola.bin ${GS_REPOS}/mission/
+mv -i all.frames ${MISSION}/sessions/${SESSION}/artifacts/
+mv Turbo-Ola.bin ${MISSION}/
 rm elka_downlink.frames
 rm gliwice_downlink.frames
 
-cd ${GS_REPOS}/mission/
-git pull --rebase
 
-git add sessions/${SESSION}/artifacts/all.frames
-git add Turbo-Ola.bin
+git -C ${MISSION} pull
 
-git commit -m "${SESSION} - all"
-git push
+git -C ${MISSION} add ${MISSION}/sessions/${SESSION}/artifacts/all.frames
+git -C ${MISSION} add ${MISSION}/Turbo-Ola.bin
+
+git -C ${MISSION} commit -m "${SESSION} - all"
+git -C ${MISSION} log --stat
+
+if confirm "Pushing to mission repo (all frames)."; then
+    git -C ${MISSION} push
+fi
 
