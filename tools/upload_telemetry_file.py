@@ -47,7 +47,8 @@ entries = telemetry_file_mapper.read_telemetry_buffer(raw)
 
 print 'Found {} entries in telemetry file'.format(len(entries))
 
-client = InfluxDBClient(database='pwsat2', host='grafana.pw-sat.pl')
+url = urlparse(args.influx)
+client = InfluxDBClient(host=url.hostname, port=url.port, database=url.path.strip('/'))
 
 entry_mapping = telemetry_file_mapper.map_telemetry(client, entries)
 
@@ -73,7 +74,4 @@ for item in entry_mapping:
 
 print 'Total {} points'.format(len(all_points))
 
-url = urlparse(args.influx)
-db = InfluxDBClient(host=url.hostname, port=url.port, database=url.path.strip('/'))
-
-db.write_points(all_points)
+client.write_points(all_points)

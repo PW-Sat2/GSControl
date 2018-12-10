@@ -4,7 +4,10 @@ import sys
 import logging
 
 import argparse
+from urlparse import urlparse
+
 import colorlog
+from influxdb import InfluxDBClient
 
 cfg_module = imp.new_module('config')
 cfg_module.config = dict(
@@ -39,8 +42,10 @@ def setup_logging():
     root_logger.addHandler(handler)
     root_logger.setLevel(logging.DEBUG)
 
+    logging.getLogger('urllib3').setLevel(logging.WARNING)
 
-def run_summary(store, current_session):
+
+def run_summary(influx, store, current_session):
     steps_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'summary_steps')
     steps = os.listdir(steps_folder)
     steps = sorted(steps)
@@ -54,6 +59,7 @@ def run_summary(store, current_session):
     scope_module = imp.new_module('summary.scope')
     scope_module.session = session
     scope_module.store = store
+    scope_module.influx = influx
 
     sys.modules['summary.scope'] = scope_module
 
@@ -79,6 +85,7 @@ def parse_args():
     mission_repo_default = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'mission'))
 
     parser.add_argument('-m', '--mission', help="Path to mission repository", default=mission_repo_default)
+    parser.add_argument('-d', '--influx', required=True, help="InfluxDB url")
     parser.add_argument('session', help="Session ID (number) to summarise", type=int)
 
     return parser.parse_args()
@@ -88,7 +95,11 @@ def main(args):
     mission_data = os.path.abspath(args.mission)
     store = MissionStore(root=mission_data)
     session = args.session
-    run_summary(store, session)
+
+    url = urlparse(args.influx)
+    influx_client = InfluxDBClient(host=url.hostname, port=url.port, database=url.path.strip('/'))
+
+    run_summary(influx_client, store, session)
 
 
 setup_logging()
