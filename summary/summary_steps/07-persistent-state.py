@@ -10,6 +10,9 @@ from utils import ensure_string
 def save_persistent_state():
     state_frames = only_type(session.all_frames, response_frames.PersistentStateFrame)
 
+    if len(state_frames) == 0:
+        return
+
     state_frames = sorted(state_frames, key=lambda f: f.seq())
 
     content = []
