@@ -66,6 +66,10 @@ if __name__ == '__main__':
         data = downloader.download(file_dict)
 
         return data
+
+    def jebnij_bekona():
+        import telecommand
+        sender.send(telecommand.SendBeacon())
     
     user_ns = {                                 
             'get_file': get_file, 
@@ -73,6 +77,7 @@ if __name__ == '__main__':
             'RemoteFile': RemoteFile, 
             'sender': sender,
             'receiver': rcv,
+            'jebnij_bekona': jebnij_bekona,
     }
 
     from shell_cmd import build_shell_commands
