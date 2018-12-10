@@ -45,7 +45,7 @@ def setup_logging():
     logging.getLogger('urllib3').setLevel(logging.WARNING)
 
 
-def run_summary(influx, store, current_session):
+def run_summary(influx, upload, store, current_session):
     steps_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'summary_steps')
     steps = os.listdir(steps_folder)
     steps = sorted(steps)
@@ -60,12 +60,14 @@ def run_summary(influx, store, current_session):
     scope_module.session = session
     scope_module.store = store
     scope_module.influx = influx
+    scope_module.upload = upload
 
     sys.modules['summary.scope'] = scope_module
 
     scope_globals = {
         'store': store,
         'session': session,
+        'scope': scope_module
     }
 
     session_step = session.expand_path('summary.py')
@@ -86,6 +88,7 @@ def parse_args():
 
     parser.add_argument('-m', '--mission', help="Path to mission repository", default=mission_repo_default)
     parser.add_argument('-d', '--influx', required=True, help="InfluxDB url")
+    parser.add_argument('-u', '--upload', help="Run upload actions", action='store_true')
     parser.add_argument('session', help="Session ID (number) to summarise", type=int)
 
     return parser.parse_args()
@@ -99,7 +102,7 @@ def main(args):
     url = urlparse(args.influx)
     influx_client = InfluxDBClient(host=url.hostname, port=url.port, database=url.path.strip('/'))
 
-    run_summary(influx_client, store, session)
+    run_summary(influx_client, args.upload, store, session)
 
 
 setup_logging()
