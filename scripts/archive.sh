@@ -1,16 +1,12 @@
 #!/bin/bash
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
+SELF_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
+source "$SELF_DIR/_common.sh"
 
 if [ -z "$1" ]; then
     echo "Please specify session number"
     echo "Usage:"
-    echo "./archive.sh <session_number> <session_date>"
-    exit 1
-fi
-
-if [[ -z "${PWSAT_GS_NAME}" ]]; then
-    echo "Please specify PWSAT_GS_NAME in .bashrc"
+    echo "./archive.sh <session_number>"
     exit 1
 fi
 
@@ -18,14 +14,20 @@ SESSION=$1
 echo "SESSION: ${SESSION}"
 ARCHIVE_FOLDER=/archive/${SESSION}
 
+if [[ -d ${ARCHIVE_FOLDER} ]]; then
+    confirm "Archive folder ${ARCHIVE_FOLDER} exists!" || exit 1
+fi
+
 mkdir -v ${ARCHIVE_FOLDER}
 
-mv /gs/iq_data_from_current_session_after_doppler_correction.raw ${ARCHIVE_FOLDER}/
-mv /gs/iq_data_from_current_session_raw.raw ${ARCHIVE_FOLDER}/
+mv /gs/iq_data_from_current_session_after_doppler_correction ${ARCHIVE_FOLDER}/
+mv /gs/iq_data_from_current_session_raw ${ARCHIVE_FOLDER}/
 
 mv /gs/uplink_audio.wav ${ARCHIVE_FOLDER}/
-mv /gs/uplink_frames ${ARCHIVE_FOLDER}/${PWSAT_GS_NAME}_uplink.frames
-mv /gs/downlink_frames ${ARCHIVE_FOLDER}/${PWSAT_GS_NAME}_downlink.frames
+mv /gs/uplink_frames ${ARCHIVE_FOLDER}/${GS_NAME}_uplink.frames
+mv /gs/downlink_frames ${ARCHIVE_FOLDER}/${GS_NAME}_downlink.frames
+mv /gs/watchdog_saved_frames_* ${ARCHIVE_FOLDER}/
+mv /gs/${GS_NAME}_versions ${ARCHIVE_FOLDER}/
 
 # Save mission artifacts
 
@@ -33,18 +35,23 @@ ls -l ${ARCHIVE_FOLDER}
 
 # Save mission artifacts
 
-REPOS_FOLDER=${DIR}/../../
+REPOS_FOLDER="$(dirname $(dirname ${SELF_DIR}))"
 ARTIFACT_FOLDER=${REPOS_FOLDER}/mission/sessions/${SESSION}/artifacts
 
-mkdir -v ${ARTIFACT_FOLDER}
+git -C ${MISSION} pull
 
-cp -vp ${ARCHIVE_FOLDER}/${PWSAT_GS_NAME}_downlink.frames ${ARTIFACT_FOLDER}/
-cp -vp ${ARCHIVE_FOLDER}/${PWSAT_GS_NAME}_uplink.frames ${ARTIFACT_FOLDER}/
+mkdir -vp ${ARTIFACT_FOLDER}
 
-cd ${ARTIFACT_FOLDER}
-ls -l
+cp -vp ${ARCHIVE_FOLDER}/${GS_NAME}_downlink.frames ${ARTIFACT_FOLDER}/
+cp -vp ${ARCHIVE_FOLDER}/${GS_NAME}_uplink.frames ${ARTIFACT_FOLDER}/
+cp -vp ${ARCHIVE_FOLDER}/${GS_NAME}_versions ${ARTIFACT_FOLDER}/
 
-git add ${PWSAT_GS_NAME}_downlink.frames ${PWSAT_GS_NAME}_uplink.frames
-git commit "${SESSION} - ${PWSAT_GS_NAME}"
-git log --stat
-git push
+ls -l ${ARTIFACT_FOLDER}
+
+git -C ${MISSION} add ${ARTIFACT_FOLDER}/${GS_NAME}_downlink.frames ${ARTIFACT_FOLDER}/${GS_NAME}_uplink.frames ${ARTIFACT_FOLDER}/${GS_NAME}_versions
+git -C ${MISSION} commit -m "${SESSION} - ${GS_NAME}"
+git -C ${MISSION} log --stat
+
+if confirm "Pushing to mission repo."; then
+    git -C ${MISSION} push
+fi
