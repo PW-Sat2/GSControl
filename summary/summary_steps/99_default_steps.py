@@ -9,6 +9,8 @@ list_requested_files()
 
 extract_downloaded_files()
 
+save_persistent_state()
+
 if session.has_artifact('telemetry.current'):
     if scope.upload:
         load_telemetry_file('telemetry.current')
