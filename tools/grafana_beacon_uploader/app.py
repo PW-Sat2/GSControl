@@ -76,6 +76,8 @@ class BeaconUploaderApp(object):
     def _receiver_worker(self):
         self._receiver_log.info("Waiting for beacons from tcp://%s:%d", self._args.downlink_host, self._args.downlink_port)
 
+        i = 0
+
         while True:
             frame = self._receiver.receive_no_wait()
             if frame:
@@ -88,8 +90,9 @@ class BeaconUploaderApp(object):
                 self._receiver_log.error('Nothing received')
                 continue
 
-            self._receiver_log.info('Pushing frame for processing')
-            self._new_frame_push.send_pyobj((datetime.utcnow(), frame))
+            self._receiver_log.info('Pushing frame {} for processing'.format(i))
+            self._new_frame_push.send_pyobj((datetime.utcnow(), i, frame))
+            i += 1
 
     def _publisher_worker(self):
         self._publisher_log.info('Waiting for frames and publishing to %s', self._args.influx)
@@ -99,10 +102,9 @@ class BeaconUploaderApp(object):
             if r[0] == self._publisher_abort:
                 self._publisher_log.info('Terminating')
                 break
-            else:
-                self._new_frame_pull.recv_pyobj()
 
-            (ts, frame) = self._new_frame_pull.recv_pyobj()
+            (ts, i, frame) = self._new_frame_pull.recv_pyobj()
+            self._receiver_log.info('Recevied frame {}'.format(i))
 
             data = self._receiver.decode_kiss(frame)
             try:
@@ -116,10 +118,12 @@ class BeaconUploaderApp(object):
         frame = self._frame_decoder.decode(raw_frame)
 
         if not isinstance(frame, BeaconFrame):
+            self._publisher_log.info("Not a beacon")
             return
 
         self._publisher_log.info("Received beacon frame")
         self._process_single_beacon(ts, frame)
+        self._publisher_log.info("Published")
 
     def _process_single_beacon(self, timestamp, beacon):
         telemetry = ParseBeacon.parse(beacon)
@@ -129,7 +133,7 @@ class BeaconUploaderApp(object):
         })
 
         url = urlparse(self._args.influx)
-        db = InfluxDBClient(host=url.hostname, port=url.port, database=url.path.strip('/'))
 
+        db = InfluxDBClient(host=url.hostname, port=url.port, database=url.path.strip('/'))
         db.write_points(points)
         db.close()
