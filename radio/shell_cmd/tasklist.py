@@ -45,7 +45,7 @@ def build(sender, rcv, frame_decoder, analyzer, ns):
 
         ns_wrapper = DictWrapper(ns)
 
-        step_no = start_from
+        step_no = start_from+1
         while step_no < len(tasks):
             [telecommand, action_type, wait] = tasks[step_no]
 
