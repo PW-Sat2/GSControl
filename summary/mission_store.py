@@ -3,7 +3,7 @@ from os import path
 import os
 
 from radio import analyzer
-from utils import ensure_byte_list
+from utils import ensure_byte_list, ensure_string
 from radio.radio_frame_decoder import FallbackResponseDecorator
 import response_frames
 
