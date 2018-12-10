@@ -97,6 +97,11 @@ class SessionView(object):
 
         return list(frames)
 
+    def has_artifact(self, file_name):
+        full_path = self.expand_artifact_path(file_name)
+
+        return path.exists(full_path)
+
 
 class MissionStore(object):
     def __init__(self, root):
