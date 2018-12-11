@@ -61,6 +61,7 @@ def gnuradio():
 
     gnuradio_socket.settimeout(0.1)
     print "Gnuradio Connected!"
+    time.sleep(2)
 
     while 1:
         try:
