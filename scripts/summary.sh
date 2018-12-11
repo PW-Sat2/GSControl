@@ -33,3 +33,7 @@ git -C ${MISSION} log --stat
 if confirm "Pushing summary tool results to mission repo."; then
     git -C ${MISSION} push
 fi
+
+if confirm "Uploading summary to grafana."; then
+    python2.7 ${GSCONTROL}/summary/run.py ${SESSION} -d ${GRAFANA_URL} -u
+fi
