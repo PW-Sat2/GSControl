@@ -35,6 +35,9 @@ if __name__ == '__main__':
                         help="Uplink host", default='localhost')
     parser.add_argument('-v', '--uplink-port', required=False,
                         help="Uplink port", default=7000, type=int)
+    parser.add_argument('-s', '--session', required=False,
+                        help="Current session to fetch tasklist", default=0, type=int)
+    parser.add_argument('-r', '--receiver', help="Start receiver loop", action='store_true')
 
     args = parser.parse_args()
     imp.load_source('config', args.config)
@@ -99,4 +102,15 @@ if __name__ == '__main__':
     shell.run_code('from radio.task_actions import *')
     shell.run_code('import response_frames')
     shell.run_code('import response_frames as rf')
+
+    if args.session != 0:
+        tasklist_file = os.path.join(os.path.dirname(__file__), '..', '..', 'mission', 'sessions', str(args.session), 'tasklist.py')
+        shell.run_code('tasks = load(\"{}\")'.format(tasklist_file))
+        shell.run_code('analyze(tasks)')
+        shell.set_next_input('run(tasks)')
+
+    if args.receiver:
+        shell.run_code('frames = receiver_loop()')
+        shell.set_next_input('frames = receiver_loop()')
+
     shell()
