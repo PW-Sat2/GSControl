@@ -27,4 +27,9 @@ if confirm "Getting all.frames. Press 'y' when ready."; then
     ${SELF_DIR}/download_all_frames.sh ${SESSION}
 fi
 
+if confirm "Waiting for running Uber Session Summary Tool. Are you ready?"; then
+    ${SELF_DIR}/summary.sh ${SESSION}
+fi
+
+
 rm ${SESSION_FILE}
