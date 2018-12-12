@@ -3,6 +3,8 @@
 SELF_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 source "$SELF_DIR/_common.sh"
 
+source ${PWSAT_GS_GNURADIO}/setup_env.sh
+
 if [ -z "$1" ]; then
     echo "Please specify session number"
     echo "Usage:"

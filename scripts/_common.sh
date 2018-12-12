@@ -21,4 +21,4 @@ if [[ -z ${GS_NAME} ]]; then
 	exit 1
 fi
 
-source ${PWSAT_GS_GNURADIO}/setup_env.sh
+#source ${PWSAT_GS_GNURADIO}/setup_env.sh
