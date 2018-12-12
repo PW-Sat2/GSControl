@@ -1268,7 +1268,7 @@ class frames_counter(gr.sync_block):
     </param>
     <param>
       <key>w</key>
-      <value>0.08</value>
+      <value>0.02</value>
     </param>
     <param>
       <key>maxoutbuf</key>
@@ -1516,7 +1516,7 @@ class frames_counter(gr.sync_block):
     </param>
     <param>
       <key>bw</key>
-      <value>symb_rate*3</value>
+      <value>symb_rate + 500</value>
     </param>
     <param>
       <key>center_frequency</key>
@@ -1532,7 +1532,7 @@ class frames_counter(gr.sync_block):
     </param>
     <param>
       <key>transition_width</key>
-      <value>1000</value>
+      <value>symb_rate/10</value>
     </param>
   </block>
   <block>
@@ -2420,7 +2420,7 @@ class frames_counter(gr.sync_block):
     </param>
     <param>
       <key>bw</key>
-      <value>samp_rate</value>
+      <value>samp_rate/4</value>
     </param>
     <param>
       <key>alias</key>
@@ -2452,7 +2452,7 @@ class frames_counter(gr.sync_block):
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1128, 500)</value>
+      <value>(1144, 560)</value>
     </param>
     <param>
       <key>gui_hint</key>
@@ -3812,7 +3812,7 @@ class frames_counter(gr.sync_block):
     </param>
     <param>
       <key>bw</key>
-      <value>samp_rate</value>
+      <value>samp_rate/4</value>
     </param>
     <param>
       <key>alias</key>
@@ -3840,7 +3840,7 @@ class frames_counter(gr.sync_block):
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1128, 412)</value>
+      <value>(1144, 488)</value>
     </param>
     <param>
       <key>gui_hint</key>
@@ -4251,6 +4251,65 @@ class frames_counter(gr.sync_block):
     </param>
   </block>
   <block>
+    <key>rational_resampler_xxx</key>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>affinity</key>
+      <value></value>
+    </param>
+    <param>
+      <key>decim</key>
+      <value>4</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>fbw</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(1024, 368)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>270</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>rational_resampler_xxx_0</value>
+    </param>
+    <param>
+      <key>interp</key>
+      <value>1</value>
+    </param>
+    <param>
+      <key>maxoutbuf</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>minoutbuf</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>taps</key>
+      <value></value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>ccc</value>
+    </param>
+  </block>
+  <block>
     <key>root_raised_cosine_filter</key>
     <param>
       <key>alpha</key>
@@ -4419,13 +4478,7 @@ class frames_counter(gr.sync_block):
   </connection>
   <connection>
     <source_block_id>fractional_resampler_xx_0</source_block_id>
-    <sink_block_id>qtgui_freq_sink_x_0_0</sink_block_id>
-    <source_key>0</source_key>
-    <sink_key>0</sink_key>
-  </connection>
-  <connection>
-    <source_block_id>fractional_resampler_xx_0</source_block_id>
-    <sink_block_id>qtgui_waterfall_sink_x_1</sink_block_id>
+    <sink_block_id>rational_resampler_xxx_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
@@ -4474,6 +4527,18 @@ class frames_counter(gr.sync_block):
   <connection>
     <source_block_id>pad_source_0</source_block_id>
     <sink_block_id>qtgui_waterfall_sink_x_1_0</sink_block_id>
+    <source_key>0</source_key>
+    <sink_key>0</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>rational_resampler_xxx_0</source_block_id>
+    <sink_block_id>qtgui_freq_sink_x_0_0</sink_block_id>
+    <source_key>0</source_key>
+    <sink_key>0</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>rational_resampler_xxx_0</source_block_id>
+    <sink_block_id>qtgui_waterfall_sink_x_1</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
