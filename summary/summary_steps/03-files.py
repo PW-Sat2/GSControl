@@ -142,11 +142,14 @@ def extract_file(file_name, also=[]):
 
         files = get_downloaded_files(s.tasklist, session_frames)
 
-        file = files[file_name]
+        if file_name in files:
+            file = files[file_name]
 
-        file_frames.extend(file['ChunkFrames'])
-        requested_chunks.update(file['RequestedChunks'])
-        error_chunk_ids.update(file['ErrorChunks'])
+            file_frames.extend(file['ChunkFrames'])
+            requested_chunks.update(file['RequestedChunks'])
+            error_chunk_ids.update(file['ErrorChunks'])
+        else:
+            logging.warning('File {} not found in session {}'.format(file_name, s.session_number))
 
 
     file_frames = unique_seqs(file_frames)
@@ -164,12 +167,13 @@ def extract_file(file_name, also=[]):
 
     session_ids = sorted(map(lambda s: str(s.session_number), sessions))
 
-    logging.info('Saving extracted file (sessions: {}) {} ({} chunks requested, {} downloaded, {} missing)'.format(
-        ', '.join(session_ids),
+    logging.info('Saving extracted file {} (sessions: {}) ({} chunks requested, {} downloaded, {} missing, {} errors)'.format(
         file_name,
+        ', '.join(session_ids),
         len(file['RequestedChunks']),
         len(file['DownloadedChunks']),
         len(file['MissingChunks']),
+        len(file['ErrorChunks'])
     ))
 
     write_file_from_description(path.join('assembled', file_name.strip('/')), file)
