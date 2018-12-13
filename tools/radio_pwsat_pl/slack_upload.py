@@ -15,7 +15,7 @@ args = parser.parse_args()
 slack_url = args.url
 
 def get_frames():
-    all_frames = download_files()
+    all_frames = download_files(only_two_days=True)
 
     # leave only unique data frames
     all_frames = sorted(list({f.data_b64(): f for f in all_frames}.values()))

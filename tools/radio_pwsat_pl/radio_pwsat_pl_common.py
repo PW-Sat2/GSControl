@@ -91,7 +91,7 @@ class SMLFrame:
             return self.date.strftime("%Y-%m-%d_%H:%M:%S:%f")
 
 
-def download_files():
+def download_files(only_two_days=False):
     import urllib2
     from zipfile import ZipFile
 
@@ -103,9 +103,11 @@ def download_files():
     shutil.rmtree(bin_files_directory, ignore_errors=True)
     os.mkdir(bin_files_directory)
 
-    url_with_bin_files = 'https://radio.pw-sat.pl/communication/log/export?f.from=2018-12-04&f.tags=public'
-    # url_with_bin_files = 'https://radio.pw-sat.pl/communication/log/export?f.from=2018-12-05&f.tags=file+send'
-    # url_with_bin_files = 'https://radio.pw-sat.pl/communication/log/export?f.from=2018-12-04'
+    url_with_bin_files = 'https://radio.pw-sat.pl/communication/log/export?f.tags=public&'
+    if only_two_days:
+        url_with_bin_files += 'f.from=' + (datetime.now()-timedelta(days=1)).strftime("%Y-%m-%d")
+    else:
+        url_with_bin_files += 'f.from=2018-12-04'
 
     zip_file_bin = urllib2.urlopen(url_with_bin_files)
     with open(zip_file, 'wb') as output:
