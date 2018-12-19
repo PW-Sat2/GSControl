@@ -32,6 +32,8 @@ from tools.parse_beacon import ParseBeacon
 gs_id_elka = 'e3fe087d-bf9c-4e4d-80c7-3366cfdec3e3'
 gs_id_fp = '721762dd-8b8f-44b3-bfa7-66cfb12d39e1'
 
+blacklist_user_id = ['f13d30a8-9bd2-4f26-93ad-32812d2e2443',]
+
 class SMLFrame:
     def __init__(self, filename, data):
         regexp = re.match("(\d{8}-\d{6})-(.{36})-(.{36})\.bin", filename)
@@ -81,6 +83,13 @@ class SMLFrame:
 
         return True
 
+    def from_backlisted_user(self):
+        if self.user_id in blacklist_user_id:
+            # print "Frame from blacklisted user ", self.frame_id
+            return True
+
+        return False
+
     def __getitem__(self, item):
         return self.data[item]
 
@@ -114,17 +123,15 @@ def download_files(only_two_days=False):
         output.write(zip_file_bin.read())
 
     zip = ZipFile(zip_file)
-    zip.extractall(bin_files_directory)
-
     frames = []
+    filenames = zip.namelist()
 
-    files_glob = glob(os.path.join(bin_files_directory, '*.bin'))
-
-    for filename in files_glob:
-        with open(filename, 'rb') as decoded_frame:
-            decoded_frame = SMLFrame(os.path.basename(filename), bytearray(decoded_frame.read()))
-            if decoded_frame.valid():
-                frames.append(decoded_frame)
+    for filename in filenames:
+        decoded_frame = zip.read(filename)
+        decoded_frame = SMLFrame(os.path.basename(filename), bytearray(decoded_frame))
+        if decoded_frame.valid() and not decoded_frame.from_backlisted_user():
+            frames.append(decoded_frame)
+    zip.close()
     shutil.rmtree(bin_files_directory, ignore_errors=True)
 
     # remove duplicate frames
