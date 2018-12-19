@@ -18,6 +18,7 @@ def save_memory_files():
 
     for cid in packs.keys():
         chunks = sorted(packs[cid], key=lambda f: f.seq())
+        chunks = unique_seqs(chunks)
 
         with session.open_artifact('memory_content_{}'.format(cid), 'wb') as f:
             for c in chunks:
