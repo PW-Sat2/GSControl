@@ -12,9 +12,9 @@ SESSION_FILE="/gs/current_session.lock"
 GSCONTROL_CONFIG=/gs/config.py
 GNURADIO_CONFIG=/gs/gr_config
 
-confirm() {
+confirm_ask() {
     # call with a prompt string or use a default
-    read -r -p "${1} Are you sure you want to continue? [y/N] " response
+    read -r -p "${1} [y/N] " response
     case "$response" in
         [yY][eE][sS]|[yY])
             true
@@ -23,4 +23,8 @@ confirm() {
             false
             ;;
     esac
+}
+
+confirm() {
+    confirm_ask "${1} Are you sure you want to continue?"
 }

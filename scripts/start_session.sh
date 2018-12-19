@@ -24,11 +24,23 @@ source "$SELF_DIR/versions.sh"
 
 echo -e "\n"
 
+# update mission repository
+git -C ${REPOS}/mission pull
+
 # save versions file
 ${SELF_DIR}/versions.sh > /gs/${GS_NAME}_versions 2>&1
 
-# update mission repository
-git -C ${REPOS}/mission pull
+while [[ "${MISSION_MASTER_REV}" != "${MISSION_REV}" ]]; do
+    if ! confirm_ask "Repo Mission NOT clean. Try again?"; then
+        break
+    fi
+
+    # update mission repository
+    git -C ${REPOS}/mission pull
+
+    # save versions file
+    ${SELF_DIR}/versions.sh > /gs/${GS_NAME}_versions 2>&1
+done
 
 if [[ "${MISSION_MASTER_REV}" != "${MISSION_REV}" ]]; then
     confirm "Repo Mission NOT clean."  || exit 1
@@ -39,9 +51,11 @@ if [[ "${GSCONTROL_MASTER_REV}" != "${GSCONTROL_REV}" ]]; then
 fi
 
 # check if ham app is running
-if ! pgrep -fx ".*PW-Sat2_Ground_Station" >> /dev/null; then
-    confirm "HAM app not running." || exit 1
-fi
+while [[ ! $(pgrep -fx ".*PW-Sat2_Ground_Station") ]]; do
+    if ! confirm_ask "HAM app not running. Try again?"; then
+        exit 1
+    fi
+done
 
 ARCHIVE_FOLDER=/archive/${SESSION}
 if [[ -d ${ARCHIVE_FOLDER} ]]; then
@@ -54,6 +68,19 @@ if [[ -f ${DOWNLINK_FILE_IN_REPO} ]]; then
 fi
 
 TASKLIST=${REPOS}/mission/sessions/${SESSION}/tasklist.py
+# check if tasklist exist
+while [[ ! -f ${TASKLIST} ]]; do
+    if ! confirm_ask "Tasklist '${TASKLIST}' does not exists! Pull again?"; then
+        break
+    fi
+
+    # update mission repository
+    git -C ${REPOS}/mission pull
+
+    # save versions file
+    ${SELF_DIR}/versions.sh > /gs/${GS_NAME}_versions 2>&1
+done
+
 if [[ ! -f ${TASKLIST} ]]; then
 	confirm "Tasklist '${TASKLIST}' does not exists! " || exit 1
 fi
