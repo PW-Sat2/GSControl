@@ -147,6 +147,7 @@ tasks = [
     [tc.PerformDetumblingExperiment(correlation_id=5, duration=datetime.timedelta(hours=16), sampling_interval=datetime.timedelta(seconds=2)), Send, WaitMode.Wait],
     [tc.ReadMemory(11, 0, 0), Send, WaitMode.Wait],
     [tc.ReadMemory(11, 0xff, 0x10), Send, WaitMode.Wait],
+    [tc.ReadMemory(11, 0xff, 230 * 38), Send, WaitMode.Wait],
     [tc.ReadMemory(11, 0xff, 0xffff), Send, WaitMode.Wait],
     [tc.ReadMemory(11, 0xffffffff, 0x1), Send, WaitMode.Wait],
     [tc.TakePhotoTelecommand(10, CameraLocation.Wing, PhotoResolution.p128, 29, datetime.timedelta(seconds = 0), "photo.jpg"), SendReceive, WaitMode.NoWait],
