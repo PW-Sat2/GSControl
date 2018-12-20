@@ -104,6 +104,10 @@ class TelecommandData(object):
 
         self.validate_wait_mode(wait_mode, notes)
 
+        response_frame_count = self.get_downlink_frames_count()
+        if self.get_downlink_frames_count() > limits.max_response_frames():
+            notes.error('Too many response frames requested: {}. At most {} frames are allowed'.format(response_frame_count, limits.max_response_frames()))
+
     def process(self, state, notes, send_mode, wait_mode, limits):
         self.process_common_command(state, notes, send_mode, wait_mode, limits)
 
@@ -642,10 +646,7 @@ class ReadMemoryData(TelecommandData):
         super(ReadMemoryData, self).__init__(telecommand)
 
     def get_response_bytes_count(self):
-        size = self.telecommand.size
-        offset = self.telecommand.offset
-        size = min(size, pow(2, 32) - 1 - offset)
-        return size * Limits().max_frame_payload_size()
+        return self.telecommand.size
 
     def get_requires_wait(self):
         return True
@@ -657,16 +658,11 @@ class ReadMemoryData(TelecommandData):
         self.process_common_command(state, notes, send_mode, wait_mode, limits)
         size = self.telecommand.size
         offset = self.telecommand.offset
-        maxSize = limits.max_correlated_frame_payload_size() * limits.max_response_frames()
-        if size > maxSize:
-            notes.error('Too many response frames are requested')
-        elif size == 0:
+        if size == 0:
             notes.error('Empty memory block requested')
 
         if (size + offset) > (pow(2, 32) - 1):
             notes.error('Wrapping around memory space is not allowed')
-        
-        
 
 # --------------------------
 class SetPeriodicMessageTelecommandData(SimpleTelecommandData):
@@ -701,13 +697,8 @@ class SendPeriodicMessageTelecommandData(SimpleTelecommandData):
     def __init__(self, telecommand):
         super(SendPeriodicMessageTelecommandData, self).__init__(telecommand, 200)
 
-    def process(self, state, notes, send_mode, wait_mode, limits):
-        self.process_common_command(state, notes, send_mode, wait_mode, limits)
-        
-        count = self.telecommand.count
-        if count > limits.max_response_frames():
-            notes.error("Too many periodic messsages are requested: {0}".format(count))
-        
+    def get_downlink_frames_count(self):
+        return self.telecommand.count
 
 class TakePhotoTelecommandData(SimpleTelecommandData):
     ALLOWED_LOCATIONS = [CameraLocation.Nadir, CameraLocation.Wing]
