@@ -1,0 +1,31 @@
+import argparse
+from base64 import b64decode
+
+import progressbar
+import zmq
+import time
+
+
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('file', help='Frames file to replace')
+    parser.add_argument('port', help='ZMQ output port', type=int)
+    return parser.parse_args()
+
+
+def run(args):
+    ctx = zmq.Context.instance()
+    socket = ctx.socket(zmq.PUB)
+    socket.bind("tcp://%s:%d" % ('*', args.port))
+
+    with open(args.file) as f:
+        lines = f.readlines()
+        for line in progressbar.progressbar(lines):
+            frame = line.split(',')[2]
+            frame = b64decode(frame)
+            socket.send(frame)
+            time.sleep(0.2)
+
+
+
+run(parse_args())
