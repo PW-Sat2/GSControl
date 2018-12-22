@@ -80,23 +80,31 @@ def build(sender, rcv, frame_decoder, analyzer, ns):
                         (Token.String, "Wait ('n'/'r'/'p'/number for next/retry/previous/goto, then <Enter>)")
                     ], style=style)
 
-                    user = ""
-                    while user[:1] != "n" and user[:1] != "r" \
-                        and user[:1] != "p" and not (user[:1] >= '0' and user[:1] <= '9'):
-                        user = custom_raw_input()
-                    if user == 'r':
-                        step_no -= 1
-                    elif user == 'p':
-                        step_no -= 2
-                    elif (user[:1] >= '0' and user[:1] <= '9'):
-                        user_step_no = -1
-                        try:
-                            user_step_no = int(user)
-                        except ValueError:
-                            pass
-                        if user_step_no > -1:
-                            step_no = user_step_no - 2
-                
+                    user_input = ""
+                    while True:
+                        user_input = custom_raw_input()
+                        if user_input == 'n':
+                            break
+                        elif user_input == 'r':
+                            step_no -= 1
+                            break
+                        elif user_input == 'p':
+                            step_no -= 2
+                            break
+                        elif user_input[:1] >= '0' and user_input[:1] <= '9':
+                            user_step_no = -1
+                            try:
+                                user_step_no = int(user_input)
+                            except ValueError:
+                                pass
+                            if user_step_no > -1:
+                                step_no = user_step_no - 2
+                                break
+
+                        print_tokens([
+                            (Token.Action, "Unknown command '{}'. ".format(user_input)),
+                            (Token.String, "Please repeat: "),
+                            ], style=style)
                 step_no += 1
         except KeyboardInterrupt:
             print_tokens([
