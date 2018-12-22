@@ -46,45 +46,73 @@ def build(sender, rcv, frame_decoder, analyzer, ns):
         ns_wrapper = DictWrapper(ns)
 
         step_no = start_from - 1
-        while step_no < len(tasks):
-            [telecommand, action_type, wait] = tasks[step_no]
 
-            tokens = [
-                (Token.String, "["),
-                (Token.Timestamp, datetime.now().strftime('%Y-%m-%d %H:%M:%S:%f')),
-                (Token.String, "] "),
-                (Token.String, "Step "),
-                (Token.CurrentStep, str(step_no + 1)),
-                (Token.String, "/"),
-                (Token.TotalSteps, str(len(tasks))),
-                (Token.String, ": "),
-                (Token.Action, action_type.__name__),
-                (Token.String, "("),
-                (Token.Telecommand, pprint.pformat(telecommand)),
-                (Token.String, ")... ")
-            ]
+        try:
+            while step_no < len(tasks) and step_no >= 0:
+                [telecommand, action_type, wait] = tasks[step_no]
 
-            print_tokens(tokens, style=style)
+                tokens = [
+                    (Token.String, "["),
+                    (Token.Timestamp, datetime.now().strftime('%Y-%m-%d %H:%M:%S:%f')),
+                    (Token.String, "] "),
+                    (Token.String, "Step "),
+                    (Token.CurrentStep, str(step_no + 1)),
+                    (Token.String, "/"),
+                    (Token.TotalSteps, str(len(tasks))),
+                    (Token.String, ": "),
+                    (Token.Action, action_type.__name__),
+                    (Token.String, "("),
+                    (Token.Telecommand, pprint.pformat(telecommand)),
+                    (Token.String, ")... ")
+                ]
 
-            action_type(telecommand).do(ns_wrapper)
+                print_tokens(tokens, style=style)
 
-            if wait is WaitMode.NoWait:
-                print_tokens([
-                    (Token.String, "Done"),
-                    (Token.String, "\n")
-                ], style=style)
-            else:
-                print_tokens([
-                    (Token.String, "Wait ('n'/'r' for next/retry, then <Enter>)")
-                ], style=style)
+                action_type(telecommand).do(ns_wrapper)
 
-                user = ""
-                while user[:1] != "n" and user[:1] != "r":
-                    user = custom_raw_input()
-                if user == 'r':
-                    step_no -= 1
+                if wait is WaitMode.NoWait:
+                    print_tokens([
+                        (Token.String, "Done"),
+                        (Token.String, "\n")
+                    ], style=style)
+                else:
+                    print_tokens([
+                        (Token.String, "Wait ('n'/'r'/'p'/number for next/retry/previous/goto, then <Enter>)")
+                    ], style=style)
 
-            step_no += 1
+                    user_input = ""
+                    while True:
+                        user_input = custom_raw_input()
+                        if user_input == 'n':
+                            break
+                        elif user_input == 'r':
+                            step_no -= 1
+                            break
+                        elif user_input == 'p':
+                            step_no -= 2
+                            break
+                        elif user_input[:1] >= '0' and user_input[:1] <= '9':
+                            user_step_no = -1
+                            try:
+                                user_step_no = int(user_input)
+                            except ValueError:
+                                pass
+                            if user_step_no > -1:
+                                step_no = user_step_no - 2
+                                break
+
+                        print_tokens([
+                            (Token.Action, "Unknown command '{}'. ".format(user_input)),
+                            (Token.String, "Please repeat: "),
+                            ], style=style)
+                step_no += 1
+        except KeyboardInterrupt:
+            print_tokens([
+                (Token.String, "\n"),
+                (Token.Action, "Aborted."),
+                (Token.String, "\n")
+            ], style=style)
+            pass
     
     def analyze(tasks):
         analyzer.run(tasks)
