@@ -1,15 +1,21 @@
+import sys
 from radio_pwsat_pl_common import *
 
-all_frames = download_files()
+search_timespan = 30
+if len(sys.argv) > 1:
+    try:
+        timespan_parameter = int(sys.argv[1])
+        search_timespan = timespan_parameter
+    except ValueError:
+        pass
 
-merge_and_save_bin_beacons(only_unique_packets(all_frames), 'Turbo-Ola.bin')
-
+all_frames = download_files(True)
 
 # ----- filter by current session -----
 
 timestamp = datetime.utcnow()
 # timestamp = datetime.strptime("2018-12-06_09-25-00", '%Y-%m-%d_%H-%M-%S')
-all_frames = filter_by_time(all_frames, timestamp, (-30, 10))
+all_frames = filter_by_time(all_frames, timestamp, (-search_timespan, 10))
 
 # save frames
 save_frames_to_csv(get_elka_frames(all_frames), 'elka_downlink.frames')
