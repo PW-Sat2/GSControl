@@ -1,6 +1,5 @@
 import base64
 import datetime
-import time
 
 # print 'aa'
 #
@@ -15,11 +14,13 @@ import requests
 import json
 import progressbar
 import urllib3
+from datetime import timedelta
+import time
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 BASE_URL = 'https://radio.pw-sat.pl'
-
+TZ_OFFSET = timedelta(seconds=time.timezone)
 
 def load_frames(file_path):
     with open(file_path, 'r') as f:
@@ -37,10 +38,10 @@ def load_frames(file_path):
 
 def create_session(credentials_file):
     s = requests.Session()
-    s.proxies = {
-      'http': 'http://127.0.0.1:8888',
-      'https': 'http://127.0.0.1:8888',
-    }
+#    s.proxies = {
+#      'http': 'http://127.0.0.1:8888',
+#      'https': 'http://127.0.0.1:8888',
+#    }
     s.verify = False
 
     s.headers = {
@@ -57,13 +58,14 @@ def create_session(credentials_file):
 
 
 def put_frame(session, (ts, frame_content)):
+    local_ts = ts - TZ_OFFSET
     data = {
         'frame': frame_content,
-        'timestamp': int(time.mktime(ts.timetuple())) * 1000,
+        'timestamp': int(time.mktime(local_ts.timetuple())) * 1000,
         'traffic': 'Rx'
     }
 
-    session.put(BASE_URL + '/communication/frame', json=data)
+    r = session.put(BASE_URL + '/communication/frame', json=data)
 
 
 def main(credentials_file, frames_file):
