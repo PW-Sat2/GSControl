@@ -1,15 +1,5 @@
 import base64
 import datetime
-
-# print 'aa'
-#
-# with open("C:/Users/Novakov/Downloads/b50c5a39-12a9-40ce-9e5c-cdaffe512cc0.bin", 'rb') as f:
-#     text = f.read()
-#
-# with open('D:/tmp/test.frames', 'w') as f:
-#     for i in range(0, 200):
-#         f.write('2018-09-11_10:49:16:803446,D,{}\n'.format(base64.b64encode(text[1:])))
-
 import requests
 import json
 import progressbar
@@ -32,16 +22,12 @@ def load_frames(file_path):
                 continue
 
             ts = datetime.datetime.strptime(ts, "%Y-%m-%d_%H:%M:%S:%f")
-
             yield ts, frame_content
 
 
 def create_session(credentials_file):
     s = requests.Session()
-#    s.proxies = {
-#      'http': 'http://127.0.0.1:8888',
-#      'https': 'http://127.0.0.1:8888',
-#    }
+
     s.verify = False
 
     s.headers = {
