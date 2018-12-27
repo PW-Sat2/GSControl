@@ -63,6 +63,13 @@ if __name__ == '__main__':
     sender = Sender(args.uplink_host, args.uplink_port, source_callsign=config['COMM_UPLINK_CALLSIGN'])
     rcv = Receiver(args.downlink_host, args.downlink_port)
     analyzer = Analyzer()
+
+
+    def static_var(varname, value):
+        def decorate(func):
+            setattr(func, varname, value)
+            return func
+        return decorate
     
     def get_file(file_dict):
         downloader = RemoteFile(sender, rcv)
@@ -73,6 +80,16 @@ if __name__ == '__main__':
     def jebnij_bekona():
         import telecommand
         sender.send(telecommand.SendBeacon())
+
+    @static_var("cid", 200)
+    def files():
+        import telecommand
+        if files.cid == 255:
+            files.cid = 200
+
+        sender.send(telecommand.ListFiles(files.cid, '/'))
+        print("File list requested, cid={0}".format(files.cid))
+        files.cid += 1
     
     user_ns = {                                 
             'get_file': get_file, 
@@ -81,6 +98,7 @@ if __name__ == '__main__':
             'sender': sender,
             'receiver': rcv,
             'jebnij_bekona': jebnij_bekona,
+            'files': files
     }
 
     from shell_cmd import build_shell_commands
