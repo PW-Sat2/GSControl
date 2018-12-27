@@ -52,12 +52,17 @@ def process_frame(already_received, frame):
     if frame.correlation_id != last_cid:
         already_received.clear()
         last_cid = frame.correlation_id
+        print("\n\n====================================")
         print("Correlation id: {0}".format(frame.correlation_id))
+        print("====================================\n")
 
     if frame.seq() in already_received:
         return
 
-    pprint.pprint(RemoteFileTools.parse_file_list(frame))
+    file_list = RemoteFileTools.parse_file_list(frame)
+
+    for f in file_list:
+        print("{0}:\t{1}".format(f['File'], f['Chunks']))
 
     already_received.add(frame.seq())
 
