@@ -40,47 +40,41 @@ def parse_frame(raw_frame):
     return Decoder.decode(ensure_byte_list(raw_frame[16:-2]))
 
 
-def display_time(t):
-    print '\t', Fore.CYAN, 'Mission time: {}{}{}'.format(Fore.GREEN, t, Fore.GREEN), Style.RESET_ALL
-
-
-def display_gyro(g):
-    x = AngularRate(g['X'])
-    y = AngularRate(g['Y'])
-    z = AngularRate(g['Z'])
-    t = GyroTemperature(g['Temperature'])
-    print '\t', Fore.BLUE, 'Gyro', Fore.WHITE, \
-        ' X: {4}{0:.2f}{5} Y: {4}{1:.2f}{5} Z: {4}{2:.2f}{5} deg/sec Temperature {4}{3:.2f}{5} C'\
-            .format(x.converted, y.converted, z.converted, t.converted,  Fore.GREEN, Fore.WHITE), Style.RESET_ALL
-
-
 def rtd_to_centigrades(raw):
     return pt1000_res_to_temp((raw / 4096.0 * 1000) / (1 - raw / 4096.0))
 
 
-def display_sail(s):
-    if s['Open']:
-        print '\t', Fore.BLACK + Back.WHITE + 'SAIL DEPLOYED!!!!!!1111', Style.RESET_ALL
-
-    t = s['Temperature']
-
-    print '\t', Fore.MAGENTA, 'Sail temperature {1}{0}{2} C'.format(rtd_to_centigrades(t), Fore.GREEN, Fore.WHITE)
-
-
 def display_experiment_info(exp):
+    full_set = 0
+
     for entry in exp:
         if entry == 'Synchronization':
             pass
         elif 'time' in entry:
-            display_time(entry['time'])
+            mission_time = entry['time']
         elif 'Gyro' in entry:
-            display_gyro(entry['Gyro'])
+            gyro = entry['Gyro']
+            full_set += 1
         elif 'Sail' in entry:
-            display_sail(entry['Sail'])
+            sail = entry['Sail']
+            full_set += 1
         elif 'Padding' in entry:
             pass
         else:
             print entry
+
+        if full_set > 1:
+            full_set = 0
+            try:
+                print("X: {0:4.2f} \t Y: {1:4.2f} \t Z: {2:4.2f} */s \t {3} \t {4:2.1f} *C".format(
+                    AngularRate(gyro['X']).converted,
+                    AngularRate(gyro['Y']).converted,
+                    AngularRate(gyro['Z']).converted,
+                    "SAIL OPEN" if sail['Open'] else "SAIL NOT OPEN",
+                    rtd_to_centigrades(sail['Temperature'])))
+            except:
+                print("Exception!")
+
 
 
 def process_frame(already_received, frame):
