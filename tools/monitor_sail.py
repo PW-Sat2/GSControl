@@ -1,6 +1,8 @@
 import argparse
 import os
 import sys
+from datetime import datetime
+
 from colorama import Fore, Style, Back
 import zmq
 from zmq.utils.win32 import allow_interrupt
@@ -45,33 +47,36 @@ def rtd_to_centigrades(raw):
 
 
 def display_experiment_info(exp):
-    full_set = 0
+    last_entry = {}
+
+    def all_in():
+        required = ['time', 'Gyro', 'Sail']
+
+        return all(map(lambda x: x in last_entry, required))
 
     for entry in exp:
         if entry == 'Synchronization':
             pass
         elif 'time' in entry:
-            mission_time = entry['time']
+            last_entry.clear()
+            last_entry.update(entry)
         elif 'Gyro' in entry:
-            gyro = entry['Gyro']
-            full_set += 1
+            last_entry.update(entry)
         elif 'Sail' in entry:
-            sail = entry['Sail']
-            full_set += 1
+            last_entry.update(entry)
         elif 'Padding' in entry:
             pass
         else:
             print entry
 
-        if full_set > 1:
-            full_set = 0
+        if all_in():
             try:
                 print("X: {0:4.2f} \t Y: {1:4.2f} \t Z: {2:4.2f} */s \t {3} \t {4:2.1f} *C".format(
-                    AngularRate(gyro['X']).converted,
-                    AngularRate(gyro['Y']).converted,
-                    AngularRate(gyro['Z']).converted,
-                    "SAIL OPEN" if sail['Open'] else "SAIL NOT OPEN",
-                    rtd_to_centigrades(sail['Temperature'])))
+                    AngularRate(last_entry['Gyro']['X']).converted,
+                    AngularRate(last_entry['Gyro']['Y']).converted,
+                    AngularRate(last_entry['Gyro']['Z']).converted,
+                    "SAIL OPEN" if last_entry['Sail']['Open'] else "SAIL NOT OPEN",
+                    rtd_to_centigrades(last_entry['Sail']['Temperature'])))
             except:
                 print("Exception!")
 
@@ -82,11 +87,11 @@ def process_frame(already_received, frame):
         return
 
     if frame.seq() in already_received:
-        pass
+        return
 
     exp = ExperimentFileParser.parse_partial(ensure_string(frame.payload()))
 
-    print 'Sail experiment chunk {}'.format(frame.seq())
+    print '{:%H:%M:%S} Sail experiment chunk {}'.format(datetime.now(), frame.seq())
     display_experiment_info(exp[0])
     print Style.RESET_ALL
 
