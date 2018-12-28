@@ -1,6 +1,8 @@
 import argparse
 import os
 import sys
+from datetime import datetime
+
 from colorama import Fore, Style, Back
 import zmq
 from zmq.utils.win32 import allow_interrupt
@@ -40,47 +42,44 @@ def parse_frame(raw_frame):
     return Decoder.decode(ensure_byte_list(raw_frame[16:-2]))
 
 
-def display_time(t):
-    print '\t', Fore.CYAN, 'Mission time: {}{}{}'.format(Fore.GREEN, t, Fore.GREEN), Style.RESET_ALL
-
-
-def display_gyro(g):
-    x = AngularRate(g['X'])
-    y = AngularRate(g['Y'])
-    z = AngularRate(g['Z'])
-    t = GyroTemperature(g['Temperature'])
-    print '\t', Fore.BLUE, 'Gyro', Fore.WHITE, \
-        ' X: {4}{0:.2f}{5} Y: {4}{1:.2f}{5} Z: {4}{2:.2f}{5} deg/sec Temperature {4}{3:.2f}{5} C'\
-            .format(x.converted, y.converted, z.converted, t.converted,  Fore.GREEN, Fore.WHITE), Style.RESET_ALL
-
-
 def rtd_to_centigrades(raw):
     return pt1000_res_to_temp((raw / 4096.0 * 1000) / (1 - raw / 4096.0))
 
 
-def display_sail(s):
-    if s['Open']:
-        print '\t', Fore.BLACK + Back.WHITE + 'SAIL DEPLOYED!!!!!!1111', Style.RESET_ALL
-
-    t = s['Temperature']
-
-    print '\t', Fore.MAGENTA, 'Sail temperature {1}{0}{2} C'.format(rtd_to_centigrades(t), Fore.GREEN, Fore.WHITE)
-
-
 def display_experiment_info(exp):
+    last_entry = {}
+
+    def all_in():
+        required = ['time', 'Gyro', 'Sail']
+
+        return all(map(lambda x: x in last_entry, required))
+
     for entry in exp:
         if entry == 'Synchronization':
             pass
         elif 'time' in entry:
-            display_time(entry['time'])
+            last_entry.clear()
+            last_entry.update(entry)
         elif 'Gyro' in entry:
-            display_gyro(entry['Gyro'])
+            last_entry.update(entry)
         elif 'Sail' in entry:
-            display_sail(entry['Sail'])
+            last_entry.update(entry)
         elif 'Padding' in entry:
             pass
         else:
             print entry
+
+        if all_in():
+            try:
+                print("X: {0:4.2f} \t Y: {1:4.2f} \t Z: {2:4.2f} */s \t {3} \t {4:2.1f} *C".format(
+                    AngularRate(last_entry['Gyro']['X']).converted,
+                    AngularRate(last_entry['Gyro']['Y']).converted,
+                    AngularRate(last_entry['Gyro']['Z']).converted,
+                    "SAIL OPEN" if last_entry['Sail']['Open'] else "SAIL NOT OPEN",
+                    rtd_to_centigrades(last_entry['Sail']['Temperature'])))
+            except:
+                print("Exception!")
+
 
 
 def process_frame(already_received, frame):
@@ -88,11 +87,11 @@ def process_frame(already_received, frame):
         return
 
     if frame.seq() in already_received:
-        pass
+        return
 
     exp = ExperimentFileParser.parse_partial(ensure_string(frame.payload()))
 
-    print 'Sail experiment chunk {}'.format(frame.seq())
+    print '{:%H:%M:%S} Sail experiment chunk {}'.format(datetime.now(), frame.seq())
     display_experiment_info(exp[0])
     print Style.RESET_ALL
 
