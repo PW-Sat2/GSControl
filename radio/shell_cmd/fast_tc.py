@@ -69,10 +69,22 @@ def build(sender, rcv, frame_decoder, analyzer, ns):
             [tc.DownloadFile(correlation_id=13, path='/sail.exp', seqs=chunks), ns['Send'], WaitMode.Wait]
         ])
 
+    def down_photo(photo_id, *chunks):
+        chunks = list(chunks)
+        if not chunks:
+            chunks = range(0, 25, 1)
+
+        photo_file = '/sail.photo_{}'.format(photo_id)
+
+        ns['run']([
+            [tc.DownloadFile(correlation_id=13, path=photo_file, seqs=chunks), ns['Send'], WaitMode.Wait]
+        ])
+
     return {
         'files': files,
         'bitrate_1200': bitrate_1200,
         'bitrate_9600': bitrate_9600,
         'sail': sail,
-        'down_sail': down_sail
+        'down_sail': down_sail,
+        'down_photo': down_photo
     }
