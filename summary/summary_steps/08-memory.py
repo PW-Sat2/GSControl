@@ -25,8 +25,9 @@ def save_memory_files():
                 f.write(ensure_string(c.content))
 
 
-def unpack_binary_file(file_name, fmt):
+def unpack_binary_file(file_name, fmt, from_byte=0):
     raw = session.read_artifact(file_name, binary=True)
+    raw = raw[from_byte:]
     size = struct.calcsize(fmt)
     part = ensure_string(raw[0:size])
 
