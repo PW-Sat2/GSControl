@@ -59,9 +59,20 @@ def build(sender, rcv, frame_decoder, analyzer, ns):
 
     sail.cid = 100
 
+    def down_sail(*chunks):
+        chunks = list(chunks)
+        if not chunks:
+            print 'Nothing to download'
+            return
+
+        ns['run']([
+            [tc.DownloadFile(correlation_id=13, path='/sail.exp', seqs=chunks), ns['Send'], WaitMode.Wait]
+        ])
+
     return {
         'files': files,
         'bitrate_1200': bitrate_1200,
         'bitrate_9600': bitrate_9600,
-        'sail': sail
+        'sail': sail,
+        'down_sail': down_sail
     }
