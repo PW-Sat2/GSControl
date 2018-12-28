@@ -2,6 +2,7 @@ import argparse
 import os
 import sys
 from datetime import datetime
+import pprint
 
 from colorama import Fore, Style, Back
 import zmq
@@ -10,11 +11,12 @@ from zmq.utils.win32 import allow_interrupt
 sys.path.append(os.path.join(os.path.dirname(__file__), '../PWSat2OBC/integration_tests'))
 import response_frames
 from utils import ensure_byte_list, ensure_string
-from experiment_file import ExperimentFileParser
-from emulator.beacon_parser.gyroscope_telemetry_parser import AngularRate, GyroTemperature
-from emulator.beacon_parser.resistance_sensors import pt1000_res_to_temp
+
+from remote_files import RemoteFileTools
 
 Decoder = response_frames.FrameDecoder(response_frames.frame_factories)
+
+last_cid = 0
 
 
 def parse_args():
@@ -42,58 +44,25 @@ def parse_frame(raw_frame):
     return Decoder.decode(ensure_byte_list(raw_frame[16:-2]))
 
 
-def rtd_to_centigrades(raw):
-    return pt1000_res_to_temp((raw / 4096.0 * 1000) / (1 - raw / 4096.0))
-
-
-def display_experiment_info(exp):
-    last_entry = {}
-
-    def all_in():
-        required = ['time', 'Gyro', 'Sail']
-
-        return all(map(lambda x: x in last_entry, required))
-
-    for entry in exp:
-        if entry == 'Synchronization':
-            pass
-        elif 'time' in entry:
-            last_entry.clear()
-            last_entry.update(entry)
-        elif 'Gyro' in entry:
-            last_entry.update(entry)
-        elif 'Sail' in entry:
-            last_entry.update(entry)
-        elif 'Padding' in entry:
-            pass
-        else:
-            print entry
-
-        if all_in():
-            try:
-                print("X: {0:4.2f} \t Y: {1:4.2f} \t Z: {2:4.2f} */s \t {3} \t {4:2.1f} *C".format(
-                    AngularRate(last_entry['Gyro']['X']).converted,
-                    AngularRate(last_entry['Gyro']['Y']).converted,
-                    AngularRate(last_entry['Gyro']['Z']).converted,
-                    "SAIL OPEN" if last_entry['Sail']['Open'] else "SAIL NOT OPEN",
-                    rtd_to_centigrades(last_entry['Sail']['Temperature'])))
-            except:
-                print("Exception!")
-
-
-
 def process_frame(already_received, frame):
-    if not isinstance(frame, response_frames.SailExperimentFrame):
+    global last_cid
+    if not isinstance(frame, response_frames.file_system.FileListSuccessFrame):
         return
+
+    if frame.correlation_id != last_cid:
+        already_received.clear()
+        last_cid = frame.correlation_id
+        print("\n\n====================================")
+        print("Correlation id: {0}".format(frame.correlation_id))
+        print("====================================\n")
 
     if frame.seq() in already_received:
         return
 
-    exp = ExperimentFileParser.parse_partial(ensure_string(frame.payload()))
+    file_list = RemoteFileTools.parse_file_list(frame)
 
-    print '{:%H:%M:%S} Sail experiment chunk {}'.format(datetime.now(), frame.seq())
-    display_experiment_info(exp[0])
-    print Style.RESET_ALL
+    for f in file_list:
+        print("{0}:\t{1}".format(f['File'], f['Chunks']))
 
     already_received.add(frame.seq())
 

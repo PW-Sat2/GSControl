@@ -73,14 +73,14 @@ if __name__ == '__main__':
     def jebnij_bekona():
         import telecommand
         sender.send(telecommand.SendBeacon())
-    
+
     user_ns = {                                 
             'get_file': get_file, 
             'RemoteFileTools': RemoteFileTools,
             'RemoteFile': RemoteFile, 
             'sender': sender,
             'receiver': rcv,
-            'jebnij_bekona': jebnij_bekona,
+            'jebnij_bekona': jebnij_bekona
     }
 
     from shell_cmd import build_shell_commands
