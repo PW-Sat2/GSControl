@@ -121,7 +121,8 @@ def run(args):
     with allow_interrupt(abort):
         with tableprint.TableContext(
                 ['Time', 'GS', 'BitRate', 'BP VOLT', 'BP TEMP', 'COMM RX Current', '3V3 DISTR CURRENT'],
-                width=20
+                width=20,
+                style='grid'
         ) as tc:
             while True:
                 (read, _, _) = zmq.select(sockets.keys() + [abort_pull], [], [])
