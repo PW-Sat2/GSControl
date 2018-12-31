@@ -58,6 +58,24 @@ def build(sender, rcv, frame_decoder, analyzer, ns):
             print("Wrong answer. No Sail Experiment performed.")
 
     sail.cid = 100
+    
+    def sads():
+        print('Are you sure to perform SADS Experiment? Type SADS (uppercase) to confirm: ')
+        user = sys.stdin.readline()
+
+        if user.replace('\n', '').replace('\r', '') == 'SADS':
+            if sads.cid == 100:
+                sads.cid = 75
+
+            ns['run']([
+                [tc.PerformSADSExperiment(sads.cid), ns['Send'], WaitMode.Wait]
+            ])
+
+            sads.cid += 1
+        else:
+            print("Wrong answer. No SADS Experiment performed.")
+
+    sads.cid = 75
 
     def down_sail(*chunks):
         chunks = list(chunks)
@@ -85,6 +103,7 @@ def build(sender, rcv, frame_decoder, analyzer, ns):
         'bitrate_1200': bitrate_1200,
         'bitrate_9600': bitrate_9600,
         'sail': sail,
+        'sads': sads,
         'down_sail': down_sail,
         'down_photo': down_photo
     }
