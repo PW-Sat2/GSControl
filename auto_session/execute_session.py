@@ -2,7 +2,10 @@ import os.path
 import sys
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../PWSat2OBC/integration_tests'))
-sys.path.append( os.path.join(os.path.dirname(__file__), '..'))
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+
+from radio.radio_sender import Sender
+from auto_session.session_base import SessionScope
 
 # TODO: GS array
 # TODO: Receiver thread per step
@@ -10,20 +13,31 @@ sys.path.append( os.path.join(os.path.dirname(__file__), '..'))
 # TODO: Load config
 # TODO: Connect all receivers
 
-def run():
-    session_file = os.path.join(os.path.dirname(__file__), 'keep_alive.py')
 
+def load_session(file_name):
     scope = {}
 
-    with open(session_file, 'r') as f:
-        exec(f, scope)
+    with open(file_name, 'r') as f:
+        exec (f, scope)
 
-    session = scope['session']
+    return scope['session']
+
+
+def run():
+    session_file = os.path.join(os.path.dirname(__file__), 'keep_alive.py')
+    session = load_session(session_file)
 
     steps = list(session())
 
-    for step in steps:
-        step()
+    sender = Sender(source_callsign='SP9NOV', port=7000, target='flatsat')
 
+    scope = SessionScope(sender)
+
+    for step in steps:
+        step(scope)
+
+
+import imp
+imp.load_source('config', 'C:/PW-Sat/obc-build/integration_tests/config.py')
 
 run()

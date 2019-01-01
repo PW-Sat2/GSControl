@@ -14,12 +14,12 @@ STYLE = style_from_dict({
 })
 
 
-class DictWrapper(object):
-    def __init__(self, d):
-        self._d = d
+class SessionScope(object):
+    def __init__(self, sender):
+        self.sender = sender
 
-    def __getattr__(self, name):
-        return self._d[name]
+    def send(self, frame):
+        self.sender.send(frame)
 
 
 class Loop(object):
@@ -27,12 +27,7 @@ class Loop(object):
         self.until = until
         self.tasks = tasks
 
-    def _execute_once(self):
-        import sys
-        scope = DictWrapper({
-            'send': lambda *args: sys.stdout.write('Sending\n')
-        })
-
+    def _execute_once(self, session_scope):
         for step_no, step in enumerate(self.tasks):
             [telecommand, action_type] = step
 
@@ -53,7 +48,7 @@ class Loop(object):
 
             print_tokens(tokens, style=STYLE)
 
-            action_type(telecommand).do(scope)
+            action_type(telecommand).do(session_scope)
 
     def _eval_until(self):
         if self.until is None:
@@ -61,9 +56,9 @@ class Loop(object):
 
         return self.until()
 
-    def __call__(self):
+    def __call__(self, session_scope):
         while True:
-            self._execute_once()
+            self._execute_once(session_scope)
 
             if self._eval_until():
                 break
