@@ -32,9 +32,9 @@ def load_telemetry_file(file_name):
 
     with progressbar.ProgressBar(max_value=len(all_points)) as bar:
         BATCH = 2500
-        remaining = all_points
+
         for i in range(0, len(all_points), BATCH):
-            part = remaining[i:i+BATCH]
+            part = all_points[i:i+BATCH]
             influx.write_points(part)
-            remaining = remaining[BATCH:]
+
             bar.update(i)
