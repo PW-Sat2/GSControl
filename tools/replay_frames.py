@@ -11,6 +11,7 @@ def parse_args():
     parser.add_argument('file', help='Frames file to replace')
     parser.add_argument('port', help='ZMQ output port', type=int)
     parser.add_argument('--loop', help='Reply in loop', action='store_true')
+    parser.add_argument('--delay', '-d', help='Delay between freames', type=float, default=0.5)
     return parser.parse_args()
 
 
@@ -29,7 +30,7 @@ def run(args):
                 frame = line.split(',')[2]
                 frame = b64decode(frame)
                 socket.send(frame)
-                time.sleep(1)
+                time.sleep(args.delay)
 
             finished = True and not args.loop
 
