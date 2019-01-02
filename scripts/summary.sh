@@ -28,7 +28,6 @@ ARTIFACT_FOLDER=${MISSION}/sessions/${SESSION}/artifacts
 
 git -C ${MISSION} add ${ARTIFACT_FOLDER}
 git -C ${MISSION} commit -m "${SESSION} - summary"
-git -C ${MISSION} log --stat
 
 if confirm "Pushing summary tool results to mission repo."; then
     git -C ${MISSION} push

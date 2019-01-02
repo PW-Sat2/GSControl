@@ -6,4 +6,4 @@ source ${PWSAT_GS_GNURADIO}/setup_env.sh
 GR="${PWSAT_GS_GNURADIO}"
 GRC="${GSCONTROL}/gnuradio"
 
-gnuradio-companion ${GRC}/downlink/downlink.grc ${GRC}/downlink/source/funcube_source.grc ${GRC}/uplink/uplink.grc
+gnuradio-companion ${GRC}/downlink/downlink-double.grc ${GRC}/downlink/source/funcube_source.grc ${GRC}/uplink/uplink.grc
