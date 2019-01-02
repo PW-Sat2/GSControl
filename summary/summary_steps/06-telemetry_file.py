@@ -1,4 +1,7 @@
 import logging
+
+import progressbar
+
 from summary import telemetry_file_mapper
 from summary.scope import session, influx
 from os import path
@@ -27,4 +30,11 @@ def load_telemetry_file(file_name):
 
     print 'Total {} points'.format(len(all_points))
 
-    influx.write_points(all_points)
+    with progressbar.ProgressBar(max_value=len(all_points)) as bar:
+        BATCH = 2500
+        remaining = all_points
+        for i in range(0, len(all_points), BATCH):
+            part = remaining[i:i+BATCH]
+            influx.write_points(part)
+            remaining = remaining[BATCH:]
+            bar.update(i)
