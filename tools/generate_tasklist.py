@@ -79,8 +79,6 @@ if __name__ == '__main__':
                             help="Maximum chunks allowed for download with single telecommand", default=20, type=int)
         parser.add_argument('-o', '--output', required=False,
                             help="Output file path", default='tasklist.missings.py')
-        parser.add_argument('-v', '--uplink-port', required=False,
-                            help="Uplink port", default=7000, type=int)
         parser.add_argument('-i', '--cid-start', required=False,
                             help="Beginning of generated correlation id", default=30, type=int)
                 
