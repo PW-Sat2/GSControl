@@ -1,5 +1,6 @@
 import os.path
 import sys
+from datetime import datetime, timedelta
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../PWSat2OBC/integration_tests'))
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
@@ -27,7 +28,10 @@ def run():
     session_file = os.path.join(os.path.dirname(__file__), 'keep_alive.py')
     session = load_session(session_file)
 
-    steps = list(session())
+    steps = list(session(
+        start=datetime.now(),
+        stop=datetime.now() + timedelta(minutes=5)
+    ))
 
     sender = Sender(source_callsign='SP9NOV', port=7000, target='flatsat')
 

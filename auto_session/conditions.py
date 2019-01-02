@@ -1,3 +1,6 @@
+from datetime import datetime, timedelta
+
+
 class Or(object):
     def __init__(self, *conditions):
         self.conditions = conditions
@@ -11,12 +14,13 @@ class Or(object):
 
 
 class Received(object):
-    def __init__(self, frame_type, min_count=None):
+    def __init__(self, frame_type, min_count=1):
         self.frame_type = frame_type
         self.min_count = min_count
 
-    def __call__(self, *args, **kwargs):
-        return True
+    def __call__(self, received_frames):
+        x = filter(lambda f: isinstance(f, self.frame_type), received_frames)
+        return len(x) >= self.min_count
 
 
 class Iterations(object):
@@ -26,3 +30,10 @@ class Iterations(object):
     def __call__(self, *args, **kwargs):
         return True
 
+
+class PointOfTime(object):
+    def __init__(self, time_to_stop):
+        self.end = time_to_stop
+
+    def __call__(self, *args, **kwargs):
+        return datetime.now() >= self.end
