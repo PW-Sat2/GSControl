@@ -30,6 +30,14 @@ class SessionScope(object):
         self.sender.send(frame)
 
 
+def build_recv_sock(target, port):
+    context = zmq.Context.instance()
+    sock = context.socket(zmq.SUB)
+    sock.connect("tcp://%s:%d" % (target, port))
+    sock.setsockopt(zmq.SUBSCRIBE, "")
+
+    return sock
+
 def receive_all(receivers, callback):
     signal = threading.Event()
     signal.clear()
@@ -37,7 +45,7 @@ def receive_all(receivers, callback):
     started = threading.Event()
 
     def worker():
-        socks = map(lambda s: s.sock, receivers)
+        socks = map(lambda s: s, receivers)
 
         started.set()
 
@@ -105,7 +113,8 @@ class Loop(object):
 
         while True:
             end_receive = receive_all([
-                Receiver(target='flatsat', port=7001)
+                build_recv_sock(target='fp-main.gs.kplabs.pl', port=7001),
+                build_recv_sock(target='elka-main.gs.pw-sat.pl', port=7001),
             ], callback=lambda f: received_frames.append(f))
 
             self._execute_once(session_scope)

@@ -30,10 +30,10 @@ def run():
 
     steps = list(session(
         start=datetime.now(),
-        stop=datetime.now() + timedelta(minutes=5)
+        stop=datetime.now() + timedelta(minutes=10)
     ))
 
-    sender = Sender(source_callsign='SP9NOV', port=7000, target='flatsat')
+    sender = Sender(source_callsign='SP9NOV', port=7000, target='fp-main.gs.kplabs.pl')
 
     scope = SessionScope(sender)
 
