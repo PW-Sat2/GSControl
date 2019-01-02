@@ -13,7 +13,7 @@ class MissingFilesTasklistGenerator:
         return allFiles
     
     @staticmethod
-    def _readMissingChunksPerFile(allFiles):
+    def _readMissingChunksPerFile(session, allFiles):
         allPossibleMissingFiles = map(lambda x: (x+'.missing').strip('/'), allFiles)
         allPossibleMissingFiles = list(set(allPossibleMissingFiles))
         allExistingMissingFiles = filter(lambda x: session.has_artifact(x), allPossibleMissingFiles)
@@ -57,42 +57,45 @@ class MissingFilesTasklistGenerator:
     @staticmethod
     def generate(session, max_chunks, cid_start):
         allFiles = MissingFilesTasklistGenerator._getAllSessionFilePaths(session)
-        missingChunksPerFile = MissingFilesTasklistGenerator._readMissingChunksPerFile(allFiles)
+        missingChunksPerFile = MissingFilesTasklistGenerator._readMissingChunksPerFile(session, allFiles)
         telecommandData = MissingFilesTasklistGenerator._generateTelecommandData(missingChunksPerFile, max_chunks, cid_start)
         telecommandsText = ",\r\n\t".join(map(lambda x: MissingFilesTasklistGenerator._generateTelecommandText(x), telecommandData))
 
-        return telecommandsText
+        return 'tasks = [\r\n' + telecommandsText + '\r\n]'
 
 if __name__ == '__main__':
     import argparse
 
-    default_mission_repository = mission_data = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../../mission'))
+    def parse_args():
+        default_mission_repository = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../../mission'))
 
-    parser = argparse.ArgumentParser()
+        parser = argparse.ArgumentParser()
 
-    parser.add_argument('-s', '--session', required=True,
-                        help="Session number", type=int)
-    parser.add_argument('-m', '--mission-path', required=False,
-                        help="Path to mission repository", default=default_mission_repository)
-    parser.add_argument('-c', '--max-chunks', required=False,
-                        help="Maximum chunks allowed for download with single telecommand", default=20, type=int)
-    parser.add_argument('-o', '--output', required=False,
-                        help="Output file path", default='tasklist.missings.py')
-    parser.add_argument('-v', '--uplink-port', required=False,
-                        help="Uplink port", default=7000, type=int)
-    parser.add_argument('-i', '--cid-start', required=False,
-                        help="Beginning of generated correlation id", default=30, type=int)
-            
+        parser.add_argument('-s', '--session', required=True,
+                            help="Session number", type=int)
+        parser.add_argument('-m', '--mission-path', required=False,
+                            help="Path to mission repository", default=default_mission_repository)
+        parser.add_argument('-c', '--max-chunks', required=False,
+                            help="Maximum chunks allowed for download with single telecommand", default=20, type=int)
+        parser.add_argument('-o', '--output', required=False,
+                            help="Output file path", default='tasklist.missings.py')
+        parser.add_argument('-v', '--uplink-port', required=False,
+                            help="Uplink port", default=7000, type=int)
+        parser.add_argument('-i', '--cid-start', required=False,
+                            help="Beginning of generated correlation id", default=30, type=int)
+                
 
-    args = parser.parse_args()
+        return parser.parse_args()
 
-    mission_data = default_mission_repository
-    store = MissionStore(root=args.mission_path)
-    session = store.get_session(args.session)
+    def main(args):        
+        store = MissionStore(root=args.mission_path)
+        session = store.get_session(args.session)
 
-    telecommandsText = MissingFilesTasklistGenerator.generate(session, args.max_chunks, args.cid_start)
+        telecommandsText = MissingFilesTasklistGenerator.generate(session, args.max_chunks, args.cid_start)
 
-    output_file = open(args.output, 'w')
-    output_file.write('tasks = [\r\n' + telecommandsText + '\r\n]')
-    output_file.flush()
-    output_file.close()
+        output_file = open(args.output, 'w')
+        output_file.write(telecommandsText)
+        output_file.flush()
+        output_file.close()
+
+    main(parse_args())

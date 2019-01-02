@@ -13,6 +13,8 @@ save_persistent_state()
 
 save_memory_files()
 
+generate_missings_tasklist()
+
 if session.has_artifact('telemetry.current'):
     if scope.upload:
         load_telemetry_file('telemetry.current')
