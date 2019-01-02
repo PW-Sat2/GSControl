@@ -16,7 +16,7 @@ mkdir -p ${MISSION}/sessions/${SESSION}/artifacts/
 
 cd ${GSCONTROL}/tools/radio_pwsat_pl/
 
-python2 download_frame_files.py
+python2 download_frame_files.py > /tmp/stats
 
 mv -i all.frames ${MISSION}/sessions/${SESSION}/artifacts/
 mv Turbo-Ola.bin ${MISSION}/
@@ -30,7 +30,6 @@ git -C ${MISSION} add ${MISSION}/sessions/${SESSION}/artifacts/all.frames
 git -C ${MISSION} add ${MISSION}/Turbo-Ola.bin
 
 git -C ${MISSION} commit -m "${SESSION} - all"
-git -C ${MISSION} log --stat
 
 if confirm "Pushing to mission repo (all frames)."; then
     git -C ${MISSION} push

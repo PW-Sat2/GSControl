@@ -11,3 +11,6 @@ hypothesis
 Pillow
 pyserial
 keyboard
+gitpython
+pytz
+slacker
