@@ -20,14 +20,15 @@ def session(start, stop):
             [tc.SendBeacon(), Send],
             [20, Sleep]
         ],
-        until=Received(rf.BeaconFrame, min_count=3)
+        until=Received(rf.BeaconFrame, min_count=2)
     )
 
     yield Loop(
         tasks=[
             [tc.ListFiles(correlation_id=13, path='/'), Send],
+            [10, Sleep],
             [tc.SendBeacon(), Send],
-            [20, Sleep]
+            [10, Sleep]
         ],
         until=Received(rf.FileListSuccessFrame)
     )
