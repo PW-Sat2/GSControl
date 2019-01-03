@@ -1383,11 +1383,11 @@
     </param>
     <param>
       <key>mode</key>
-      <value>0</value>
+      <value>1</value>
     </param>
     <param>
       <key>pps</key>
-      <value>60</value>
+      <value>30</value>
     </param>
     <param>
       <key>samp_rate</key>
