@@ -7,6 +7,7 @@ import requests
 import argparse
 import urllib2
 import random
+import os
 
 from dateutil import tz
 from slacker import Slacker
@@ -36,7 +37,9 @@ def send_to_slack(msg):
 def send_to_slack_important(text):
     s = Slacker(slack_token)
     channel_id = s.channels.get_channel_id(slack_important_channel)
-    s.chat.command(channel=channel_id, command='/imgflip', text=' ' + text)
+    print text
+    s.chat.command(channel=channel_id, command='/imgflip', text='sad frog; ' + text)
+
 def imgflip(text):
     s = Slacker(slack_token)
     channel_id = s.channels.get_channel_id(slack_channel)
@@ -60,12 +63,26 @@ mission_repo_path = os.path.join(repos_path, 'mission')
 repo = Repo(mission_repo_path)
 origin = repo.remote('origin')
 
+gs_name = ''
+gs_primary = False
+
+def mark_main_session(session):
+    global gs_name
+    global gs_primary
+
+    gs_name = os.environ['GS_NAME']
+    gs_primary = False
+    if gs_name.find(session.primary_gs) != -1:
+        gs_primary = True
+        gs_name += '-primary'
+
 
 class Session:
-    def __init__(self, nr, start, stop):
+    def __init__(self, nr, start, stop, primary_gs):
         self.nr = nr
         self.start = start
         self.stop = stop
+        self.primary_gs = primary_gs
 
     def __repr__(self):
         return str(self.nr) + ': ' + str(self.start) + ' -> ' + \
@@ -76,7 +93,8 @@ class Session:
             return False
         return self.nr == other.nr and \
                str(self.start) == str(other.start) and \
-               str(self.stop) == str(other.stop)
+               str(self.stop) == str(other.stop) and \
+               self.primary_gs == other.primary_gs
 
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -94,8 +112,9 @@ def parse_sessions():
 
         start = parser.parse(j['Session']['start_time_iso_with_zone']).astimezone(pytz.utc).replace(tzinfo=None)
         stop = parser.parse(j['Session']['stop_time_iso_with_zone']).astimezone(pytz.utc).replace(tzinfo=None)
+        primary = j['Session'].get('primary') or ''
 
-        sessions.append(Session(nr, start, stop))
+        sessions.append(Session(nr, start, stop, primary))
 
     return sorted(sessions, key=lambda x: x.start)
 
@@ -119,6 +138,8 @@ def execute(time_events):
         print i[1].__name__, "finished"
         print ""
 
+# --------------------------------------------------
+
 
 session = None
 
@@ -135,13 +156,15 @@ while True:
     if session != list(sessions)[0]:
         session = list(sessions)[0]
         print "New session!"
+        mark_main_session(session)
 
         # convert to localtime
         convert_to_local = lambda x: x.replace(tzinfo=tz.tzutc()).astimezone(tz.tzlocal()).replace(tzinfo=None)
         local_start = convert_to_local(session.start)
         local_stop = convert_to_local(session.stop)
-        send_to_slack("Next session {} scheduled at {} -> {}"
-                      .format(session.nr, local_start, local_stop))
+        if gs_primary:
+            send_to_slack("Next session {} scheduled at {} -> {}"
+                          .format(session.nr, local_start, local_stop))
 
     time_left_to_session = session.start - datetime.utcnow()
     print "Session: ", session, "; Time left: ", time_left_to_session
@@ -152,17 +175,15 @@ while True:
     # plenty of time left, fetch again
     sleep(timedelta(minutes=1))
 
+# --------------------------------------------------
+
 
 def run_cmd(cmd, name):
     print "Run: ", cmd
     if os.system(cmd) > 0:
-        print " !!!" + name + "failed!"
-        send_to_slack_important(name + " jestem smutny; napraw mnie")
+        print " !!!" + gs_name + '/' + name + "failed!"
+        send_to_slack_important(gs_name + '/' + name + "; napraw mnie")
         exit(1)
-
-
-def time_Tm10():
-    send_to_slack('T-10 min')
 
 
 def start_session():
@@ -170,37 +191,35 @@ def start_session():
     names = [str(i['name']) for i in j['data']['memes']]
     name = random.choice(names)
 
-    imgflip(name + '; Sesja ' + str(session.nr))
+    imgflip(name + '; Sesja ' + str(session.nr) + '; {}'.format(gs_name))
     run_cmd(gscontrol + '/scripts/start_auto_session.sh ' + str(session.nr),
-            'start session' + str(session.nr))
+            'start ' + str(session.nr))
 
 
 def stop_session():
-    send_to_slack('Stopping session!')
+    send_to_slack(gs_name + ': stopping session!')
     run_cmd('yes \'n\' | ' + gscontrol + '/scripts/stop_session.sh',
-            'stop_session')
+            'stop')
     origin.push()
 
 
 def all_frames_summary():
-    run_cmd('yes \'y\' | ' + gscontrol + '/scripts/download_all_frames.sh ' + str(session.nr),
-            'Download all frames')
+    if gs_primary:
+        run_cmd('yes \'y\' | ' + gscontrol + '/scripts/download_all_frames.sh ' + str(session.nr),
+                'all.frames')
 
-    run_cmd('yes \'y\' | ' + gscontrol + '/scripts/summary.sh ' + str(session.nr),
-            'Download all frames')
+        run_cmd('yes \'y\' | ' + gscontrol + '/scripts/summary.sh ' + str(session.nr),
+                'summary')
 
-def end_session():
-    with open('/tmp/stats') as stats:
-        send_to_slack(stats.read())
-    send_to_slack("---------------------------------------------")
+        with open('/tmp/stats') as stats:
+            send_to_slack(stats.read())
+        send_to_slack("---------------------------------------------")
 
 
 time_events = [
-    (session.start - timedelta(minutes=10), time_Tm10),
     (session.start - timedelta(minutes=2), start_session),
     (session.stop + timedelta(minutes=1), stop_session),
     (session.stop + timedelta(minutes=2), all_frames_summary),
-    (session.stop + timedelta(minutes=3), end_session),
 ]
 
 execute(time_events)
