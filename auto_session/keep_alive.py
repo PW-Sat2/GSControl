@@ -1,4 +1,4 @@
-from auto_session.conditions import Received, Or, Iterations, PointOfTime
+from auto_session.conditions import Received, Or, Iterations, PointOfTime, Eternity
 from auto_session.session_base import Loop
 from devices import BaudRate
 from radio.task_actions import Send, Sleep

@@ -11,12 +11,6 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 from radio.radio_sender import Sender
 from auto_session.session_base import SessionScope
 
-# TODO: GS array
-# TODO: Receiver thread per step
-# TODO: Some context to hold all received/uplinked frames
-# TODO: Load config
-# TODO: Connect all receivers
-
 GS_LIST = dict(map(lambda i: (i['name'], i), [
     dict(
         name='elka',
