@@ -5,6 +5,7 @@ import os
 import imp
 import datetime
 import json
+from collections import OrderedDict
 
 class Predicton:
     def __init__(self, start, end, maxElev, aosAzimuth):
@@ -33,14 +34,14 @@ def generateSessions(predictions, minElev):
     sessions = []
     for sat_pass in predictions:
         if sat_pass.maxElev >= minElev:
-            session = dict()
+            session = OrderedDict()
             session['short_description'] = "Automatic session."
             session['phase'] = "None"
             session['status'] = "auto"
-            session['maximum_elevation'] = sat_pass.maxElev
+            session['primary'] = "elka" if (sat_pass.aosAzimuth < 90.0 or sat_pass.aosAzimuth > 270.0) else "fp"
             session['start_time_iso_with_zone'] = sat_pass.start
             session['stop_time_iso_with_zone'] = sat_pass.end
-            session['primary'] = "elka" if (sat_pass.aosAzimuth < 90.0 or sat_pass.aosAzimuth > 270.0) else "fp"
+            session['maximum_elevation'] = sat_pass.maxElev
 
             sessionObject = dict()
             sessionObject['Session']=session
@@ -56,7 +57,7 @@ def saveSessions(sessionNumber, sessionsData, missionPath):
         dataPath = os.path.join(sessionFolderPath,"data.json")
         print dataPath
         with open(dataPath, "w") as outFile:
-            json.dump(session, outFile)
+            json.dump(session, outFile, indent=4)
         sessionIndex = sessionIndex + 1
 
 def qthListToQth(qthlist):
