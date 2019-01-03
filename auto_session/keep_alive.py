@@ -29,9 +29,9 @@ def session(start, stop):
         title="Get file list",
         tasks=[
             [tc.ListFiles(correlation_id=13, path='/'), Send],
-            [10, Sleep],
+            [20, Sleep],
             [tc.SendBeacon(), Send],
-            [10, Sleep]
+            [20, Sleep]
         ],
         until=Received(rf.FileListSuccessFrame)
     )
@@ -40,7 +40,7 @@ def session(start, stop):
         title="Get beacons at the end",
         tasks=[
             [tc.SendBeacon(), Send],
-            [20, Sleep]
+            [40, Sleep]
         ],
         until=Eternity()
     )
