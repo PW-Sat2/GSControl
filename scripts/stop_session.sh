@@ -21,7 +21,7 @@ pgrep -fx ".*/GSControl/gnuradio/downlink/source/funcube_source.py" | xargs kill
 
 sleep 5
 
-gnuplot -e "inputfile='/gs/waterfall_raw_data'" -e "outfile='/gs/waterfall.png'" /gs/satnogs_waterfall.gp
+gnuplot -e "inputfile='/gs/waterfall_raw_data'" -e "outfile='/gs/waterfall.png'" ${SELF_DIR}/satnogs_waterfall.gp
 
 ${SELF_DIR}/archive.sh ${SESSION}
 
