@@ -37,3 +37,8 @@ class PointOfTime(object):
 
     def __call__(self, *args, **kwargs):
         return datetime.now() >= self.end
+
+
+class Eternity(object):
+    def __call__(self, *args, **kwargs):
+        return False

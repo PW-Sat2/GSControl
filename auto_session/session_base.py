@@ -1,23 +1,13 @@
 import pprint
 import threading
 from datetime import datetime
+
 import zmq
+
+import response_frames as rf
 from utils import ensure_byte_list
 
-from prompt_toolkit.shortcuts import print_tokens
-from prompt_toolkit.styles import style_from_dict
-from pygments.token import Token
-import response_frames as rf
-
 Decoder = rf.FrameDecoder(rf.frame_factories)
-
-STYLE = style_from_dict({
-    Token.Timestamp: '#fdf6e3',
-    Token.CurrentStep: '#b58900',
-    Token.TotalSteps: '#6c71c4',
-    Token.Action: '#dc322f',
-    Token.Telecommand: '#268bd2',
-})
 
 
 class SessionScope(object):
@@ -64,7 +54,8 @@ def receive_all(receivers, callback):
 
 
 class Loop(object):
-    def __init__(self, tasks, until=None):
+    def __init__(self, title, tasks, until=None):
+        self.title = title
         self.until = until
         self.tasks = tasks
 
@@ -72,22 +63,13 @@ class Loop(object):
         for step_no, step in enumerate(self.tasks):
             [telecommand, action_type] = step
 
-            tokens = [
-                (Token.String, "["),
-                (Token.Timestamp, datetime.now().strftime('%Y-%m-%d %H:%M:%S:%f')),
-                (Token.String, "] "),
-                (Token.String, "Step "),
-                (Token.CurrentStep, str(step_no + 1)),
-                (Token.String, "/"),
-                (Token.TotalSteps, str(len(self.tasks))),
-                (Token.String, ": "),
-                (Token.Action, action_type.__name__),
-                (Token.String, "("),
-                (Token.Telecommand, pprint.pformat(telecommand)),
-                (Token.String, ")...\n")
-            ]
-
-            print_tokens(tokens, style=STYLE)
+            print '\t{:%H:%M:%S:%f}: Step {}/{}\t{}({})'.format(
+                datetime.now(),
+                step_no + 1,
+                len(self.tasks),
+                action_type.__name__,
+                pprint.pformat(telecommand)
+            )
 
             action_type(telecommand).do(session_scope)
 
@@ -99,9 +81,15 @@ class Loop(object):
 
     def __call__(self, session_scope):
         received_frames = []
+        counter = 1
+
+        def on_frame(f):
+            received_frames.append(f)
+            print '\tFrame: {}'.format(repr(f))
 
         while True:
-            end_receive = receive_all(session_scope.receivers, callback=lambda f: received_frames.append(f))
+            print '{} Iteration: {}'.format(self.title, counter)
+            end_receive = receive_all(session_scope.receivers, callback=on_frame)
 
             self._execute_once(session_scope)
 
@@ -109,3 +97,5 @@ class Loop(object):
 
             if self._eval_until(received_frames):
                 break
+
+            counter += 1

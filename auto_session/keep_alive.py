@@ -8,6 +8,7 @@ import response_frames as rf
 
 def session(start, stop):
     yield Loop(
+        title="Ensure bitrate 9600",
         tasks=[
             [10, Sleep],
             [tc.SetBitrate(correlation_id=12, bitrate=BaudRate.BaudRate9600), Send],
@@ -16,6 +17,7 @@ def session(start, stop):
     )
 
     yield Loop(
+        title="Get few beacons",
         tasks=[
             [tc.SendBeacon(), Send],
             [20, Sleep]
@@ -24,6 +26,7 @@ def session(start, stop):
     )
 
     yield Loop(
+        title="Get file list",
         tasks=[
             [tc.ListFiles(correlation_id=13, path='/'), Send],
             [10, Sleep],
@@ -34,9 +37,10 @@ def session(start, stop):
     )
 
     yield Loop(
+        title="Get beacons at the end",
         tasks=[
             [tc.SendBeacon(), Send],
             [20, Sleep]
         ],
-        until=PointOfTime(stop)
+        until=Eternity
     )
