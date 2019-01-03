@@ -25,7 +25,7 @@
 
 reset
 if (!exists("height")) height=8000
-if (!exists("width")) width=2400
+if (!exists("width")) width=1200
 if (!exists("outfile")) outfile='/tmp/waterfall.png'
 
 ################################################################################
