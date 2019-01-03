@@ -47,8 +47,7 @@ if [[ "${MISSION_MASTER_REV}" != "${MISSION_REV}" ]]; then
 fi
 
 if [[ "${GSCONTROL_MASTER_REV}" != "${GSCONTROL_REV}" ]]; then
-echo "UNCLEAN"
-    #confirm "Repo GSControl NOT clean."  || exit 1
+    confirm "Repo GSControl NOT clean."  || exit 1
 fi
 
 # check if ham app is running

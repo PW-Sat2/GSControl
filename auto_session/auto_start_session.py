@@ -213,7 +213,6 @@ def all_frames_summary():
 
         with open('/tmp/stats') as stats:
             send_to_slack(stats.read())
-        send_to_slack("---------------------------------------------")
 
 
 time_events = [

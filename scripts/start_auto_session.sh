@@ -5,7 +5,7 @@ source "$SELF_DIR/_common.sh"
 
 source ${PWSAT_GS_GNURADIO}/setup_env.sh
 
-if [ -z "$1" ]; then
+if [[ -z "$1" ]]; then
     echo "Please specify session number"
     echo "Usage:"
     echo "./start_auto_session.sh <session_number>"
@@ -44,8 +44,23 @@ fi
 run_grc() {
     cd /gs && python2.7 $1 &
 }
+compile_grc() {
+    echo "Compiling ${1}..."
+    TMP_FOLDER="$(dirname ${1})"
+    if ! grcc $1 -d $TMP_FOLDER > /dev/null 2>&1; then
+        echo "FAILED!"
+    fi
+}
 
 GRC="${GSCONTROL}/gnuradio"
+
+echo -e "\n"
+
+compile_grc ${GRC}/downlink/downlink-hier.grc
+compile_grc ${GRC}/downlink/downlink-double.grc
+compile_grc ${GRC}/downlink/source/funcube_source.grc
+compile_grc ${GRC}/uplink/uplink.grc
+compile_grc ${GRC}/uplink/uplink_watchdog.grc
 
 run_grc ${GRC}/downlink/downlink_double.py
 run_grc ${GRC}/downlink/source/funcube_source.py
