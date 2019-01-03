@@ -224,6 +224,8 @@ if __name__ == '__main__':
                             help="Output file path", default='tasklist.telemetry.py')
         parser.add_argument('-i', '--cid-start', required=False,
                             help="Beginning of generated correlation id", default=30, type=int)
+        parser.add_argument('-t', '--template-path', required=False,
+                            help="Path to template of the tasklist", type=str, default="tasklist_templates/telemetry_download.template")
 
         return parser.parse_args()
 
@@ -247,10 +249,12 @@ if __name__ == '__main__':
                 cid_start=args.cid_start
                 )
 
-            output_file = open(args.output, 'w')
-            output_file.write('tasks = [\r\n' + ",\r\n\t".join(generated_tasks) + '\r\n]')
-            output_file.flush()
-            output_file.close()
+
+            with open(args.template_path, 'r') as template:
+                output_file = open(args.output, 'w')
+                output_file.write(template.read().format(",\r\n\t".join(generated_tasks)))
+                output_file.flush()
+                output_file.close()
 
 
     main(parse_args())
