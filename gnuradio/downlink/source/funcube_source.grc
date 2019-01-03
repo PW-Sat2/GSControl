@@ -1468,12 +1468,6 @@
     <sink_key>0</sink_key>
   </connection>
   <connection>
-    <source_block_id>fcdproplus_fcdproplus_0</source_block_id>
-    <sink_block_id>satnogs_waterfall_sink_0</sink_block_id>
-    <source_key>0</source_key>
-    <sink_key>0</sink_key>
-  </connection>
-  <connection>
     <source_block_id>frequency_shift_0</source_block_id>
     <sink_block_id>blocks_file_sink_0</sink_block_id>
     <source_key>0</source_key>
@@ -1482,6 +1476,12 @@
   <connection>
     <source_block_id>frequency_shift_0</source_block_id>
     <sink_block_id>qtgui_waterfall_sink_x_1</sink_block_id>
+    <source_key>0</source_key>
+    <sink_key>0</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>frequency_shift_0</source_block_id>
+    <sink_block_id>satnogs_waterfall_sink_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
