@@ -7,7 +7,6 @@ import requests
 import argparse
 import urllib2
 import random
-import os
 
 from dateutil import tz
 from slacker import Slacker
@@ -64,25 +63,36 @@ repo = Repo(mission_repo_path)
 origin = repo.remote('origin')
 
 gs_name = ''
-gs_primary = False
+on_primary_gs = False
+auto_session = False
+auto_session_str = ''
 
 def mark_main_session(session):
     global gs_name
-    global gs_primary
+    global on_primary_gs
+    global auto_session
+    global auto_session_str
 
     gs_name = os.environ['GS_NAME']
-    gs_primary = False
+    on_primary_gs = False
     if gs_name.find(session.primary_gs) != -1:
-        gs_primary = True
+        on_primary_gs = True
         gs_name += '-primary'
+
+    auto_session = session.auto
+
+    auto_session_str = ''
+    if auto_session:
+        auto_session_str = 'auto'
 
 
 class Session:
-    def __init__(self, nr, start, stop, primary_gs):
+    def __init__(self, nr, start, stop, primary_gs, auto):
         self.nr = nr
         self.start = start
         self.stop = stop
         self.primary_gs = primary_gs
+        self.auto = auto
 
     def __repr__(self):
         return str(self.nr) + ': ' + str(self.start) + ' -> ' + \
@@ -94,7 +104,8 @@ class Session:
         return self.nr == other.nr and \
                str(self.start) == str(other.start) and \
                str(self.stop) == str(other.stop) and \
-               self.primary_gs == other.primary_gs
+               self.primary_gs == other.primary_gs and \
+               self.auto == other.auto
 
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -113,8 +124,11 @@ def parse_sessions():
         start = parser.parse(j['Session']['start_time_iso_with_zone']).astimezone(pytz.utc).replace(tzinfo=None)
         stop = parser.parse(j['Session']['stop_time_iso_with_zone']).astimezone(pytz.utc).replace(tzinfo=None)
         primary = j['Session'].get('primary') or ''
+        auto = False
+        if j['Session'].get('status') == 'auto':
+            auto = True
 
-        sessions.append(Session(nr, start, stop, primary))
+        sessions.append(Session(nr, start, stop, primary, auto))
 
     return sorted(sessions, key=lambda x: x.start)
 
@@ -162,9 +176,9 @@ while True:
         convert_to_local = lambda x: x.replace(tzinfo=tz.tzutc()).astimezone(tz.tzlocal()).replace(tzinfo=None)
         local_start = convert_to_local(session.start)
         local_stop = convert_to_local(session.stop)
-        if gs_primary:
-            send_to_slack("Next session {} scheduled at {} -> {}"
-                          .format(session.nr, local_start, local_stop))
+        send_to_slack("Next session {} scheduled at {} -> {}: {}, {}"
+                      .format(session.nr, local_start, local_stop,
+                              session.primary_gs, auto_session_str))
 
     time_left_to_session = session.start - datetime.utcnow()
     print "Session: ", session, "; Time left: ", time_left_to_session
@@ -191,9 +205,21 @@ def start_session():
     names = [str(i['name']) for i in j['data']['memes']]
     name = random.choice(names)
 
-    imgflip(name + '; Sesja ' + str(session.nr) + '; {}'.format(gs_name))
+    imgflip(name + '; Sesja ' + str(session.nr) + '; {} {}'.format(gs_name, auto_session_str))
     run_cmd(gscontrol + '/scripts/start_auto_session.sh ' + str(session.nr),
             'start ' + str(session.nr))
+
+
+def run_keep_alive():
+    if on_primary_gs and auto_session:
+        run_cmd("python2 " + gscontrol + "/auto_session/execute_session.py" +
+                " --downlink fp,elka --uplink " + session.primary_gs +
+                " --config /gs/config.py &", 'execute_session')
+
+
+def stop_keep_alive():
+    if on_primary_gs and auto_session:
+        run_cmd('pgrep -fx ".*/GSControl/auto_session/execute_session.py.*" | xargs kill', 'kill execute')
 
 
 def stop_session():
@@ -204,7 +230,7 @@ def stop_session():
 
 
 def all_frames_summary():
-    if gs_primary:
+    if on_primary_gs:
         run_cmd('yes \'y\' | ' + gscontrol + '/scripts/download_all_frames.sh ' + str(session.nr),
                 'all.frames')
 
@@ -217,8 +243,10 @@ def all_frames_summary():
 
 time_events = [
     (session.start - timedelta(minutes=2), start_session),
-    (session.stop + timedelta(minutes=1), stop_session),
-    (session.stop + timedelta(minutes=2), all_frames_summary),
+    (session.start - timedelta(minutes=1), run_keep_alive),
+    (session.stop + timedelta(seconds=30), stop_keep_alive),
+    (session.stop + timedelta(minutes=1),  stop_session),
+    (session.stop + timedelta(minutes=2),  all_frames_summary),
 ]
 
 execute(time_events)
