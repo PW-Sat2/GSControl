@@ -28,6 +28,7 @@ mv /gs/uplink_frames ${ARCHIVE_FOLDER}/${GS_NAME}_uplink.frames
 mv /gs/downlink_frames ${ARCHIVE_FOLDER}/${GS_NAME}_downlink.frames
 mv /gs/watchdog_saved_frames_* ${ARCHIVE_FOLDER}/
 mv /gs/${GS_NAME}_versions ${ARCHIVE_FOLDER}/
+mv /gs/waterfall.png ${ARCHIVE_FOLDER}/${GS_NAME}_waterfall.png
 
 # Save mission artifacts
 
@@ -45,10 +46,11 @@ mkdir -vp ${ARTIFACT_FOLDER}
 cp -vp ${ARCHIVE_FOLDER}/${GS_NAME}_downlink.frames ${ARTIFACT_FOLDER}/
 cp -vp ${ARCHIVE_FOLDER}/${GS_NAME}_uplink.frames ${ARTIFACT_FOLDER}/
 cp -vp ${ARCHIVE_FOLDER}/${GS_NAME}_versions ${ARTIFACT_FOLDER}/
+cp -vp ${ARCHIVE_FOLDER}/${GS_NAME}_waterfall.png ${ARTIFACT_FOLDER}/
 
 ls -l ${ARTIFACT_FOLDER}
 
-git -C ${MISSION} add ${ARTIFACT_FOLDER}/${GS_NAME}_downlink.frames ${ARTIFACT_FOLDER}/${GS_NAME}_uplink.frames ${ARTIFACT_FOLDER}/${GS_NAME}_versions
+git -C ${MISSION} add ${ARTIFACT_FOLDER}/${GS_NAME}_downlink.frames ${ARTIFACT_FOLDER}/${GS_NAME}_uplink.frames ${ARTIFACT_FOLDER}/${GS_NAME}_versions ${ARTIFACT_FOLDER}/${GS_NAME}_waterfall.png
 git -C ${MISSION} commit -m "${SESSION} - ${GS_NAME}"
 
 if confirm "Pushing to mission repo."; then
