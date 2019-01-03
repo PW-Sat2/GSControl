@@ -97,6 +97,7 @@ class MissingFilesTasklistGenerator:
 class NextSessionTelemetryTasklistGenerator:
     CHUNKS_PER_MINUTE = 1.82
     MAX_CHUNKS = 2280
+    CHUNKS_SAFE_BUFFER = 50
 
     def estimateChunks(self, startChunk, startTime, nextTime):
         chunksPerMinute = self.CHUNKS_PER_MINUTE
@@ -108,7 +109,7 @@ class NextSessionTelemetryTasklistGenerator:
         
         totalSeconds = (nextTime - startTime).total_seconds();
 
-        estimation.generated_chunks = int((totalSeconds / 60) * chunksPerMinute)
+        estimation.generated_chunks = int((totalSeconds / 60) * chunksPerMinute) + self.CHUNKS_SAFE_BUFFER
 
         estimation.current_end = estimation.current_start + estimation.generated_chunks
 
@@ -207,8 +208,10 @@ if __name__ == '__main__':
 
         parser = argparse.ArgumentParser()
 
-        parser.add_argument('-s', '--session', required=True,
-                            help="Session number", type=int)
+        parser.add_argument('-s', '--start-session', required=True,
+                            help="Start session number", type=int)
+        parser.add_argument('-e', '--end-session', required=False,
+                            help="End session number. Start session + 1 if omitted", type=int, default=0)
         parser.add_argument('-m', '--mission-path', required=False,
                             help="Path to mission repository", default=default_mission_repository)
         parser.add_argument('-c', '--chunks-per-tc', required=False,
@@ -221,14 +224,16 @@ if __name__ == '__main__':
         return parser.parse_args()
 
     def main(args):
+        end_session = args.end_session if args.end_session > 0 else args.start_session + 1
+
         store = MissionStore(root=args.mission_path)
-        session = store.get_session(args.session)
-        next_session = store.get_session(args.session+1)
+        start_session_view = store.get_session(args.start_session)
+        end_session_view = store.get_session(end_session)
 
         task_generator = NextSessionTelemetryTasklistGenerator()
         estimation = task_generator.estimate_session(
-            session, 
-            next_session.read_metadata()["start_time_iso_with_zone"])
+            start_session_view, 
+            end_session_view.read_metadata()["start_time_iso_with_zone"])
 
         if not (estimation is None):
             generated_tasks = task_generator.generate_telemetry_tasks(
