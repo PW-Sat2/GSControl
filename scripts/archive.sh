@@ -29,6 +29,7 @@ mv /gs/downlink_frames ${ARCHIVE_FOLDER}/${GS_NAME}_downlink.frames
 mv /gs/watchdog_saved_frames_* ${ARCHIVE_FOLDER}/
 mv /gs/${GS_NAME}_versions ${ARCHIVE_FOLDER}/
 mv /gs/waterfall.jpg ${ARCHIVE_FOLDER}/${GS_NAME}_waterfall.jpg
+mv /gs/waterfall.png ${ARCHIVE_FOLDER}/${GS_NAME}_waterfall.png
 
 # Save mission artifacts
 
