@@ -9,8 +9,6 @@ from prompt_toolkit.styles import style_from_dict
 from pygments.token import Token
 import response_frames as rf
 
-from radio.radio_receiver import Receiver
-
 Decoder = rf.FrameDecoder(rf.frame_factories)
 
 STYLE = style_from_dict({
@@ -23,20 +21,13 @@ STYLE = style_from_dict({
 
 
 class SessionScope(object):
-    def __init__(self, sender):
+    def __init__(self, sender, receivers):
+        self.receivers = receivers
         self.sender = sender
 
     def send(self, frame):
         self.sender.send(frame)
 
-
-def build_recv_sock(target, port):
-    context = zmq.Context.instance()
-    sock = context.socket(zmq.SUB)
-    sock.connect("tcp://%s:%d" % (target, port))
-    sock.setsockopt(zmq.SUBSCRIBE, "")
-
-    return sock
 
 def receive_all(receivers, callback):
     signal = threading.Event()
@@ -45,12 +36,10 @@ def receive_all(receivers, callback):
     started = threading.Event()
 
     def worker():
-        socks = map(lambda s: s, receivers)
-
         started.set()
 
         while True:
-            (r, _, _) = zmq.select(socks, [], [], timeout=2)
+            (r, _, _) = zmq.select(receivers, [], [], timeout=2)
 
             if not r and signal.is_set():
                 break
@@ -112,10 +101,7 @@ class Loop(object):
         received_frames = []
 
         while True:
-            end_receive = receive_all([
-                build_recv_sock(target='fp-main.gs.kplabs.pl', port=7001),
-                build_recv_sock(target='elka-main.gs.pw-sat.pl', port=7001),
-            ], callback=lambda f: received_frames.append(f))
+            end_receive = receive_all(session_scope.receivers, callback=lambda f: received_frames.append(f))
 
             self._execute_once(session_scope)
 

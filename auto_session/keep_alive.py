@@ -9,7 +9,7 @@ import response_frames as rf
 def session(start, stop):
     yield Loop(
         tasks=[
-            [5, Sleep],
+            [10, Sleep],
             [tc.SetBitrate(correlation_id=12, bitrate=BaudRate.BaudRate9600), Send],
         ],
         until=Received(rf.SetBitrateSuccessFrame)
