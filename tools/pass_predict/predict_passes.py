@@ -48,6 +48,17 @@ def generateSessions(predictions, minElev):
             sessions.append(sessionObject)
     return sessions
 
+def saveSessions(sessionNumber, sessionsData, missionPath):
+    sessionIndex = sessionNumber
+    for session in sessionsData:
+        sessionFolderPath = os.path.join(missionPath, "sessions", str(sessionIndex))
+        os.mkdir(sessionFolderPath)
+        dataPath = os.path.join(sessionFolderPath,"data.json")
+        print dataPath
+        with open(dataPath, "w") as outFile:
+            json.dump(session, outFile)
+        sessionIndex = sessionIndex + 1
+
 def qthListToQth(qthlist):
     firstGs = qthlist[0]
     qth = (firstGs[0], -firstGs[1], firstGs[2])
@@ -64,6 +75,8 @@ def main():
                         help="Next session number", type=int)
     parser.add_argument('-n', '--session-count', required=False,
                         help="Number of sessions to generate", default=1, type=int)
+    parser.add_argument('-m', '--mission-path', required=False,
+                        help="Path to Mission repository", default="~/gs/mission")
     
     args = parser.parse_args()
     imp.load_source('config', args.config)
@@ -84,8 +97,11 @@ def main():
     predictions = predict_pass("\n".join(tleLines), qth, args.session_count)
     sessions = generateSessions(predictions, minimum_elevation)
 
-    for s in sessions:
-        print json.dumps(s, indent=4)
+    if args.session:
+        saveSessions(args.session, sessions, args.mission_path)
+    else:
+        for s in sessions:
+            print json.dumps(s, indent=4)
 
 if __name__ == "__main__":
     main()
