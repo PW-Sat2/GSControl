@@ -1,9 +1,13 @@
 import os
+import sys
 
 import numpy as np
 import datetime as dt
 
 import json
+
+sys.path.append(os.path.join(os.path.dirname(__file__), '../PWSat2OBC/integration_tests'))
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 from summary.mission_store import MissionStore
 from summary.steps_lib.files import get_downloaded_files
@@ -201,7 +205,7 @@ class NextSessionTelemetryTasklistGenerator:
 
 if __name__ == '__main__':  
     import argparse
-
+    
     def parse_args():
         default_mission_repository = os.path.abspath(
             os.path.join(os.path.dirname(os.path.realpath(__file__)), '../../mission'))
