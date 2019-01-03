@@ -133,12 +133,6 @@ def parse_sessions():
     return sorted(sessions, key=lambda x: x.start)
 
 
-def filter_old(sessions):
-    for i in sessions:
-        if i.stop + timedelta(minutes=5) > datetime.utcnow():
-            yield i
-
-
 def execute(time_events):
     for i in time_events:
         delay = i[0] - datetime.utcnow()
