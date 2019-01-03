@@ -1,21 +1,54 @@
 import os
 
 import numpy as np
+import datetime as dt
+
+import json
 
 from summary.mission_store import MissionStore
 from summary.steps_lib.files import get_downloaded_files
 
+import telecommand
+
+class ChunksEstimation:
+    def __str__(self):
+        return "current start: {0}, current end: {1}, previous_start: {2}, previous_end: {3}".format(            
+            self.current_start,
+            self.current_end,
+            self.previous_start,
+            self.previous_end)
+
+
+def flat_array(arr):
+    return [y for x in arr for y in x]
+
+def splitAllChunks(data, max_chunks):
+    splitCount = (len(data) / max_chunks) + 1
+    return map(lambda x: list(x), np.array_split(data, splitCount))
+
+def pop_matching(arr, total, delegate):
+    taken = []
+    idx = 0
+    while True:    
+        if (len(taken) >= total) or (idx >= len(arr)):
+            break;
+
+        val = arr[idx]
+
+        if delegate(val):
+            taken.append(val)
+            del arr[idx]
+        else:
+            idx = idx + 1
+
+    return taken
 
 class MissingFilesTasklistGenerator:
     @staticmethod
     def _generateTelecommandData(missing_files, max_chunks, cid_start):
-        def splitAllChunks(data):
-            splitCount = (len(data) / max_chunks) + 1
-            return map(lambda x: list(x), np.array_split(data, splitCount))
-
         missingSplittedChunksPerFile = map(lambda (name, info): ({
             "name": name,
-            "chunks": splitAllChunks(info["MissingChunks"])
+            "chunks": splitAllChunks(info["MissingChunks"], max_chunks)
         }), missing_files.items())
 
         flattenedChunksPerFile = [{"name": x["name"], "chunks": y} for x in missingSplittedChunksPerFile for y in
@@ -60,9 +93,113 @@ class MissingFilesTasklistGenerator:
         return 'tasks = [\r\n' + telecommandsText + '\r\n]'
 
 
-if __name__ == '__main__':
-    import argparse
 
+class NextSessionTelemetryTasklistGenerator:
+    CHUNKS_PER_MINUTE = 1.82
+    MAX_CHUNKS = 2280
+
+    def estimateChunks(self, startChunk, startTime, nextTime):
+        chunksPerMinute = self.CHUNKS_PER_MINUTE
+
+        estimation = ChunksEstimation()
+        estimation.current_start = startChunk
+        estimation.previous_start = -1
+        estimation.previous_end = -1
+        
+        totalSeconds = (nextTime - startTime).total_seconds();
+
+        estimation.generated_chunks = int((totalSeconds / 60) * chunksPerMinute)
+
+        estimation.current_end = estimation.current_start + estimation.generated_chunks
+
+        if (estimation.current_end > self.MAX_CHUNKS):
+            estimation.previous_start = estimation.current_start
+            estimation.previous_end = self.MAX_CHUNKS
+            estimation.current_start = 0
+            estimation.current_end -= self.MAX_CHUNKS
+
+        return estimation
+
+
+    def read_session_telemetry_chunks(self, session):
+        tasklist = filter(lambda x: isinstance(x[0], telecommand.fs.ListFiles), session.tasklist)
+        file_list_cids = map(lambda x: x[0]._correlation_id, tasklist)
+        file_list_cids.reverse()
+        
+
+        for cid in file_list_cids:
+            loaded_list = []
+            
+            file_list_file = "file_list_{0}.txt".format(cid)
+
+            if session.has_artifact(file_list_file) == False:
+                continue
+
+            file_list_txt = session.read_artifact(file_list_file)
+            loaded_list = json.loads(file_list_txt.replace("'", '"'))
+
+            telemetry_entries = filter(lambda x: x["File"] == 'telemetry.current', loaded_list)
+
+            if len(telemetry_entries) == 0:
+                continue
+
+            return telemetry_entries[0]["Chunks"]
+
+    def estimate_session(self, previous_session, next_session_start):
+        start_time = previous_session.read_metadata()["start_time_iso_with_zone"]
+        start_chunk = self.read_session_telemetry_chunks(previous_session)
+        
+        if start_chunk is None:
+            print "Unable to find previous session file list"
+            return
+        
+
+        return self.estimateChunks(
+            startChunk=start_chunk, 
+            startTime=start_time, 
+            nextTime=next_session_start
+        )
+
+
+    def generate_telemetry_tasks(self, estimation, density_level = 5, chunk_step = 50, cid_start = 30, chunks_per_tc = 20):
+        
+        # Generate the start indexes with binary division of the range, so that telemetry gets more dense as more chunks are downloaded
+        indexes = [0, chunk_step/2]
+        for current_level in range(2, density_level, 1):
+            divisor = max(1, int(chunk_step/(2**current_level))) 
+            indexes = indexes + flat_array([[index-divisor, index+divisor] for index in indexes[-(2**(current_level-2)):]])
+            if divisor == 1:
+                break;
+
+        chunks_offsets = map(lambda start: range(start, estimation.generated_chunks, chunk_step) ,indexes)
+        chunk_index_offset = -estimation.current_start if estimation.previous_end == -1 else  estimation.previous_end - estimation.previous_start
+
+        chunk_ids = flat_array(map(lambda x: map(lambda y: y - chunk_index_offset, x), chunks_offsets))
+
+        telemetry_chunks = []
+        while len(chunk_ids) > 0:
+            if chunk_ids[0] < 0:
+                telemetry_chunks.append({
+                    "name": "telemetry.previous",
+                    "chunks": [x+self.MAX_CHUNKS for x in pop_matching(chunk_ids, chunks_per_tc, lambda x: x < 0)]
+                })
+            else:
+                telemetry_chunks.append({
+                    "name": "telemetry.current",
+                    "chunks": pop_matching(chunk_ids, chunks_per_tc, lambda x: x >= 0)
+                })
+
+        telecommandData = map(lambda (i, x): ({
+            "cid": i + cid_start,
+            "chunks": ', '.join(map(str, x["chunks"])),
+            "file": x["name"]
+        }), enumerate(telemetry_chunks))
+
+        return map(lambda x: MissingFilesTasklistGenerator._generateTelecommandText(x), telecommandData)
+
+
+if __name__ == '__main__':  
+    import argparse
 
     def parse_args():
         default_mission_repository = os.path.abspath(
@@ -74,26 +211,37 @@ if __name__ == '__main__':
                             help="Session number", type=int)
         parser.add_argument('-m', '--mission-path', required=False,
                             help="Path to mission repository", default=default_mission_repository)
-        parser.add_argument('-c', '--max-chunks', required=False,
+        parser.add_argument('-c', '--chunks-per-tc', required=False,
                             help="Maximum chunks allowed for download with single telecommand", default=20, type=int)
         parser.add_argument('-o', '--output', required=False,
-                            help="Output file path", default='tasklist.missings.py')
+                            help="Output file path", default='tasklist.telemetry.py')
         parser.add_argument('-i', '--cid-start', required=False,
                             help="Beginning of generated correlation id", default=30, type=int)
 
         return parser.parse_args()
 
-
     def main(args):
         store = MissionStore(root=args.mission_path)
         session = store.get_session(args.session)
+        next_session = store.get_session(args.session+1)
 
-        telecommandsText = MissingFilesTasklistGenerator.generate(session, args.max_chunks, args.cid_start)
+        task_generator = NextSessionTelemetryTasklistGenerator()
+        estimation = task_generator.estimate_session(
+            session, 
+            next_session.read_metadata()["start_time_iso_with_zone"])
 
-        output_file = open(args.output, 'w')
-        output_file.write(telecommandsText)
-        output_file.flush()
-        output_file.close()
+        if not (estimation is None):
+            generated_tasks = task_generator.generate_telemetry_tasks(
+                estimation, 
+                density_level=5, 
+                chunks_per_tc=args.chunks_per_tc,
+                cid_start=args.cid_start
+                )
+
+            output_file = open(args.output, 'w')
+            output_file.write('tasks = [\r\n' + ",\r\n\t".join(generated_tasks) + '\r\n]')
+            output_file.flush()
+            output_file.close()
 
 
     main(parse_args())

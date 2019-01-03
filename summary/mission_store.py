@@ -1,6 +1,8 @@
 import base64
 from os import path
 import os
+import json
+import dateutil.parser
 
 from radio import analyzer
 from utils import ensure_byte_list, ensure_string
@@ -21,6 +23,14 @@ class SessionView(object):
         self.tasklist = store.load_tasklist(self.tasklist_path)
 
         self.all_frames = self.frames(['all'])
+
+    def read_metadata(self):
+        metadata = json.loads(self.get_file('data.json'))["Session"]
+        metadata["start_time_iso_with_zone"] = dateutil.parser.parse(metadata["start_time_iso_with_zone"])
+        metadata["stop_time_iso_with_zone"] = dateutil.parser.parse(metadata["stop_time_iso_with_zone"])
+
+        return metadata
+
 
     def expand_path(self, relative_path):
         return path.join(self._root, relative_path)
