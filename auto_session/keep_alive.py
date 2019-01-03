@@ -42,5 +42,5 @@ def session(start, stop):
             [tc.SendBeacon(), Send],
             [20, Sleep]
         ],
-        until=Eternity
+        until=Eternity()
     )
