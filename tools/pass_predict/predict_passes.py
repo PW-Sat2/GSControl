@@ -15,8 +15,24 @@ class Predicton:
         self.aosAzimuth = aosAzimuth
 
 def predict_pass(tle, qth, count):
+    def parseTimezonedelta(delta):
+        sign = "+" if delta.days >= 0 else "-"
+        seconds = delta.seconds
+        if (delta.days < 0):
+            seconds = abs(delta.days * 86400 + delta.seconds)
+
+        hours, seconds = divmod(seconds, 3600)
+        minutes, seconds = divmod(seconds, 60)
+        diffString = '{}{:02d}:{:02d}'.format(sign, hours, minutes)
+        return diffString
+
     def makeDate(timestamp):
-        return datetime.datetime.utcfromtimestamp(timestamp).replace(microsecond=0).isoformat() + '+00:00'
+        utcDate = datetime.datetime.utcfromtimestamp(timestamp).replace(microsecond=0)
+        localDate = datetime.datetime.fromtimestamp(timestamp).replace(microsecond=0) 
+        diff = localDate - utcDate
+        diffString = parseTimezonedelta(diff)
+
+        return localDate.isoformat() + diffString
 
     predictions = []
     p = predict.transits(tle, qth)
