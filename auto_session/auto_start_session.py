@@ -181,9 +181,9 @@ while True:
         convert_to_local = lambda x: x.replace(tzinfo=tz.tzutc()).astimezone(tz.tzlocal()).replace(tzinfo=None)
         local_start = convert_to_local(session.start)
         local_stop = convert_to_local(session.stop)
-        send_to_slack("{}: Next session {} scheduled at {} -> {}: {}, {}"
-                      .format(gs_name, session.nr, local_start, local_stop,
-                              session.primary_gs, auto_session_str))
+        send_to_slack("{}: Next {} session {} scheduled at {} -> {}: primary gs: {}"
+                      .format(gs_name, auto_session_str, session.nr, local_start, local_stop,
+                              session.primary_gs))
 
     time_left_to_session = session.start - datetime.utcnow()
     print "Session: ", session, "; Time left: ", time_left_to_session
