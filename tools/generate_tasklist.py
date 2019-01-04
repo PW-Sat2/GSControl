@@ -1,46 +1,29 @@
 import os
+
 import numpy as np
 
 from summary.mission_store import MissionStore
-import telecommand
+from summary.steps_lib.files import get_downloaded_files
+
 
 class MissingFilesTasklistGenerator:
     @staticmethod
-    def _getAllSessionFilePaths(session):
-        downloadFiles =  filter(lambda x: isinstance(x[0], telecommand.fs.DownloadFile), session.tasklist)
-        allFiles = map(lambda x: x[0]._path, downloadFiles)
-
-        return allFiles
-    
-    @staticmethod
-    def _readMissingChunksPerFile(session, allFiles):
-        allPossibleMissingFiles = map(lambda x: (x+'.missing').strip('/'), allFiles)
-        allPossibleMissingFiles = list(set(allPossibleMissingFiles))
-        allExistingMissingFiles = filter(lambda x: session.has_artifact(x), allPossibleMissingFiles)
-
-        def readChunksFromMissing(file):
-            return session.read_artifact(file, as_lines=True)[0].strip('[],').split()
-
-        missingChunksPerFile = map(lambda x: ({"name": x.replace('.missing',''), "data": readChunksFromMissing(x)}), allExistingMissingFiles)
-        return missingChunksPerFile
-
-    @staticmethod
-    def _generateTelecommandData(missingChunksPerFile, max_chunks, cid_start):    
+    def _generateTelecommandData(missing_files, max_chunks, cid_start):
         def splitAllChunks(data):
-            splitCount = (len(data)/max_chunks)+1
-            return map(lambda x: list(x), np.array_split(data,splitCount))
+            splitCount = (len(data) / max_chunks) + 1
+            return map(lambda x: list(x), np.array_split(data, splitCount))
 
-        missingSplittedChunksPerFile = map(lambda x: ({
-            "name": x["name"],
-            "chunks": splitAllChunks(x["data"])
-        }) , missingChunksPerFile)
+        missingSplittedChunksPerFile = map(lambda (name, info): ({
+            "name": name,
+            "chunks": splitAllChunks(info["MissingChunks"])
+        }), missing_files.items())
 
+        flattenedChunksPerFile = [{"name": x["name"], "chunks": y} for x in missingSplittedChunksPerFile for y in
+                                  x["chunks"]]
 
-        flattenedChunksPerFile = [{"name": x["name"], "chunks": y} for x in missingSplittedChunksPerFile for y in x["chunks"]]
-
-        telecommandData = map(lambda (i,x): ({
-            "cid": i+cid_start,
-            "chunks": ''.join(x["chunks"]),
+        telecommandData = map(lambda (i, x): ({
+            "cid": i + cid_start,
+            "chunks": ', '.join(map(str, x["chunks"])),
             "file": x["name"]
         }), enumerate(flattenedChunksPerFile))
 
@@ -52,22 +35,38 @@ class MissingFilesTasklistGenerator:
             singleTelecommandData["cid"],
             singleTelecommandData["file"],
             singleTelecommandData["chunks"]
-    )
+        )
+
+    @staticmethod
+    def _filter_missing(files):
+        result = {}
+
+        for name, info in files.items():
+            if info['MissingChunks']:
+                result[name] = info
+
+        return result
 
     @staticmethod
     def generate(session, max_chunks, cid_start):
-        allFiles = MissingFilesTasklistGenerator._getAllSessionFilePaths(session)
-        missingChunksPerFile = MissingFilesTasklistGenerator._readMissingChunksPerFile(session, allFiles)
-        telecommandData = MissingFilesTasklistGenerator._generateTelecommandData(missingChunksPerFile, max_chunks, cid_start)
-        telecommandsText = ",\r\n\t".join(map(lambda x: MissingFilesTasklistGenerator._generateTelecommandText(x), telecommandData))
+        downloaded_files = get_downloaded_files(session.tasklist, session.all_frames)
+
+        missing_files = MissingFilesTasklistGenerator._filter_missing(downloaded_files)
+
+        telecommandData = MissingFilesTasklistGenerator._generateTelecommandData(missing_files, max_chunks, cid_start)
+        telecommandsText = ",\r\n\t".join(
+            map(lambda x: MissingFilesTasklistGenerator._generateTelecommandText(x), telecommandData))
 
         return 'tasks = [\r\n' + telecommandsText + '\r\n]'
+
 
 if __name__ == '__main__':
     import argparse
 
+
     def parse_args():
-        default_mission_repository = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../../mission'))
+        default_mission_repository = os.path.abspath(
+            os.path.join(os.path.dirname(os.path.realpath(__file__)), '../../mission'))
 
         parser = argparse.ArgumentParser()
 
@@ -81,11 +80,11 @@ if __name__ == '__main__':
                             help="Output file path", default='tasklist.missings.py')
         parser.add_argument('-i', '--cid-start', required=False,
                             help="Beginning of generated correlation id", default=30, type=int)
-                
 
         return parser.parse_args()
 
-    def main(args):        
+
+    def main(args):
         store = MissionStore(root=args.mission_path)
         session = store.get_session(args.session)
 
@@ -95,5 +94,6 @@ if __name__ == '__main__':
         output_file.write(telecommandsText)
         output_file.flush()
         output_file.close()
+
 
     main(parse_args())
