@@ -8,6 +8,7 @@ import argparse
 import urllib2
 import random
 import subprocess
+import traceback
 
 from dateutil import tz
 from slacker import Slacker
@@ -33,17 +34,26 @@ slack_important_channel = args.important_channel
 
 
 def send_to_slack(msg):
-    requests.post(slack_url, json={'text': msg})
+    try:
+        requests.post(slack_url, json={'text': msg})
+    except Exception:
+        traceback.print_exc()
 def send_to_slack_important(text):
-    s = Slacker(slack_token)
-    channel_id = s.channels.get_channel_id(slack_important_channel)
-    print text
-    s.chat.command(channel=channel_id, command='/imgflip', text='sad frog; ' + text)
+    try:
+        s = Slacker(slack_token)
+        channel_id = s.channels.get_channel_id(slack_important_channel)
+        print text
+        s.chat.command(channel=channel_id, command='/imgflip', text='sad frog; ' + text)
+    except Exception:
+        traceback.print_exc()
 
 def imgflip(text):
-    s = Slacker(slack_token)
-    channel_id = s.channels.get_channel_id(slack_channel)
-    s.chat.command(channel=channel_id, command='/imgflip', text=' ' + text)
+    try:
+        s = Slacker(slack_token)
+        channel_id = s.channels.get_channel_id(slack_channel)
+        s.chat.command(channel=channel_id, command='/imgflip', text=' ' + text)
+    except Exception:
+        traceback.print_exc()
 
 
 def sleep(timeout):
@@ -195,11 +205,15 @@ def run_cmd(cmd, name):
 
 
 def start_session():
-    j = json.load(urllib2.urlopen(urllib2.Request('https://api.imgflip.com/get_memes', headers={'User-Agent': "Magic Browser"})))
-    names = [str(i['name']) for i in j['data']['memes']]
-    name = random.choice(names)
+    try:
+        j = json.load(urllib2.urlopen(urllib2.Request('https://api.imgflip.com/get_memes', headers={'User-Agent': "Magic Browser"})))
+        names = [str(i['name']) for i in j['data']['memes']]
+        name = random.choice(names)
 
-    imgflip(name + '; Sesja ' + str(session.nr) + '; {} {}'.format(gs_name, auto_session_str))
+        imgflip(name + '; Sesja ' + str(session.nr) + '; {} {}'.format(gs_name, auto_session_str))
+    except Exception:
+        traceback.print_exc()
+
     run_cmd(gscontrol + '/scripts/start_auto_session.sh ' + str(session.nr),
             'start ' + str(session.nr))
 
@@ -233,8 +247,11 @@ def all_frames_summary():
         run_cmd('yes \'y\' | ' + gscontrol + '/scripts/summary.sh ' + str(session.nr),
                 'summary')
 
-        with open('/tmp/stats') as stats:
-            send_to_slack(stats.read())
+        try:
+            with open('/tmp/stats') as stats:
+                send_to_slack(stats.read())
+        except Exception:
+            traceback.print_exc()
 
 
 time_events = [
