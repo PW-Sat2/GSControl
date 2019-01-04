@@ -52,7 +52,7 @@ def generateSessions(predictions, minElev):
         if sat_pass.maxElev >= minElev:
             session = OrderedDict()
             session['short_description'] = "Automatic session."
-            session['phase'] = "None"
+            session['phase'] = "after_sail_deployment"
             session['status'] = "auto"
             session['primary'] = "elka" if (sat_pass.aosAzimuth < 90.0 or sat_pass.aosAzimuth > 270.0) else "fp"
             session['start_time_iso_with_zone'] = sat_pass.start
