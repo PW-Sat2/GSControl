@@ -210,6 +210,11 @@ if __name__ == '__main__':
         default_mission_repository = os.path.abspath(
             os.path.join(os.path.dirname(os.path.realpath(__file__)), '../../mission'))
 
+        task_templates_path = os.path.abspath(
+            os.path.join(os.path.dirname(os.path.realpath(__file__)), 'tasklist_templates'))
+
+        default_template_path = os.path.join(task_templates_path, 'telemetry_download.template')
+
         parser = argparse.ArgumentParser()
 
         parser.add_argument('-s', '--start-session', required=True,
@@ -225,7 +230,7 @@ if __name__ == '__main__':
         parser.add_argument('-i', '--cid-start', required=False,
                             help="Beginning of generated correlation id", default=30, type=int)
         parser.add_argument('-t', '--template-path', required=False,
-                            help="Path to template of the tasklist", type=str, default="tasklist_templates/telemetry_download.template")
+                            help="Path to template of the tasklist", type=str, default=default_template_path)
 
         return parser.parse_args()
 
