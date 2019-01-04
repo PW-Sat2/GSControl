@@ -7,6 +7,7 @@ import requests
 import argparse
 import urllib2
 import random
+import subprocess
 
 from dateutil import tz
 from slacker import Slacker
@@ -170,8 +171,8 @@ while True:
         convert_to_local = lambda x: x.replace(tzinfo=tz.tzutc()).astimezone(tz.tzlocal()).replace(tzinfo=None)
         local_start = convert_to_local(session.start)
         local_stop = convert_to_local(session.stop)
-        send_to_slack("Next session {} scheduled at {} -> {}: {}, {}"
-                      .format(session.nr, local_start, local_stop,
+        send_to_slack("{}: Next session {} scheduled at {} -> {}: {}, {}"
+                      .format(gs_name, session.nr, local_start, local_stop,
                               session.primary_gs, auto_session_str))
 
     time_left_to_session = session.start - datetime.utcnow()
@@ -191,7 +192,6 @@ def run_cmd(cmd, name):
     if os.system(cmd) > 0:
         print " !!!" + gs_name + '/' + name + "failed!"
         send_to_slack_important(gs_name + '/' + name + "; napraw mnie")
-        exit(1)
 
 
 def start_session():
@@ -213,7 +213,9 @@ def run_keep_alive():
 
 def stop_keep_alive():
     if on_primary_gs and auto_session:
-        run_cmd('pgrep -fx ".*/GSControl/auto_session/execute_session.py.*" | xargs kill', 'kill execute')
+        pid = subprocess.Popen('pgrep -fx \".*execute_session.py.*\"', shell=True, stdout=subprocess.PIPE).stdout.read().strip()
+        print 'pid:', pid
+        run_cmd('kill {}'.format(pid), 'kill execute')
 
 
 def stop_session():
