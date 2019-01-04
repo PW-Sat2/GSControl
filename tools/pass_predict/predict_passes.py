@@ -1,4 +1,5 @@
 from gpredict_tle_loader import GpredictTleLoader
+from prediction import Predicton
 import predict
 import argparse
 import os
@@ -7,44 +8,66 @@ import datetime
 import json
 from collections import OrderedDict
 
-class Predicton:
-    def __init__(self, start, end, maxElev, aosAzimuth):
-        self.start = start
-        self.end = end
-        self.maxElev = maxElev
-        self.aosAzimuth = aosAzimuth
+def predict_pass(tle, qths, count):
+    def predictOneStation(tle, qth):
+        predictions = []
+        p = predict.transits(tle, qth)
+        for _ in range(0, count):
+            transit = p.next()
+            start = transit.start
+            stop = transit.end
+            maxElev = round(transit.peak()['elevation'],2)
+            aosAzimuth = transit.at(transit.start)['azimuth']
 
-def predict_pass(tle, qth, count):
-    def parseTimezonedelta(delta):
-        sign = "+" if delta.days >= 0 else "-"
-        seconds = delta.seconds
-        if (delta.days < 0):
-            seconds = abs(delta.days * 86400 + delta.seconds)
+            prediction = Predicton(start, stop, maxElev, aosAzimuth)          
+            predictions.append(prediction)
+            
+        return predictions
+   
+    allStationPredictions = []
+    for station in qths:
+        allStationPredictions.append(predictOneStation(tle,station))       
 
-        hours, seconds = divmod(seconds, 3600)
-        minutes, seconds = divmod(seconds, 60)
-        diffString = '{}{:02d}:{:02d}'.format(sign, hours, minutes)
-        return diffString
+    return allStationPredictions
 
-    def makeDate(timestamp):
-        utcDate = datetime.datetime.utcfromtimestamp(timestamp).replace(microsecond=0)
-        localDate = datetime.datetime.fromtimestamp(timestamp).replace(microsecond=0) 
-        diff = localDate - utcDate
-        diffString = parseTimezonedelta(diff)
+def mergeStationPredictions(allStationPredictions):
+    def comparisonFunction(element1, element2):
+        diff = abs(element1.start - element2.start)
+        return diff < 20 * 60
+    
+    def groupSimilarPasses(allPredictions):
+        groupped = []
+        visited = []
+        for prediction in allPredictions:
+            if prediction in visited:
+                continue
+            similar = []
+            for p in allPredictions:
+                if comparisonFunction(prediction, p):
+                    similar.append(p)
+                    visited.append(p)
+            groupped.append(similar)
+        return groupped
 
-        return localDate.isoformat() + diffString
+    allPredictions = [] 
+    [ allPredictions.extend(el) for el in allStationPredictions]
 
-    predictions = []
-    p = predict.transits(tle, qth)
-    for _ in range(0, count):
-        transit = p.next()
-        start = makeDate(transit.start)
-        stop = makeDate(transit.end)
-        maxElev = round(transit.peak()['elevation'],2)
-        aosAzimuth = transit.at(transit.start)['azimuth']
-        predictions.append(Predicton(start, stop, maxElev, aosAzimuth))
-        print("{}\t{}\t{}".format(start, stop, maxElev))
-    return predictions
+    groupped = groupSimilarPasses(allPredictions)
+
+    merged = []
+    for group in groupped:
+        if len(group) < len(allStationPredictions):
+            continue
+        newStart = min([e.start for e in group])
+        newEnd = max([e.end for e in group])
+        newElev = max([e.maxElev for e in group])
+        newAosAzimuth = [e.aosAzimuth for e in group if e.start == newStart][0]
+        newPrediction = Predicton(newStart, newEnd, newElev, newAosAzimuth)
+        print newPrediction
+        merged.append(newPrediction)
+
+    return merged
+
 
 def generateSessions(predictions, minElev):
     sessions = []
@@ -55,8 +78,8 @@ def generateSessions(predictions, minElev):
             session['phase'] = "after_sail_deployment"
             session['status'] = "auto"
             session['primary'] = "elka" if (sat_pass.aosAzimuth < 90.0 or sat_pass.aosAzimuth > 270.0) else "fp"
-            session['start_time_iso_with_zone'] = sat_pass.start
-            session['stop_time_iso_with_zone'] = sat_pass.end
+            session['start_time_iso_with_zone'] = sat_pass.getIsoStartDate()
+            session['stop_time_iso_with_zone'] = sat_pass.getIsoEndDate()
             session['maximum_elevation'] = sat_pass.maxElev
 
             sessionObject = dict()
@@ -77,9 +100,10 @@ def saveSessions(sessionNumber, sessionsData, missionPath):
         sessionIndex = sessionIndex + 1
 
 def qthListToQth(qthlist):
-    firstGs = qthlist[0]
-    qth = (firstGs[0], -firstGs[1], firstGs[2])
-    return qth
+    qths = []
+    for place in qthlist:
+        qths.append((place[0], -place[1], place[2]))
+    return qths
 
 
 def main():
@@ -107,12 +131,13 @@ def main():
     noradId = 43814 if 'NORAD_ID' not in config else config['NORAD_ID']
     minimum_elevation = 1 if 'MINIMUM_ELEVATION' not in config else config['MINIMUM_ELEVATION']
 
-    qth = qthListToQth(config['QTH'])
+    qths = qthListToQth(config['QTH'])
 
     tleLoadter = GpredictTleLoader(gpredict_path)
     tleLines = tleLoadter.loadTle(noradId)
-    predictions = predict_pass("\n".join(tleLines), qth, args.session_count)
-    sessions = generateSessions(predictions, minimum_elevation)
+    allStationPredictions = predict_pass("\n".join(tleLines), qths, args.session_count)
+    mergedPredictions = mergeStationPredictions(allStationPredictions)
+    sessions = generateSessions(mergedPredictions, minimum_elevation)
 
     if args.session:
         saveSessions(args.session, sessions, args.mission_path)
