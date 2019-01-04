@@ -163,7 +163,7 @@ def execute(time_events):
 session = None
 
 while True:
-    origin.pull()
+    origin.pull(rebase=True)
     sessions = parse_sessions()
     sessions = filter(lambda i: i.stop > datetime.utcnow(), sessions)
 
@@ -236,8 +236,8 @@ def stop_session():
     send_to_slack(gs_name + ': stopping session!')
     run_cmd('yes \'n\' | ' + gscontrol + '/scripts/stop_session.sh',
             'stop')
-    
-    origin.pull()
+
+    origin.pull(rebase=True)
     info = origin.push()[0]
     print('info.ref', info.ref)  # Symbolic Reference or RemoteReference to the changed remote head or FETCH_HEAD
     print('info.flags', info.flags)  # additional flags to be & with enumeration members,
