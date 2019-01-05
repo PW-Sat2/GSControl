@@ -227,7 +227,7 @@ def run_keep_alive():
 
 def stop_keep_alive():
     if on_primary_gs and auto_session:
-        pid = subprocess.Popen('pgrep -fx \".*execute_session.py.*\"', shell=True, stdout=subprocess.PIPE).stdout.read().strip()
+        pid = subprocess.Popen(executable='/usr/bin/pgrep', args=['pgrep', '-fx', '.*execute_session.py.*'], shell=False, stdout=subprocess.PIPE).stdout.read().strip()
         print 'pid:', pid
         run_cmd('kill {}'.format(pid), 'kill execute')
 
