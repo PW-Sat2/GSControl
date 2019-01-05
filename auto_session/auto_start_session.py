@@ -198,7 +198,7 @@ while True:
 
 
 def run_cmd(cmd, name):
-    print "Run: ", cmd
+    print "Run: '{}'".format(cmd)
     if os.system(cmd) > 0:
         print " !!!" + gs_name + '/' + name + "failed!"
         send_to_slack_important(gs_name + '/' + name + "; napraw mnie")
