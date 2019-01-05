@@ -249,15 +249,14 @@ if __name__ == '__main__':
         if not (estimation is None):
             generated_tasks = task_generator.generate_telemetry_tasks(
                 estimation, 
-                density_level=5, 
+                density_level=4, 
                 chunks_per_tc=args.chunks_per_tc,
                 cid_start=args.cid_start
                 )
 
-
             with open(args.template_path, 'r') as template:
                 output_file = open(args.output, 'w')
-                output_file.write(template.read().format(",\r\n\t".join(generated_tasks)))
+                output_file.write(template.read().format(",\n    ".join(generated_tasks)))
                 output_file.flush()
                 output_file.close()
 
