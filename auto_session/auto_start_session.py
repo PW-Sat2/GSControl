@@ -14,7 +14,7 @@ from dateutil import tz
 from slacker import Slacker
 from dateutil import parser
 from datetime import datetime, timedelta
-from git import Repo
+from git import Repo, PushInfo
 
 
 argparser = argparse.ArgumentParser()
@@ -237,16 +237,20 @@ def stop_session():
     run_cmd('yes \'n\' | ' + gscontrol + '/scripts/stop_session.sh',
             'stop')
 
-    origin.pull(rebase=True)
-    info = origin.push()[0]
-    print('info.remote_ref', info.remote_ref)  # Symbolic Reference or RemoteReference to the changed remote head or FETCH_HEAD
-    print('info.flags', info.flags)  # additional flags to be & with enumeration members,
-    # i.e. info.flags & info.REJECTED
-    # is 0 if ref is SymbolicReference
-    # print('info.note', info.note)  # additional notes given by git-fetch intended for the user
-    print('info.old_commit', info.old_commit)  # if info.flags & info.FORCED_UPDATE|info.FAST_FORWARD,
-    # field is set to the previous location of ref, otherwise None
-    # print('info.remote_ref_path', info.remote_ref_path)  # The path from which we fetched on the remote. It's the remote's version of our info.ref
+    for _ in range(0, 10):
+        # random sleep from 0.1 to 5 seconds
+        time.sleep(float(random.randint(100, 3000))/1000.)
+
+        origin.pull(rebase=True)
+        info = origin.push()[0]
+        print('info.remote_ref', info.remote_ref)
+        print('info.flags', info.flags)
+        print('info.old_commit', info.old_commit)
+
+        if info.flags & PushInfo.ERROR == 0:
+            return
+
+    print "Push failed after 10 tries!"
 
 
 def all_frames_summary():
