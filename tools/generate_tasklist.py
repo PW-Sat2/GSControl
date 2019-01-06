@@ -1,5 +1,6 @@
 import os
 import sys
+import glob
 
 import numpy as np
 import datetime as dt
@@ -127,16 +128,12 @@ class NextSessionTelemetryTasklistGenerator:
 
 
     def read_session_telemetry_chunks(self, session):
-        tasklist = filter(lambda x: isinstance(x[0], telecommand.fs.ListFiles), session.tasklist)
-        file_list_cids = map(lambda x: x[0]._correlation_id, tasklist)
-        file_list_cids.reverse()
-        
 
-        for cid in file_list_cids:
+        file_list_paths = glob.glob(session.expand_artifact_path('file_list*'))
+        
+        for file_list_file in file_list_paths:
             loaded_list = []
             
-            file_list_file = "file_list_{0}.txt".format(cid)
-
             if session.has_artifact(file_list_file) == False:
                 continue
 
@@ -180,6 +177,10 @@ class NextSessionTelemetryTasklistGenerator:
         chunk_index_offset = -estimation.current_start if estimation.previous_end == -1 else  estimation.previous_end - estimation.previous_start
 
         chunk_ids = flat_array(map(lambda x: map(lambda y: y - chunk_index_offset, x), chunks_offsets))
+
+        if max(chunk_ids) >= self.MAX_CHUNKS:
+            print 'ERROR: Telemetry is out of range, session period is to large'
+            return []
 
         telemetry_chunks = []
         while len(chunk_ids) > 0:
