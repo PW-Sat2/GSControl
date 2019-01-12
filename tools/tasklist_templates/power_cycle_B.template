@@ -12,10 +12,6 @@ tasks = [
     [tc.PowerCycleTelecommand(3), Send, WaitMode.Wait],
     [tc.PingTelecommand(), Send, WaitMode.Wait],
 
-    [tc.SendBeacon(), Send, WaitMode.Wait],
-
-    [tc.PingTelecommand(), Send, WaitMode.Wait],
-
     # Set 9600
     [tc.SetBitrate(4, BaudRate.BaudRate9600), Send, WaitMode.Wait],
     [tc.SendBeacon(), Send, WaitMode.Wait],
