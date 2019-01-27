@@ -20,6 +20,7 @@ class SessionView(object):
 
         self.tasklist_path = self.expand_path('tasklist.py')
 
+        self.tasklist = []
         if path.exists(self.tasklist_path):
             self.tasklist = store.load_tasklist(self.tasklist_path)
 
