@@ -191,7 +191,7 @@
     </param>
     <param>
       <key>gui_hint</key>
-      <value>speed_tab@0</value>
+      <value>speed_tab@1</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -238,7 +238,7 @@
     </param>
     <param>
       <key>gui_hint</key>
-      <value>speed_tab@1</value>
+      <value>speed_tab@0</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -367,11 +367,11 @@
     </param>
     <param>
       <key>label0</key>
-      <value>&amp;1 - 1200 bps</value>
+      <value>&amp;1 - 9600 bps</value>
     </param>
     <param>
       <key>label1</key>
-      <value>&amp;2 - 9600 bps</value>
+      <value>&amp;2 - 1200 bps</value>
     </param>
     <param>
       <key>label10</key>
