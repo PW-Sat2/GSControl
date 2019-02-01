@@ -97,7 +97,7 @@ def build(sender, rcv, frame_decoder, analyzer, ns):
                     ], style=style)
                 else:
                     print_tokens([
-                        (Token.String, "Wait ('n'/'r'/'p'/number for next/retry/previous/goto, then <Enter>)")
+                        (Token.String, "Wait ")
                     ], style=style)
 
                     user_input = ""
