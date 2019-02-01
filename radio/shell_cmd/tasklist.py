@@ -15,6 +15,32 @@ class DictWrapper(object):
         return self._d[name]
 
 def build(sender, rcv, frame_decoder, analyzer, ns):
+    import pprint
+    from prompt_toolkit.shortcuts import print_tokens
+    from prompt_toolkit.styles import style_from_dict
+    from pygments.token import Token
+
+    def send_additional_beacon(style, ns_wrapper):
+        import telecommand as tc
+        from radio.task_actions import Send
+
+        [telecommand, action_type] = [tc.SendBeacon(), Send]
+
+        tokens = [
+            (Token.String, "["),
+            (Token.Timestamp, datetime.now().strftime('%Y-%m-%d %H:%M:%S:%f')),
+            (Token.String, "] "),
+            (Token.CurrentStep, "Extra"),
+            (Token.String, ": "),
+            (Token.Action, action_type.__name__),
+            (Token.String, "("),
+            (Token.Telecommand, pprint.pformat(telecommand)),
+            (Token.String, ")... Please repeat: "),
+        ]
+
+        print_tokens(tokens, style=style)
+        action_type(telecommand).do(ns_wrapper)
+
     def run(tasks, start_from=1):
         """
         Performs list of tasks.
@@ -27,13 +53,7 @@ def build(sender, rcv, frame_decoder, analyzer, ns):
         For Print <arg> is text to display
 
         When using "Wait" it is necessary to type 'n<ENTER>' to continue running tasks
-        """
-
-        import pprint
-        from prompt_toolkit.shortcuts import print_tokens
-        from prompt_toolkit.styles import style_from_dict
-        from pygments.token import Token
-        
+        """     
 
         style = style_from_dict({
             Token.Timestamp: '#fdf6e3',
@@ -100,6 +120,11 @@ def build(sender, rcv, frame_decoder, analyzer, ns):
                             if user_step_no > -1:
                                 step_no = user_step_no - 2
                                 break
+                        elif user_input == 'b':
+                            send_additional_beacon(style, ns_wrapper)
+                            continue
+                        elif user_input == 'q':
+                            return
 
                         print_tokens([
                             (Token.Action, "Unknown command '{}'. ".format(user_input)),
