@@ -15,6 +15,7 @@ from slacker import Slacker
 from dateutil import parser
 from datetime import datetime, timedelta
 from git import Repo, PushInfo
+from math import ceil
 
 
 argparser = argparse.ArgumentParser()
@@ -44,6 +45,15 @@ def send_to_slack_important(text):
         channel_id = s.channels.get_channel_id(slack_important_channel)
         print text
         s.chat.command(channel=channel_id, command='/imgflip', text='sad frog; ' + text)
+    except Exception:
+        traceback.print_exc()
+
+def notify_oper(text):
+    try:
+        s = Slacker(slack_token)
+        channel_id = s.channels.get_channel_id(slack_important_channel)
+        print text
+        s.chat.post_message(channel=channel_id, text='@oper ' + text,parse='full', link_names=1, username="Session")
     except Exception:
         traceback.print_exc()
 
@@ -187,6 +197,10 @@ while True:
 
     time_left_to_session = session.start - datetime.utcnow()
     print "Session: ", session, "; Time left: ", time_left_to_session
+
+    notification_time = 10
+    if timedelta(minutes=notification_time) <= time_left_to_session and time_left_to_session <= timedelta(minutes=notification_time + 1):
+        notify_oper("Session {} in {:.0f} minutes. Station *{}* reporting for duty!".format(session.nr, ceil(time_left_to_session.total_seconds() / 60), os.environ['GS_NAME']))
 
     if time_left_to_session < timedelta(minutes=3):
         break
