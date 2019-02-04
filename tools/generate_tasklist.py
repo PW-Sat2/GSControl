@@ -257,7 +257,14 @@ if __name__ == '__main__':
 
             with open(args.template_path, 'r') as template:
                 output_file = open(args.output, 'w')
-                output_file.write(template.read().format(",\n    ".join(generated_tasks)))
+                generated_tasks_string = ",\n    ".join(generated_tasks)
+                output_file.write(
+                        template.read().format(
+                        dt.datetime.now(),
+                        args.start_session,
+                        end_session,
+                        end_session_view.read_metadata()["start_time_iso_with_zone"],
+                        generated_tasks_string))
                 output_file.flush()
                 output_file.close()
 
