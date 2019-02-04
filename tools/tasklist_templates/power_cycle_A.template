@@ -1,11 +1,15 @@
 tasks = [
+    ["Generated on {0}, contains telemetry from sessions {1} to {2}", Print, WaitMode.NoWait],
+    ["The session starts on {3}", Print, WaitMode.NoWait],
+
     [[tc.SetBitrate(1, BaudRate.BaudRate9600), 5], SendLoop, WaitMode.NoWait],
+
     [[tc.SendBeacon(), 10], SendLoop, WaitMode.NoWait],
 
     # ReadMemory, weird telecommands
     [tc.ReadMemory(2, 0x8801b620, 248), Send, WaitMode.Wait], # scrubbing
 
-     # Wait until good communication
+    # Wait until good communication
     [tc.SendBeacon(), Send, WaitMode.Wait],
 
     # Power cycle EPS A
@@ -20,7 +24,7 @@ tasks = [
     [tc.ListFiles(5, '/'), Send, WaitMode.Wait],
 
     # auto-generated telemetry start
-    {0},
+    {4},
     # auto-generated telemetry end
 
     [[tc.SendBeacon(), 20], SendLoop, WaitMode.NoWait],
