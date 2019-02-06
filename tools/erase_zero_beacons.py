@@ -20,6 +20,7 @@ def parse_args():
     parser = argparse.ArgumentParser()
 
     parser.add_argument("influx", help="InfluxDB URL (http://<serve>:<port>/<database>")
+    parser.add_argument('-a', '--auto', help="Auto-mode without user confirmation", action='store_true')
 
     return parser.parse_args()
 
@@ -92,9 +93,10 @@ def main(args):
 
     print_times(zero_beacon_times)
 
-    if not ask_for_remove():
-        print 'NOT removing data'
-        return
+    if not args.auto:
+        if not ask_for_remove():
+            print 'NOT removing data'
+            return
 
     print 'Removing data...'
 
