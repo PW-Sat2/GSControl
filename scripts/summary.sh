@@ -38,5 +38,5 @@ if confirm "Uploading summary to grafana."; then
 fi
 
 if confirm "Ereasing zero beacons."; then
-    python2.7 ${GSCONTROL}/tools/erase_zero_beacons.py ${GRAFANA_URL} --auto=True
+    python2.7 ${GSCONTROL}/tools/erase_zero_beacons.py ${GRAFANA_URL} --auto
 fi
