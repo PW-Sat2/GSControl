@@ -107,17 +107,20 @@ future = NextSessionTelemetryTasklistGenerator()
 message = "*Telemetry.current/previous chunks margin since session {}:*\n".format(args.start)
 
 for i in range(args.start + 1, args.start + args.next + 1):
-    list_of_directories.index(str(i))
-    end_session_view = store.get_session(i)
-    estimation = future.estimate_session(
-        start_session_view,
-        end_session_view.read_metadata()["stop_time_iso_with_zone"])
+    try:
+        list_of_directories.index(str(i))
+        end_session_view = store.get_session(i)
+        estimation = future.estimate_session(
+            start_session_view,
+            end_session_view.read_metadata()["stop_time_iso_with_zone"])
 
-    if end_session_view.read_metadata()["maximum_elevation"] > args.elevation:
-        line = "session {}: margin *{:5}*\t({}, elev. {} deg)".format(i, estimation, end_session_view.read_metadata()["start_time_iso_with_zone"], end_session_view.read_metadata()["maximum_elevation"])
-        if estimation < future.CHUNKS_SAFE_BUFFER:
-            line = "~" + line + "~"
-        message += "> " + line + "\n"
+        if end_session_view.read_metadata()["maximum_elevation"] > args.elevation:
+            line = "session {}: margin *{:5}*\t({}, elev. {} deg)".format(i, estimation, end_session_view.read_metadata()["start_time_iso_with_zone"], end_session_view.read_metadata()["maximum_elevation"])
+            if estimation < future.CHUNKS_SAFE_BUFFER:
+                line = "~" + line + "~"
+            message += "> " + line + "\n"
+    except Exception:
+        traceback.print_exc()
 
 print(message)
 
