@@ -36,3 +36,7 @@ fi
 if confirm "Uploading summary to grafana."; then
     python2.7 ${GSCONTROL}/summary/run.py ${SESSION} -d ${GRAFANA_URL} -u
 fi
+
+if confirm "Ereasing zero beacons."; then
+    python2.7 ${GSCONTROL}/tools/erase_zero_beacons.py ${GRAFANA_URL} --auto=True
+fi
