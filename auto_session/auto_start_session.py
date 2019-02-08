@@ -281,7 +281,7 @@ def all_frames_summary():
         except Exception:
             traceback.print_exc()
 
-        run_cmd("python2 " + gscontrol + "/tools/telemetry_loss_notifier.py" + " -s " + str(session.nr) + " -c " + slack_channel + " -t " + slack_token,
+        run_cmd("python2 " + gscontrol + "/tools/telemetry_loss_notifier.py" + " -s " + str(session.nr) + " -c " + slack_important_channel + " -t " + slack_token,
                 'telemetry loss notifier')
 
 
