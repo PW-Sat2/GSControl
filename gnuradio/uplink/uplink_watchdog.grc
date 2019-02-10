@@ -250,7 +250,7 @@
     </param>
     <param>
       <key>gui_hint</key>
-      <value>1,0</value>
+      <value>4,0</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -473,7 +473,7 @@
     </param>
     <param>
       <key>gui_hint</key>
-      <value>4,0</value>
+      <value>6,0</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -587,7 +587,7 @@
     </param>
     <param>
       <key>gui_hint</key>
-      <value>0,0</value>
+      <value>3,0</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -653,7 +653,7 @@
     </param>
     <param>
       <key>gui_hint</key>
-      <value>3,0</value>
+      <value>5,0</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -770,7 +770,7 @@
     </param>
     <param>
       <key>gui_hint</key>
-      <value>5,0</value>
+      <value>7,0</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -837,7 +837,7 @@
     </param>
     <param>
       <key>gui_hint</key>
-      <value>6,0</value>
+      <value>1,0</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -2216,7 +2216,7 @@ class frames_counter(gr.sync_block):
     </param>
     <param>
       <key>gui_hint</key>
-      <value>7,0</value>
+      <value>0,0</value>
     </param>
     <param>
       <key>_rotation</key>
