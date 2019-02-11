@@ -47,7 +47,6 @@ mkdir -vp ${ARTIFACT_FOLDER}
 cp -vp ${ARCHIVE_FOLDER}/${GS_NAME}_downlink.frames ${ARTIFACT_FOLDER}/
 cp -vp ${ARCHIVE_FOLDER}/${GS_NAME}_uplink.frames ${ARTIFACT_FOLDER}/
 cp -vp ${ARCHIVE_FOLDER}/${GS_NAME}_versions ${ARTIFACT_FOLDER}/
-cp -vp ${ARCHIVE_FOLDER}/${GS_NAME}_waterfall.jpg ${ARTIFACT_FOLDER}/
 
 ls -l ${ARTIFACT_FOLDER}
 
@@ -57,3 +56,10 @@ git -C ${MISSION} commit -m "${SESSION} - ${GS_NAME}"
 if confirm "Pushing to mission repo."; then
     git -C ${MISSION} push
 fi
+
+# Upload waterfall to titan
+mkdir -v /gs/${SESSION}
+cp ${ARCHIVE_FOLDER}/${GS_NAME}_waterfall.png /gs/${SESSION}/${GS_NAME}_waterfall.png
+
+scp -r -P 22 -i ~/.ssh/titan_key /gs/${SESSION}  pwsatwaterfall@titan.gajoch.pl:/home/pwsat/public/comm/waterfall/
+rm -r /gs/${SESSION}
