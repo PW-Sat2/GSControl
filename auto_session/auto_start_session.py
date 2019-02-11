@@ -269,6 +269,10 @@ def stop_session():
 
 def all_frames_summary():
     if on_primary_gs:
+        # random sleep from 10 to 30 seconds
+        time.sleep(float(random.randint(10000, 30000))/1000.)
+        origin.pull(rebase=True)
+
         run_cmd('yes \'y\' | ' + gscontrol + '/scripts/download_all_frames.sh ' + str(session.nr),
                 'all.frames')
 
