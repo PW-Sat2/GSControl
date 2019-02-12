@@ -16,6 +16,7 @@ from dateutil import parser
 from datetime import datetime, timedelta
 from git import Repo, PushInfo
 from math import ceil
+from roster import Roster, SLACK_NAMES
 
 
 argparser = argparse.ArgumentParser()
@@ -27,12 +28,15 @@ argparser.add_argument('-c', '--channel', required=True,
                 help="Main garbage channel name")
 argparser.add_argument('-i', '--important-channel', required=True,
                 help="Notification and important messages channel")
+argparser.add_argument('--spreadsheet', required=True, help="Roster spreadsheet ID")
+argparser.add_argument('--gcreds', required=True, help="Google credentials.json file")
 args = argparser.parse_args()
 slack_url = args.url
 slack_token = args.token
 slack_channel = args.channel
 slack_important_channel = args.important_channel
 
+roster = Roster(args.spreadsheet, args.gcreds)
 
 def send_to_slack(msg):
     try:
@@ -48,12 +52,15 @@ def send_to_slack_important(text):
     except Exception:
         traceback.print_exc()
 
-def notify_oper(text):
+def notify_oper(text, operator='oper'):
     try:
         s = Slacker(slack_token)
         channel_id = s.channels.get_channel_id(slack_important_channel)
         print text
-        s.chat.post_message(channel=channel_id, text='@oper ' + text,parse='full', link_names=1, username="Session")
+
+        operator = SLACK_NAMES.get(operator, operator or 'oper')
+
+        s.chat.post_message(channel=channel_id, text='@{} {}'.format(operator, text), parse='full', link_names=1, username="Session")
     except Exception:
         traceback.print_exc()
 
@@ -199,8 +206,14 @@ while True:
     print "Session: ", session, "; Time left: ", time_left_to_session
 
     notification_time = 10
+    #if True:
     if timedelta(minutes=notification_time) <= time_left_to_session and time_left_to_session <= timedelta(minutes=notification_time + 1):
-        notify_oper("Session {} in {:.0f} minutes. Station *{}* reporting for duty!".format(session.nr, ceil(time_left_to_session.total_seconds() / 60), os.environ['GS_NAME']))
+        assignment = roster.find_assignment_for_date(session.start)
+        operator = assignment.for_time(session.start)
+        if operator == '':
+            notify_oper("Session {} in {:.0f} minutes. Station *{}* reporting for duty! *NO OPERATOR ASSIGNED*".format(session.nr, ceil(time_left_to_session.total_seconds() / 60), os.environ['GS_NAME']))
+        else:
+            notify_oper("Session {} in {:.0f} minutes. Station *{}* reporting for duty!".format(session.nr, ceil(time_left_to_session.total_seconds() / 60), os.environ['GS_NAME']), operator=operator)
 
     if time_left_to_session < timedelta(minutes=3):
         break
