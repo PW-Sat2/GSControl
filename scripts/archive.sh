@@ -50,8 +50,7 @@ cp -vp ${ARCHIVE_FOLDER}/${GS_NAME}_versions ${ARTIFACT_FOLDER}/
 
 ls -l ${ARTIFACT_FOLDER}
 
-git -C ${MISSION} add ${ARTIFACT_FOLDER}/${GS_NAME}_downlink.frames ${ARTIFACT_FOLDER}/${GS_NAME}_uplink.frames ${ARTIFACT_FOLDER}/${GS_NAME}_versions ${ARTIFACT_FOLDER}/${GS_NAME}_waterfall.jpg
-git -C ${MISSION} commit -m "${SESSION} - ${GS_NAME}"
+git -C ${MISSION} add ${ARTIFACT_FOLDER}/${GS_NAME}_downlink.frames ${ARTIFACT_FOLDER}/${GS_NAME}_uplink.frames ${ARTIFACT_FOLDER}/${GS_NAME}_versions
 
 if confirm "Pushing to mission repo."; then
     git -C ${MISSION} push
