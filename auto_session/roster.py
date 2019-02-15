@@ -10,7 +10,7 @@ from datetime import datetime, timedelta
 MONTHS = ['Sty', 'Lut', 'Mar', 'Kwi', 'Maj', 'Cze', 'Lip', 'Sie', 'Wrz', 'Paź', 'Lis', 'Gru']
 
 OPERATORS_DEF = [
-   ('Łukasz', 'zaq32'), 
+   (u'Łukasz', 'zaq32'), 
    ('Novakov', 'novakov'), 
    ('Tomek', 'tomasz.mart'),
    ('Kfazi', 'kfazi'),
