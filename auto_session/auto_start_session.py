@@ -206,8 +206,8 @@ while True:
     print "Session: ", session, "; Time left: ", time_left_to_session
 
     notification_time = 10
-    if True:
-    #if timedelta(minutes=notification_time) <= time_left_to_session and time_left_to_session <= timedelta(minutes=notification_time + 1):
+    #if True:
+    if timedelta(minutes=notification_time) <= time_left_to_session and time_left_to_session <= timedelta(minutes=notification_time + 1):
         assignment = roster.find_assignment_for_date(session.start)
         operator = assignment.for_time(session.start)
         if operator == '':
