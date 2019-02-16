@@ -16,7 +16,7 @@ OPERATORS_DEF = [
    ('Kfazi', 'kfazi'),
    ('Mandro', 'mandro'),
    ('Piter', 'pkuligowski'),
-   ('Gumiś', 'michalgumiela'),
+   (u'Gumiś', 'michalgumiela'),
    ('Grzesiek', 'ggajoch'),
 ]
 
