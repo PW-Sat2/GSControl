@@ -26,14 +26,20 @@ class Predicton:
 
         return localDate.isoformat() + diffString
 
-    def getIsoStartDate(self):
+    def getIsoStartDateString(self):
         return self._makeDate(self.start)
 
-    def getIsoEndDate(self):
+    def getIsoEndDateString(self):
         return self._makeDate(self.end)
     
+    def getIsoStartDate(self):
+        return datetime.datetime.fromtimestamp(self.start).replace(microsecond=0)
+
+    def getIsoEndDate(self):
+        return datetime.datetime.fromtimestamp(self.stop).replace(microsecond=0)
+
     def __str__(self):
-        return "Prediction: {}\t{}\t{}".format(self.getIsoStartDate(), self.getIsoEndDate(), self.maxElev)
+        return "Prediction: {}\t{}\t{}".format(self.getIsoStartDateString(), self.getIsoEndDateString(), self.maxElev)
 
     def __repr__(self):
         return self.__str__()

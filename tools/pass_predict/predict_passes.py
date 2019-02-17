@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from gpredict_tle_loader import GpredictTleLoader
 from prediction import Predicton
 import predict
@@ -7,26 +9,30 @@ import imp
 import datetime
 import json
 from collections import OrderedDict
+import time
 
-def predict_pass(tle, qths, count):
+def predict_pass(tle, qths, elev, start_datetime, count):
     def predictOneStation(tle, qth):
         predictions = []
         p = predict.transits(tle, qth)
-        for _ in range(0, count):
+
+        while len(predictions) < count:
             transit = p.next()
             start = transit.start
             stop = transit.end
-            maxElev = round(transit.peak()['elevation'],2)
+            maxElev = round(transit.peak()['elevation'], 2)
             aosAzimuth = transit.at(transit.start)['azimuth']
 
-            prediction = Predicton(start, stop, maxElev, aosAzimuth)          
-            predictions.append(prediction)
-            
+            prediction = Predicton(start, stop, maxElev, aosAzimuth)
+
+            if (start > start_datetime) and (maxElev >= 1):
+                predictions.append(prediction)
+
         return predictions
    
     allStationPredictions = []
     for station in qths:
-        allStationPredictions.append(predictOneStation(tle,station))       
+        allStationPredictions.append(predictOneStation(tle, station))       
 
     return allStationPredictions
 
@@ -69,23 +75,60 @@ def mergeStationPredictions(allStationPredictions):
     return merged
 
 
-def generateSessions(predictions, minElev):
+def generateSessions(predictions, session_start_index, lastPowerCycleController, powerCycleMinElevation):
+    def tasksDescriptions(task):
+        switcher = {
+            "power-cycle-A" : "Power cycle A. ",
+            "power-cycle-B" : "Power cycle B. ",
+            "telemetry"     : "Telemetry download. ",
+            "keep-alive"    : "Keep-alive session. "
+        }
+        return switcher.get(task, "")
+
+    def generateDescription(session_tasks):
+        desc_string = ""
+        for task in session_tasks:
+            desc_string += tasksDescriptions(task)
+        return desc_string
+
+    power_cycle_days = set()
     sessions = []
+    session_index = session_start_index
+    lastPowerCycleController = lastPowerCycleController
+
     for sat_pass in predictions:
-        if sat_pass.maxElev >= minElev:
-            session = OrderedDict()
-            session['short_description'] = "Automatic session."
-            session['phase'] = "after_sail_deployment"
+        session = OrderedDict()
+        session['index'] = session_index
+        session['phase'] = "after_sail_deployment"
+        session['primary'] = "elka" if (sat_pass.aosAzimuth < 90.0 or sat_pass.aosAzimuth > 270.0) else "fp"
+        session['start_time_iso_with_zone'] = sat_pass.getIsoStartDateString()
+        session['stop_time_iso_with_zone'] = sat_pass.getIsoEndDateString()
+        session['maximum_elevation'] = sat_pass.maxElev
+
+        
+        day = sat_pass.getIsoStartDate().date()
+        session_tasks = []
+
+        if (day not in power_cycle_days) and (not (sat_pass.aosAzimuth < 90.0 or sat_pass.aosAzimuth > 270.0)) and (sat_pass.maxElev >= powerCycleMinElevation):
+            currentPowerCycleController = "power-cycle-B" if lastPowerCycleController == "power-cycle-A" else "power-cycle-A"
+
+            session_tasks = [currentPowerCycleController, 'telemetry']
+            session['status'] = "planned"   
+
+            lastPowerCycleController = currentPowerCycleController
+            power_cycle_days.add(day)
+        else:
+            session_tasks = ['keep-alive']
             session['status'] = "auto"
-            session['primary'] = "elka" if (sat_pass.aosAzimuth < 90.0 or sat_pass.aosAzimuth > 270.0) else "fp"
-            session['start_time_iso_with_zone'] = sat_pass.getIsoStartDate()
-            session['stop_time_iso_with_zone'] = sat_pass.getIsoEndDate()
-            session['maximum_elevation'] = sat_pass.maxElev
 
-            sessionObject = dict()
-            sessionObject['Session']=session
+        session['session_tasks'] = session_tasks
+        session['short_description'] = generateDescription(session_tasks)
+        sessionObject = dict()
+        sessionObject['Session']=session
 
-            sessions.append(sessionObject)
+        sessions.append(sessionObject)
+
+        session_index += 1
     return sessions
 
 def saveSessions(sessionNumber, sessionsData, missionPath):
@@ -105,6 +148,51 @@ def qthListToQth(qthlist):
         qths.append((place[0], -place[1], place[2]))
     return qths
 
+def getSessionFolders(missionRepoPath):
+    dirList = [name for name in os.listdir(os.path.join(missionRepoPath, 'sessions')) if os.path.isdir(os.path.join(missionRepoPath, 'sessions', name))]
+
+    sessionDirs = []
+    for d in dirList:
+        try:
+            sessionDirs.append(int(d))
+        except:
+            print("Not a session dir!")
+
+    return sessionDirs
+
+def getLastSessionData(missionRepoPath):
+    sessionDirs = getSessionFolders(missionRepoPath)
+
+    lastSessionDir = max(sessionDirs)
+    with open(os.path.join(missionRepoPath, 'sessions', str(lastSessionDir), 'data.json'), 'r') as f:
+        data = json.loads(f.read())
+
+    data['index'] = lastSessionDir
+    return data
+
+def getLastPowerCycleController(missionRepoPath):
+    sessionDirs = getSessionFolders(missionRepoPath)
+
+    sessionDirsFromLast = sorted(sessionDirs, reverse=True)
+
+    for sessionDir in sessionDirsFromLast:
+        with open(os.path.join(missionRepoPath, 'sessions', str(sessionDir), 'data.json'), 'r') as f:
+            data = json.loads(f.read())
+            try:
+                data['Session']['session_tasks'].index("power-cycle-A")
+                return "power-cycle-A"
+            except:
+                pass
+            try:
+                data['Session']['session_tasks'].index("power-cycle-B")
+                return "power-cycle-B"
+            except:
+                pass     
+
+    return None
+
+def fromLocalStringToTimestamp(timestampString):
+    return float(datetime.datetime.strptime(timestampString.split("+")[0], "%Y-%m-%dT%H:%M:%S").strftime("%S"))
 
 def main():
     parser = argparse.ArgumentParser()
@@ -116,6 +204,8 @@ def main():
                         help="Next session number", type=int)
     parser.add_argument('-n', '--session-count', required=False,
                         help="Number of sessions to generate", default=1, type=int)
+    parser.add_argument('-p', '--power-cycle-min-elevation', required=False,
+                        help="Minimum elevation for power cycle", default=20, type=int)
     parser.add_argument('-m', '--mission-path', required=False,
                         help="Path to Mission repository", default="~/gs/mission")
     
@@ -131,17 +221,24 @@ def main():
     noradId = 43814 if 'NORAD_ID' not in config else config['NORAD_ID']
     minimum_elevation = 1 if 'MINIMUM_ELEVATION' not in config else config['MINIMUM_ELEVATION']
 
+    lastSessionData = getLastSessionData(args.mission_path)
+    lastPowerCycleController = getLastPowerCycleController(args.mission_path)
+    start_time = fromLocalStringToTimestamp(lastSessionData['Session']['stop_time_iso_with_zone'])
+
     qths = qthListToQth(config['QTH'])
 
     tleLoadter = GpredictTleLoader(gpredict_path)
     tleLines = tleLoadter.loadTle(noradId)
-    allStationPredictions = predict_pass("\n".join(tleLines), qths, args.session_count)
+    allStationPredictions = predict_pass("\n".join(tleLines), qths, minimum_elevation, start_time, args.session_count)
     mergedPredictions = mergeStationPredictions(allStationPredictions)
-    sessions = generateSessions(mergedPredictions, minimum_elevation)
+
+    nextSessionIndex = lastSessionData['index'] + 1
+    sessions = generateSessions(mergedPredictions, nextSessionIndex, lastPowerCycleController, args.power_cycle_min_elevation)
 
     if args.session:
         saveSessions(args.session, sessions, args.mission_path)
     else:
+        saveSessions(nextSessionIndex, sessions, args.mission_path)
         for s in sessions:
             print json.dumps(s, indent=4)
 
