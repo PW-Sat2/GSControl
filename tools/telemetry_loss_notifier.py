@@ -115,12 +115,18 @@ for i in range(args.start + 1, args.start + args.next + 1):
             end_session_view.read_metadata()["stop_time_iso_with_zone"])
 
         if end_session_view.read_metadata()["maximum_elevation"] > args.elevation:
-            line = "session {}: margin *{:5}*\t({}, elev. {} deg)".format(i, estimation, end_session_view.read_metadata()["start_time_iso_with_zone"], end_session_view.read_metadata()["maximum_elevation"])
-            if estimation < future.CHUNKS_SAFE_BUFFER:
-                line = "~" + line + "~"
-            message += "> " + line + "\n"
+            line = ""
+            
+            if estimation < 0:
+                line = "> :x: ~session {}: margin~ *{:5}*\t~({}, elev. {} deg)~".format(i, estimation, end_session_view.read_metadata()["start_time_iso_with_zone"], end_session_view.read_metadata()["maximum_elevation"])
+            elif estimation < future.CHUNKS_SAFE_BUFFER:
+                line = "> :warning: ~session {}: margin~ *{:5}*\t~({}, elev. {} deg)~".format(i, estimation, end_session_view.read_metadata()["start_time_iso_with_zone"], end_session_view.read_metadata()["maximum_elevation"])
+            else:
+                line = "> :heavy_check_mark: session {}: margin *{:5}*\t({}, elev. {} deg)".format(i, estimation, end_session_view.read_metadata()["start_time_iso_with_zone"], end_session_view.read_metadata()["maximum_elevation"])
+                
+            message += line + "\n"
     except Exception:
-        traceback.print_exc()
+        pass
 
 print(message)
 
