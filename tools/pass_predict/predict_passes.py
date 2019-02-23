@@ -11,7 +11,7 @@ import json
 from collections import OrderedDict
 import time
 
-def predict_pass(tle, qths, elev, start_datetime, count):
+def predict_pass(tle, qths, elev, end_datetime, count):
     def predictOneStation(tle, qth):
         predictions = []
         p = predict.transits(tle, qth)
@@ -25,7 +25,7 @@ def predict_pass(tle, qths, elev, start_datetime, count):
 
             prediction = Predicton(start, stop, maxElev, aosAzimuth)
 
-            if (start > start_datetime) and (maxElev >= 1):
+            if (start > end_datetime) and (maxElev >= 1):
                 predictions.append(prediction)
 
         return predictions
@@ -192,7 +192,7 @@ def getLastPowerCycleController(missionRepoPath):
     return None
 
 def fromLocalStringToTimestamp(timestampString):
-    return float(datetime.datetime.strptime(timestampString.split("+")[0], "%Y-%m-%dT%H:%M:%S").strftime("%S"))
+    return (datetime.datetime.strptime(timestampString.split("+")[0], "%Y-%m-%dT%H:%M:%S") - datetime.datetime(1970, 1, 1)).total_seconds()
 
 def main():
     parser = argparse.ArgumentParser()
@@ -223,13 +223,14 @@ def main():
 
     lastSessionData = getLastSessionData(args.mission_path)
     lastPowerCycleController = getLastPowerCycleController(args.mission_path)
-    start_time = fromLocalStringToTimestamp(lastSessionData['Session']['stop_time_iso_with_zone'])
+    stop_time = fromLocalStringToTimestamp(lastSessionData['Session']['stop_time_iso_with_zone'])
+    print("Last session stop time: {}".format(stop_time))
 
     qths = qthListToQth(config['QTH'])
 
     tleLoadter = GpredictTleLoader(gpredict_path)
     tleLines = tleLoadter.loadTle(noradId)
-    allStationPredictions = predict_pass("\n".join(tleLines), qths, minimum_elevation, start_time, args.session_count)
+    allStationPredictions = predict_pass("\n".join(tleLines), qths, minimum_elevation, stop_time, args.session_count)
     mergedPredictions = mergeStationPredictions(allStationPredictions)
 
     nextSessionIndex = lastSessionData['index'] + 1
