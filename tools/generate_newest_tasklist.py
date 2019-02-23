@@ -34,7 +34,8 @@ for i in sessions:
         continue
 
     data = json.loads(open(file).read())['Session']
-    if data['short_description'] == 'Automatic session.':
+    if data['short_description'].find('Automatic') > -1 or \
+       data['short_description'].find('Keep-alive') > -1:
         continue
     
     date = parser.parse(data['start_time_iso_with_zone']).astimezone(pytz.utc).replace(tzinfo=None)
