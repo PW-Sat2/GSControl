@@ -24,9 +24,8 @@ def predict_pass(tle, qths, elev, end_datetime, count):
             aosAzimuth = transit.at(transit.start)['azimuth']
 
             prediction = Predicton(start, stop, maxElev, aosAzimuth)
-            print(prediction)
 
-            if (start > end_datetime) and (maxElev >= 0.5):
+            if (start > end_datetime) and (maxElev >= elev):
                 predictions.append(prediction)
 
         return predictions
@@ -98,7 +97,6 @@ def generateSessions(predictions, session_start_index, lastPowerCycleController,
     lastPowerCycleController = lastPowerCycleController
 
     power_cycle_days.add(datetime.datetime.strptime(lastPowerCycleSessionData['Session']['start_time_iso_with_zone'].split("T")[0], "%Y-%m-%d").date())
-    print(power_cycle_days)
 
     for sat_pass in predictions:
         session = OrderedDict()
@@ -121,7 +119,6 @@ def generateSessions(predictions, session_start_index, lastPowerCycleController,
 
             lastPowerCycleController = currentPowerCycleController
             power_cycle_days.add(day)
-            print(power_cycle_days)
         else:
             session_tasks = ['keep-alive']
             session['status'] = "auto"
