@@ -193,21 +193,16 @@ def getLastSessionPowerCycleSession(missionRepoPath):
     for sessionDir in sessionDirsFromLast:
         with open(os.path.join(missionRepoPath, 'sessions', str(sessionDir), 'data.json'), 'r') as f:
             data = json.loads(f.read())
-            return data
+
+            if "power-cycle-A" in data['Session']['session_tasks'] or "power-cycle-B" in data['Session']['session_tasks']:
+                return data
     return None
 
 def getLastPowerCycleController(data):
-    try:
-        data['Session']['session_tasks'].index("power-cycle-A")
+    if "power-cycle-A" in data['Session']['session_tasks']:
         return "power-cycle-A"
-    except:
-        pass
-    try:
-        data['Session']['session_tasks'].index("power-cycle-B")
+    elif "power-cycle-B" in data['Session']['session_tasks']:
         return "power-cycle-B"
-    except:
-        pass
-
     return None
 
 def fromLocalStringToTimestamp(timestampString):
