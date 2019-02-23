@@ -24,8 +24,9 @@ def predict_pass(tle, qths, elev, end_datetime, count):
             aosAzimuth = transit.at(transit.start)['azimuth']
 
             prediction = Predicton(start, stop, maxElev, aosAzimuth)
+            print(prediction)
 
-            if (start > end_datetime) and (maxElev >= 1):
+            if (start > end_datetime) and (maxElev >= 0.5):
                 predictions.append(prediction)
 
         return predictions
@@ -75,7 +76,7 @@ def mergeStationPredictions(allStationPredictions):
     return merged
 
 
-def generateSessions(predictions, session_start_index, lastPowerCycleController, powerCycleMinElevation):
+def generateSessions(predictions, session_start_index, lastPowerCycleController, powerCycleMinElevation, lastPowerCycleSessionData):
     def tasksDescriptions(task):
         switcher = {
             "power-cycle-A" : "Power cycle EPS A. ",
@@ -95,6 +96,9 @@ def generateSessions(predictions, session_start_index, lastPowerCycleController,
     sessions = []
     session_index = session_start_index
     lastPowerCycleController = lastPowerCycleController
+
+    power_cycle_days.add(datetime.datetime.strptime(lastPowerCycleSessionData['Session']['start_time_iso_with_zone'].split("T")[0], "%Y-%m-%d").date())
+    print(power_cycle_days)
 
     for sat_pass in predictions:
         session = OrderedDict()
@@ -117,6 +121,7 @@ def generateSessions(predictions, session_start_index, lastPowerCycleController,
 
             lastPowerCycleController = currentPowerCycleController
             power_cycle_days.add(day)
+            print(power_cycle_days)
         else:
             session_tasks = ['keep-alive']
             session['status'] = "auto"
@@ -182,7 +187,7 @@ def getLastSessionData(missionRepoPath):
     data['index'] = lastSessionDir
     return data
 
-def getLastPowerCycleController(missionRepoPath):
+def getLastSessionPowerCycleSession(missionRepoPath):
     sessionDirs = getSessionFolders(missionRepoPath)
 
     sessionDirsFromLast = sorted(sessionDirs, reverse=True)
@@ -190,16 +195,20 @@ def getLastPowerCycleController(missionRepoPath):
     for sessionDir in sessionDirsFromLast:
         with open(os.path.join(missionRepoPath, 'sessions', str(sessionDir), 'data.json'), 'r') as f:
             data = json.loads(f.read())
-            try:
-                data['Session']['session_tasks'].index("power-cycle-A")
-                return "power-cycle-A"
-            except:
-                pass
-            try:
-                data['Session']['session_tasks'].index("power-cycle-B")
-                return "power-cycle-B"
-            except:
-                pass     
+            return data
+    return None
+
+def getLastPowerCycleController(data):
+    try:
+        data['Session']['session_tasks'].index("power-cycle-A")
+        return "power-cycle-A"
+    except:
+        pass
+    try:
+        data['Session']['session_tasks'].index("power-cycle-B")
+        return "power-cycle-B"
+    except:
+        pass
 
     return None
 
@@ -234,7 +243,9 @@ def main():
     minimum_elevation = 1 if 'MINIMUM_ELEVATION' not in config else config['MINIMUM_ELEVATION']
 
     lastSessionData = getLastSessionData(args.mission_path)
-    lastPowerCycleController = getLastPowerCycleController(args.mission_path)
+    
+    lastPowerCycleSessionData = getLastSessionPowerCycleSession(args.mission_path)
+    lastPowerCycleController = getLastPowerCycleController(lastPowerCycleSessionData)
     stop_time = fromLocalStringToTimestamp(lastSessionData['Session']['stop_time_iso_with_zone'])
     print("Last session stop time: {}".format(stop_time))
 
@@ -242,11 +253,20 @@ def main():
 
     tleLoadter = GpredictTleLoader(gpredict_path)
     tleLines = tleLoadter.loadTle(noradId)
-    allStationPredictions = predict_pass("\n".join(tleLines), qths, minimum_elevation, stop_time, args.session_count)
+    allStationPredictions = predict_pass("\n".join(tleLines),
+                                         qths,
+                                         minimum_elevation,
+                                         stop_time,
+                                         args.session_count)
+
     mergedPredictions = mergeStationPredictions(allStationPredictions)
 
     nextSessionIndex = lastSessionData['index'] + 1
-    sessions = generateSessions(mergedPredictions, nextSessionIndex, lastPowerCycleController, args.power_cycle_min_elevation)
+    sessions = generateSessions(mergedPredictions,
+                                nextSessionIndex,
+                                lastPowerCycleController,
+                                args.power_cycle_min_elevation,
+                                lastPowerCycleSessionData)
 
     if args.session:
         saveSessions(args.session, sessions, args.mission_path)
