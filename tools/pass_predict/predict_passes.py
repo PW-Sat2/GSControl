@@ -11,7 +11,7 @@ import json
 from collections import OrderedDict
 import time
 
-def predict_pass(tle, qths, elev, end_datetime, count):
+def predict_pass(tle, qths, end_datetime, count):
     def predictOneStation(tle, qth):
         predictions = []
         p = predict.transits(tle, qth)
@@ -25,7 +25,7 @@ def predict_pass(tle, qths, elev, end_datetime, count):
 
             prediction = Predicton(start, stop, maxElev, aosAzimuth)
 
-            if (start > end_datetime) and (maxElev >= elev):
+            if start > end_datetime:
                 predictions.append(prediction)
 
         return predictions
@@ -75,7 +75,7 @@ def mergeStationPredictions(allStationPredictions):
     return merged
 
 
-def generateSessions(predictions, session_start_index, lastPowerCycleController, powerCycleMinElevation, lastPowerCycleSessionData):
+def generateSessions(predictions, min_elev, session_start_index, lastPowerCycleController, powerCycleMinElevation, lastPowerCycleSessionData):
     def tasksDescriptions(task):
         switcher = {
             "power-cycle-A" : "Power cycle EPS A. ",
@@ -99,38 +99,39 @@ def generateSessions(predictions, session_start_index, lastPowerCycleController,
     power_cycle_days.add(datetime.datetime.strptime(lastPowerCycleSessionData['Session']['start_time_iso_with_zone'].split("T")[0], "%Y-%m-%d").date())
 
     for sat_pass in predictions:
-        session = OrderedDict()
-        session['index'] = session_index
-        session['phase'] = "after_sail_deployment"
-        session['primary'] = "elka" if (sat_pass.aosAzimuth < 90.0 or sat_pass.aosAzimuth > 270.0) else "fp"
-        session['start_time_iso_with_zone'] = sat_pass.getIsoStartDateString()
-        session['stop_time_iso_with_zone'] = sat_pass.getIsoEndDateString()
-        session['maximum_elevation'] = sat_pass.maxElev
+        if sat_pass.maxElev >= min_elev:
+            session = OrderedDict()
+            session['index'] = session_index
+            session['phase'] = "after_sail_deployment"
+            session['primary'] = "elka" if (sat_pass.aosAzimuth < 90.0 or sat_pass.aosAzimuth > 270.0) else "fp"
+            session['start_time_iso_with_zone'] = sat_pass.getIsoStartDateString()
+            session['stop_time_iso_with_zone'] = sat_pass.getIsoEndDateString()
+            session['maximum_elevation'] = sat_pass.maxElev
 
-        
-        day = sat_pass.getIsoStartDate().date()
-        session_tasks = []
+            
+            day = sat_pass.getIsoStartDate().date()
+            session_tasks = []
 
-        if (day not in power_cycle_days) and (not (sat_pass.aosAzimuth < 90.0 or sat_pass.aosAzimuth > 270.0)) and (sat_pass.maxElev >= powerCycleMinElevation):
-            currentPowerCycleController = "power-cycle-B" if lastPowerCycleController == "power-cycle-A" else "power-cycle-A"
+            if (day not in power_cycle_days) and (not (sat_pass.aosAzimuth < 90.0 or sat_pass.aosAzimuth > 270.0)) and (sat_pass.maxElev >= powerCycleMinElevation):
+                currentPowerCycleController = "power-cycle-B" if lastPowerCycleController == "power-cycle-A" else "power-cycle-A"
 
-            session_tasks = [currentPowerCycleController, 'telemetry']
-            session['status'] = "planned"   
+                session_tasks = [currentPowerCycleController, 'telemetry']
+                session['status'] = "planned"   
 
-            lastPowerCycleController = currentPowerCycleController
-            power_cycle_days.add(day)
-        else:
-            session_tasks = ['keep-alive']
-            session['status'] = "auto"
+                lastPowerCycleController = currentPowerCycleController
+                power_cycle_days.add(day)
+            else:
+                session_tasks = ['keep-alive']
+                session['status'] = "auto"
 
-        session['session_tasks'] = session_tasks
-        session['short_description'] = generateDescription(session_tasks)
-        sessionObject = dict()
-        sessionObject['Session']=session
+            session['session_tasks'] = session_tasks
+            session['short_description'] = generateDescription(session_tasks)
+            sessionObject = dict()
+            sessionObject['Session']=session
 
-        sessions.append(sessionObject)
+            sessions.append(sessionObject)
 
-        session_index += 1
+            session_index += 1
     return sessions
 
 def fallbackDesc(desc):
@@ -252,7 +253,6 @@ def main():
     tleLines = tleLoadter.loadTle(noradId)
     allStationPredictions = predict_pass("\n".join(tleLines),
                                          qths,
-                                         minimum_elevation,
                                          stop_time,
                                          args.session_count)
 
@@ -260,6 +260,7 @@ def main():
 
     nextSessionIndex = lastSessionData['index'] + 1
     sessions = generateSessions(mergedPredictions,
+                                minimum_elevation,
                                 nextSessionIndex,
                                 lastPowerCycleController,
                                 args.power_cycle_min_elevation,
