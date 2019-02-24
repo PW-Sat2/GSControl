@@ -61,7 +61,7 @@ class Roster(object):
     def _group_week(self, days, mornings, evenings):
         result = []
 
-        for i in range(0, 6):
+        for i in range(0, 7):
             day = days[i] or '' if i < len(days) else ''
             morning = mornings[i] or '' if i < len(mornings) else ''
             evening = evenings[i] or '' if i < len(evenings) else ''
