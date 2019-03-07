@@ -31,13 +31,12 @@ class Receiver:
     class TimeoutError(Exception):
         pass
 
-    """ Receive RAW frame from socket. If timeout expired zmq.Again is raised """
-    def receive_raw(self):
-        return self.sock.recv()
-
     def get_packet(self):
-        frame_data = self.receive_raw()
-        return {'timestamp': time.time(), 'frame': self.parse_packet(frame_data)}
+        try:
+            frame_data = self.sock.recv()
+            return {'timestamp': time.time(), 'frame': self.parse_packet(frame_data)}
+        except:
+            return None
 
     def parse_packet(self, frame_data):
         return decoder.decode(ensure_byte_list(frame_data[16:-2]))
