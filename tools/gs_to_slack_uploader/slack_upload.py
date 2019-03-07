@@ -95,7 +95,9 @@ class UploadSlack(Thread):
         # check other lines for correctness
         for i in frame_text_split[1:-1]:
             # filter out some lines
-            if i.find("GYRO UNCAL") != -1 or i.find("EXPERIMENT") != -1:
+            if i.find("GYRO UNCAL") != -1 or \
+               i.find("EXPERIMENT") != -1 or \
+               i.find("OBC CRC") != -1:
                 continue
 
             # find warnings
