@@ -63,7 +63,7 @@ class UploadSlack(Thread):
 
                 if isinstance(decoded_frame, response_frames.BeaconFrame):
                     date_mission += str(decoded_frame._parsed['03: Time Telemetry']['0072: Mission time'])[:-7]
-                    formated_message = "{0}  *{1}*     |     :pwsat2: *{2}*\r\n{3}\r\n".format(self.gs_emoji, date_earth, date_mission, self._format_message_new(frame_text))
+                    formated_message = "{0}  *{1}* | :pwsat2: *{2}*\r\n{3}\r\n".format(self.gs_emoji, date_earth, date_mission, self._format_message_new(frame_text))
                 elif isinstance(decoded_frame, response_frames.file_system.FileListSuccessFrame):
                     frame_text = self._format_file_list(decoded_frame)
                     formated_message = "{0}  *{1}*\r\n{2}\r\n".format(self.gs_emoji, date_earth, frame_text)
