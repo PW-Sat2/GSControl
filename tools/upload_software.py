@@ -3,7 +3,7 @@ import os
 import sys
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../PWSat2OBC/integration_tests'))
-sys.path.append(os.path.join(os.path.dirname(__file__), '../build/integration_tests'))
+sys.path.append(os.path.join(os.path.dirname(__file__), '../../build/integration_tests'))
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 import response_frames
@@ -13,8 +13,9 @@ from utils import ensure_string
 
 from radio.radio_receiver import *
 from radio.radio_sender import *
-from tools.remote_files import *
-from tools.parse_beacon import *
+
+from radio.radio_frame_decoder import FallbackResponseDecorator
+import argparse
 
 from telecommand import *
 from response_frames import operation
@@ -35,14 +36,44 @@ from crc import pad, calc_crc
 from response_frames.program_upload import EntryEraseSuccessFrame, EntryProgramPartWriteSuccess, EntryFinalizeSuccess
 from telecommand import WriteProgramPart, EraseBootTableEntry, FinalizeProgramEntry
 
-PARTS_PER_ITERATION = 1
+frame_decoder = FallbackResponseDecorator(response_frames.FrameDecoder(response_frames.frame_factories))
 
-sender = Sender('localhost', 8001)
-sender.connect()
-receiver = Receiver('localhost', 52001)
-receiver.connect()
+
+parser = argparse.ArgumentParser()
+
+parser.add_argument('-c', '--config', required=False,
+                    help="Config file (in CMake-generated integration tests format)",
+                    default=os.path.join(os.path.dirname(__file__), 'config.py'))
+parser.add_argument('-t', '--downlink-host', required=False,
+                    help="GNURadio host", default='localhost')
+parser.add_argument('-p', '--downlink-port', required=False,
+                    help="GNURadio port", default=7001, type=int)
+parser.add_argument('-u', '--uplink-host', required=False,
+                    help="Uplink host", default='localhost')
+parser.add_argument('-v', '--uplink-port', required=False,
+                    help="Uplink port", default=7000, type=int)
+
+parser.add_argument('-f', '--file', required=True,
+                    help="Bin file")
+
+parser.add_argument('-s', '--slots', nargs='+', required=True,
+                    help="List of boot slots", type=int)
+
+parser.add_argument('-d', '--desc', required=True,
+                    help="Description of the slot")
+
+
+args = parser.parse_args()
+imp.load_source('config', args.config)
+from config import config
+
+sender = Sender(args.uplink_host, args.uplink_port, source_callsign=config['COMM_UPLINK_CALLSIGN'])
+receiver = Receiver(args.downlink_host, args.downlink_port)
 receiver.timeout(1)
 
+
+
+PARTS_PER_ITERATION = 1
 
 def wait_for_frame(expected_type, timeout):
     start_time = time()
@@ -50,24 +81,25 @@ def wait_for_frame(expected_type, timeout):
 
     while time() < timeout_at:
         try:
-            frame = receiver.receive_no_wait()
-            if frame is not None:
-                frame = receiver.decode_kiss(frame)
-                frame = receiver.make_frame(frame)
+            data = receiver.receive_no_wait()
+            if data is not None:
+                data = receiver.decode_kiss(data)
+                frame = frame_decoder.decode(data)
 
-            if type(frame) is expected_type:
-                return frame
-
-            print 'Ignoring {}'.format(frame)
+                if type(frame) is expected_type:
+                    pprint.pprint(frame)
+                    #sleep(5)
+                    return frame
+                print 'Ignoring'
         except Empty:
             pass
 
     return None
 
 
-file = sys.argv[1]
-slots = [int(sys.argv[2]), int(sys.argv[3]), int(sys.argv[4])]
-description = sys.argv[5]
+file = args.file
+slots = args.slots
+description = args.desc
 
 with open(file, 'rb') as f:
     program_data = f.read()
@@ -85,6 +117,7 @@ print 'Will upload {} bytes of program (CRC: {:4X}), {} parts into slots {}'.for
 )
 
 print 'Erasing boot slots'
+
 sender.send(EraseBootTableEntry(slots))
 
 response = wait_for_frame(EntryEraseSuccessFrame, 50)
@@ -108,7 +141,7 @@ with progressbar.ProgressBar(max_value=total_parts, redirect_stdout=True) as bar
             print 'Trial: {}'.format(count)
             part = program_data[offsets[0]:offsets[0] + WriteProgramPart.MAX_PART_SIZE]
             sender.send(WriteProgramPart(entries=slots, offset=offsets[0], content=part))
-            response = wait_for_frame(EntryProgramPartWriteSuccess, 5)
+            response = wait_for_frame(EntryProgramPartWriteSuccess, 10)
             try:
                 if response.offset not in offsets:
                     print 'Invalid offset received {}'.format(response.offset)
@@ -119,22 +152,6 @@ with progressbar.ProgressBar(max_value=total_parts, redirect_stdout=True) as bar
             except:
                 print 'Timeout?'
   
-
-    #
-    # for i in xrange(0, len(offsets)):
-    #     offset = offsets[i]
-    #     print 'Uploading to offset 0x{:X} ({}/{})'.format(offset, i + 1, len(offsets))
-    #
-    #     part = program_data[offset:offset + WriteProgramPart.MAX_PART_SIZE]
-    #
-    #     sender.send(WriteProgramPart(entries=slots, offset=offset, content=part))
-    #
-    #     response = wait_for_frame(EntryProgramPartWriteSuccess, 120)
-    #
-    #     if response is None:
-    #         print 'Failed to program'
-    #         sys.exit(2)
-    #
 
 print 'Upload finished'
 
@@ -147,7 +164,7 @@ for i in range(10):
         pass
 
     if response is None:
-        print 'Failed to finalize'
+        print 'Failed to finalize - try no. {0}'.format(i)
     else:
         break
 
