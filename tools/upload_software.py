@@ -3,7 +3,6 @@ import os
 import sys
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../PWSat2OBC/integration_tests'))
-sys.path.append(os.path.join(os.path.dirname(__file__), '../../build/integration_tests'))
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 import response_frames
