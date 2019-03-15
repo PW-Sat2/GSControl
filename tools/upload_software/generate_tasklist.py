@@ -2,22 +2,18 @@ import os
 import math
 import sys
 import argparse
-import json
 
-import numpy as np
-import datetime as dt
+sys.path.append(os.path.join(os.path.dirname(__file__), '../../PWSat2OBC/integration_tests'))
+sys.path.append(os.path.join(os.path.dirname(__file__), '../..'))
 
-sys.path.append(os.path.join(os.path.dirname(__file__), '../PWSat2OBC/integration_tests'))
-sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
-
+from crc import pad, calc_crc
 import telecommand
-# telecommand.WriteProgramPart()
 
 
 def parse_args():
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('-f', '--file', required=True,
+    parser.add_argument('file',
                         help=".bin file to upload")
     parser.add_argument('-c', '--chunks-per-tc', required=False,
                         help="Maximum chunks allowed for download with single telecommand", default=20, type=int)
@@ -46,9 +42,10 @@ args = parse_args()
 PART_SIZE = telecommand.WriteProgramPart.MAX_PART_SIZE
 
 binary_data = open(args.file, 'rb').read()
+binary_data = list(pad(binary_data, multiply_of=128, pad_with=0x1A))
+crc = calc_crc(binary_data)
 boot_slots = process_boot_slots(args.boot_slots)
 
-print PART_SIZE
 chunks = int(math.ceil(len(binary_data)*1.0/PART_SIZE))
 
 print "Generating:"
@@ -56,19 +53,35 @@ print "  - file {}".format(args.file)
 print "  - length {} bytes, {} chunks".format(len(binary_data), chunks)
 print "  - bootslots {}".format(boot_slots)
 print "  - Sample: tc.WriteProgramPart(" + str(boot_slots) + ", 0xA5, [0x00, 0x01])"
+print "  - CRC: {:4X}".format(crc)
 
 output_file = open(args.output, 'w')
 output_file.write('tasks = [\n')
 
 offset = 0
 while offset < len(binary_data):
-    bin = binary_data[offset:offset + PART_SIZE]
+    binary = binary_data[offset:offset + PART_SIZE]
     output_file.write("[tc.WriteProgramPart({}, {}, {}), Send, WaitMode.Wait],\n".format(
                       str(boot_slots),
                       str(offset),
-                      str('[{}]'.format(', '.join(hex(ord(x)) for x in bin)))))
+                      str('[{}]'.format(', '.join(hex(x) for x in binary)))))
 
     offset += PART_SIZE
 
 output_file.write(']\n')
 output_file.close()
+
+mask = 0
+not_mask = 0b111111
+for i in boot_slots:
+    mask |= (1 << i)
+    not_mask &= ~(1 << i)
+
+print '\n\n' + 50*"="
+print "telecommands to perform upload:"
+for i in boot_slots:
+    print "  [tc.EraseBootTableEntry([{}]), Send, WaitMode.Wait],".format(i)
+print "  ~~ send binary ~~ "
+print "  [tc.SetBootSlots(76, {}, {}), Send, WaitMode.Wait],".format(bin(mask), bin(not_mask))
+print "  [tc.FinalizeProgramEntry([{}], {}, 0x{:4X}, \"name\")), Send, WaitMode.Wait],".format(
+    boot_slots, len(binary_data), crc)
