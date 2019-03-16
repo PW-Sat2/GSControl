@@ -1,3 +1,6 @@
+import sys
+import os
+
 try:
     from utils import ensure_string, ensure_byte_list
     import response_frames
