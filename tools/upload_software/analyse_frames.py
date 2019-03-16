@@ -64,7 +64,10 @@ with open(args.tasklist) as tasklist:
                 upload_done.remove(requested)
                 skip = True
 
-        if not skip:
+        if skip:
+            buf += '#'
+            buf += task[1:]
+        else:
             buf += task
 
 with open(output, 'w') as output:
