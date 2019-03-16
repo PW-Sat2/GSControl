@@ -74,10 +74,31 @@ for i in boot_slots:
     mask |= (1 << i)
     not_mask &= ~(1 << i)
 
+
+
+output_file.write("    [[tc.SetBitrate(1, BaudRate.BaudRate9600), 5], SendLoop, WaitMode.NoWait],\n")
+output_file.write('\n')
+output_file.write("    [tc.SendBeacon(), Send, WaitMode.Wait],\n")
+output_file.write('\n')
+output_file.write("    [\"The next step is PowerCycleTelecommand\", Print, WaitMode.Wait],\n")
+output_file.write("    [tc.PowerCycleTelecommand(3), Send, WaitMode.Wait],\n")
+output_file.write('\n')
+output_file.write("    [tc.PingTelecommand(), Send, WaitMode.Wait],\n")
+output_file.write('\n')
+output_file.write("    [tc.SetBitrate(4, BaudRate.BaudRate9600), Send, WaitMode.Wait],\n")
+output_file.write('\n')
+output_file.write("    [tc.SendBeacon(), Send, WaitMode.Wait],\n")
+
+output_file.write('\n')
+output_file.write('\n')
+
+output_file.write("    [\"The next step is EraseBootTableEntry.\", Print, WaitMode.Wait],\n")
 for i in boot_slots:
     output_file.write("    [tc.EraseBootTableEntry({}), Send, WaitMode.Wait],\n".format(i))
 
 output_file.write('\n')
+
+output_file.write("    [\"The next step is program upload.\", Print, WaitMode.Wait],\n")
 
 offset = 0
 while offset < len(binary_data):
@@ -90,9 +111,38 @@ while offset < len(binary_data):
     offset += PART_SIZE
 
 output_file.write('\n')
+
+output_file.write("    [\"The next step is FinalizeProgramEntry.\", Print, WaitMode.Wait],\n")
 output_file.write("    [tc.FinalizeProgramEntry({}, {}, 0x{:4X}, \"name\"), Send, WaitMode.Wait],\n".format(
     boot_slots, len(binary_data), crc))
+
+output_file.write('\n')
+
+output_file.write("    [\"The next step is SetBootSlots.\", Print, WaitMode.Wait],\n")
 output_file.write("    [tc.SetBootSlots(76, {}, {}), Send, WaitMode.Wait],\n".format(bin(mask), bin(not_mask)))
+
+output_file.write('\n')
+
+output_file.write("    [\"The next step is Power Cycle B.\", Print, WaitMode.Wait],\n")
+output_file.write("    [tc.PowerCycleTelecommand(100), Send, WaitMode.Wait],\n")
+
+output_file.write('\n')
+
+output_file.write("    [\"The satellite should be inactive for 2 minutes.\", Print, WaitMode.Wait],\n")
+output_file.write("    [tc.PingTelecommand(), Send, WaitMode.Wait],\n")
+output_file.write("    [tc.SetBitrate(101, BaudRate.BaudRate9600), Send, WaitMode.Wait],\n")
+
+output_file.write('\n')
+
+output_file.write("    [\"Set bootslots for deep_sleep.\", Print, WaitMode.Wait],\n")
+output_file.write("    [tc.SetBootSlots(101, {}, {}), Send, WaitMode.Wait],\n".format(bin(mask), bin(not_mask)))
+
+output_file.write('\n')
+
+output_file.write("    [\"Wait for good Uplink/Downlink. The next step is Power Cycle B to switch to deep_sleep.\", Print, WaitMode.Wait],\n")
+output_file.write("    [tc.PowerCycleTelecommand(100), Send, WaitMode.Wait],\n")
+
+output_file.write('\n')
 
 output_file.write(']\n')
 output_file.close()
