@@ -94,7 +94,7 @@ output_file.write('\n')
 
 output_file.write("    [\"The next step is EraseBootTableEntry.\", Print, WaitMode.Wait],\n")
 for i in boot_slots:
-    output_file.write("    [tc.EraseBootTableEntry({}), Send, WaitMode.Wait],\n".format(i))
+    output_file.write("    [tc.EraseBootTableEntry([{}]), Send, WaitMode.Wait],\n".format(i))
 
 output_file.write('\n')
 
