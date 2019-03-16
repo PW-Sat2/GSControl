@@ -1,4 +1,6 @@
 from enum import Enum, unique
+import telecommand as tc
+from threading import Timer
 
 class SendReceive(object):
     def __init__(self, arg):

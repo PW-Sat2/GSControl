@@ -75,7 +75,6 @@ for i in boot_slots:
     not_mask &= ~(1 << i)
 
 
-
 output_file.write("    [[tc.SetBitrate(1, BaudRate.BaudRate9600), 5], SendLoop, WaitMode.NoWait],\n")
 output_file.write('\n')
 output_file.write("    [tc.SendBeacon(), Send, WaitMode.Wait],\n")
@@ -100,15 +99,17 @@ output_file.write('\n')
 
 output_file.write("    [\"The next step is program upload.\", Print, WaitMode.Wait],\n")
 
+chunk = 0
 offset = 0
 while offset < len(binary_data):
     binary = binary_data[offset:offset + PART_SIZE]
-    output_file.write("    [tc.WriteProgramPart({}, {}, {}), Send, WaitMode.Wait],\n".format(
+    output_file.write("    [tc.WriteProgramPart({}, {: <3} * 190, {}), Send, WaitMode.Wait],\n".format(
                       str(boot_slots),
-                      str(offset),
+                      str(chunk),
                       str('[{}]'.format(', '.join(hex(x) for x in binary)))))
 
-    offset += PART_SIZE
+    chunk += 1
+    offset = chunk * PART_SIZE
 
 output_file.write('\n')
 
@@ -139,9 +140,12 @@ output_file.write("    [tc.SetBootSlots(101, {}, {}), Send, WaitMode.Wait],\n".f
 
 output_file.write('\n')
 
-output_file.write("    [\"Wait for good Uplink/Downlink. The next step is Power Cycle B to switch to deep_sleep.\", Print, WaitMode.Wait],\n")
+output_file.write("    [\"Wait for good Uplink/Downlink. The next step is Ping, later Power Cycle B to switch to deep_sleep.\", Print, WaitMode.Wait],\n")
+output_file.write("    [tc.PingTelecommand(), Send, WaitMode.Wait],\n")
 output_file.write("    [tc.PowerCycleTelecommand(100), Send, WaitMode.Wait],\n")
 
+output_file.write('\n')
+output_file.write("    [[tc.SendBeacon(), 20], SendLoop, WaitMode.NoWait],\n")
 output_file.write('\n')
 
 output_file.write(']\n')

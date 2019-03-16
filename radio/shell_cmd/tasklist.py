@@ -1,6 +1,8 @@
+from threading import Timer
 from datetime import datetime
 from radio.task_actions import WaitMode
 import sys
+import telecommand as tc
 
 
 def custom_raw_input(text=""):
@@ -88,6 +90,13 @@ def build(sender, rcv, frame_decoder, analyzer, ns):
 
                 print_tokens(tokens, style=style)
 
+                def write_end():
+                    print "[X] "
+
+                timer_WriteProgramPart = Timer(7, write_end)
+                if isinstance(telecommand, tc.WriteProgramPart):
+                    timer_WriteProgramPart.start()
+
                 action_type(telecommand).do(ns_wrapper)
 
                 if wait is WaitMode.NoWait:
@@ -100,9 +109,9 @@ def build(sender, rcv, frame_decoder, analyzer, ns):
                         (Token.String, "Wait ")
                     ], style=style)
 
-                    user_input = ""
                     while True:
                         user_input = custom_raw_input()
+                        timer_WriteProgramPart.cancel()
                         if user_input == 'n':
                             break
                         elif user_input == 'r':
