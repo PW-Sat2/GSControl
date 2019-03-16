@@ -91,7 +91,8 @@ def build(sender, rcv, frame_decoder, analyzer, ns):
                 print_tokens(tokens, style=style)
 
                 def write_end():
-                    print "[X] "
+                    sys.stdout.write("[X] ")
+                    sys.stdout.flush()
 
                 timer_WriteProgramPart = Timer(7, write_end)
                 if isinstance(telecommand, tc.WriteProgramPart):

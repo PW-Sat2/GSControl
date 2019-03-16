@@ -97,7 +97,7 @@ for i in boot_slots:
 
 output_file.write('\n')
 
-output_file.write("    [\"The next step is program upload.\", Print, WaitMode.Wait],\n")
+output_file.write("    [\"The next step is program upload.\", Print, WaitMode.Wait],\n\n")
 
 chunk = 0
 offset = 0
@@ -110,6 +110,9 @@ while offset < len(binary_data):
 
     chunk += 1
     offset = chunk * PART_SIZE
+
+    if chunk % 10 == 0:
+        output_file.write("\n")
 
 output_file.write('\n')
 
