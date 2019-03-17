@@ -57,12 +57,12 @@ print "  - file {}".format(args.file)
 print "  - length {} bytes, {} chunks".format(len(binary_data), chunks)
 print "  - bootslots {}".format(boot_slots)
 print "  - Sample: tc.WriteProgramPart(" + str(boot_slots) + ", 0xA5, [0x00, 0x01])"
-print "  - CRC: {:4X}".format(crc)
+print "  - CRC: {:04X}".format(crc)
 
 output_file = open(args.output, 'w')
 output_file.write('tasks = [\n')
 
-output_file.write("    # Generated for file {} at {date:%Y-%m-%d %H:%M:%S}, md5sum: {md5}, crc: 0x{crc:4X}\n\n"
+output_file.write("    # Generated for file {} at {date:%Y-%m-%d %H:%M:%S}, md5sum: {md5}, crc: 0x{crc:04X}\n\n"
                   .format(args.file,
                   date=datetime.datetime.now(),
                   md5=md5.new(binary_data_org).hexdigest(),
@@ -117,7 +117,7 @@ while offset < len(binary_data):
 output_file.write('\n')
 
 output_file.write("    [\"The next step is FinalizeProgramEntry.\", Print, WaitMode.Wait],\n")
-output_file.write("    [tc.FinalizeProgramEntry({}, {}, 0x{:4X}, \"name\"), Send, WaitMode.Wait],\n".format(
+output_file.write("    [tc.FinalizeProgramEntry({}, {}, 0x{:04X}, \"name\"), Send, WaitMode.Wait],\n".format(
     boot_slots, len(binary_data), crc))
 
 output_file.write('\n')
