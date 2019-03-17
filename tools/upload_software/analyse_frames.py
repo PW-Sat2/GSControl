@@ -4,8 +4,8 @@ import sys
 import argparse
 from base64 import b64decode
 
-sys.path.append(os.path.join(os.path.dirname(__file__), '../PWSat2OBC/integration_tests'))
-sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.append(os.path.join(os.path.dirname(__file__), '../../PWSat2OBC/integration_tests'))
+sys.path.append(os.path.join(os.path.dirname(__file__), '../..'))
 
 from utils import ensure_byte_list
 from radio.radio_frame_decoder import FallbackResponseDecorator
@@ -57,7 +57,7 @@ with open(args.tasklist) as tasklist:
         skip = False
 
         if task.find('tc.WriteProgramPart(') != -1:
-            tec = eval(','.join(task.split(',')[0:-3])[1:])
+            tec = eval(','.join(task.split(',')[0:-3])[5:])
 
             requested = (tec._offset, len(tec._content), ord(tec.payload()[0]))
             if requested in upload_done:
