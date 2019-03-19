@@ -150,7 +150,7 @@ class NextSessionTelemetryTasklistGenerator:
     def estimate_session(self, previous_session, next_session_start):
         start_time = previous_session.read_metadata()["start_time_iso_with_zone"]
         start_chunk = self.read_session_telemetry_chunks(previous_session)
-        
+
         if start_chunk is None:
             print "Unable to find previous session file list"
             return
@@ -218,7 +218,7 @@ if __name__ == '__main__':
 
         parser = argparse.ArgumentParser()
 
-        parser.add_argument('-s', '--start-session', required=True,
+        parser.add_argument('-s', '--start-session', required=False,
                             help="Start session number", type=int)
         parser.add_argument('-e', '--end-session', required=False,
                             help="End session number. Start session + 1 if omitted", type=int, default=0)
@@ -236,37 +236,48 @@ if __name__ == '__main__':
         return parser.parse_args()
 
     def main(args):
-        end_session = args.end_session if args.end_session > 0 else args.start_session + 1
 
-        store = MissionStore(root=args.mission_path)
-        start_session_view = store.get_session(args.start_session)
-        end_session_view = store.get_session(end_session)
+        format_args = [
+            dt.datetime.now(),
+        ]
 
-        task_generator = NextSessionTelemetryTasklistGenerator()
-        estimation = task_generator.estimate_session(
-            start_session_view, 
-            end_session_view.read_metadata()["start_time_iso_with_zone"])
+        if args.start_session is not None:
+            end_session = args.end_session if args.end_session > 0 else args.start_session + 1
+            store = MissionStore(root=args.mission_path)
+            start_session_view = store.get_session(args.start_session)
+            end_session_view = store.get_session(end_session)
 
-        if not (estimation is None):
-            generated_tasks = task_generator.generate_telemetry_tasks(
-                estimation, 
-                density_level=4, 
-                chunks_per_tc=args.chunks_per_tc,
-                cid_start=args.cid_start
-                )
+            task_generator = NextSessionTelemetryTasklistGenerator()
+            estimation = task_generator.estimate_session(
+                start_session_view, 
+                end_session_view.read_metadata()["start_time_iso_with_zone"])
 
-            with open(args.template_path, 'r') as template:
-                output_file = open(args.output, 'w')
-                generated_tasks_string = ",\n    ".join(generated_tasks)
-                output_file.write(
-                        template.read().format(
-                        dt.datetime.now(),
-                        args.start_session,
-                        end_session,
-                        end_session_view.read_metadata()["start_time_iso_with_zone"],
-                        generated_tasks_string))
-                output_file.flush()
-                output_file.close()
+            if not (estimation is None):
+                generated_tasks = task_generator.generate_telemetry_tasks(
+                    estimation, 
+                    density_level=4, 
+                    chunks_per_tc=args.chunks_per_tc,
+                    cid_start=args.cid_start
+                    )
+            else:
+                generated_tasks = []
+
+            generated_tasks_string = ",\n    ".join(generated_tasks)
+            format_args.extend([
+                args.start_session,
+                end_session,
+                end_session_view.read_metadata()["start_time_iso_with_zone"],
+                generated_tasks_string
+            ])
+        else:
+            generated_tasks = ''
+
+        with open(args.template_path, 'r') as template:
+            output_file = open(args.output, 'w')
+            
+            output_file.write(template.read().format(*format_args))
+            output_file.flush()
+            output_file.close()
 
 
     main(parse_args())

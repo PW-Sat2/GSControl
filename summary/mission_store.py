@@ -16,7 +16,8 @@ class SessionView(object):
         self.session_number = session_number
         self._root = path.join(store.root, 'sessions', str(session_number))
 
-        self._frame_decoder = FallbackResponseDecorator(response_frames.FrameDecoder(response_frames.frame_factories))
+        self._frame_decoder = FallbackResponseDecorator(
+            response_frames.FrameDecoder(response_frames.frame_factories))
 
         self.tasklist_path = self.expand_path('tasklist.py')
 
@@ -29,8 +30,10 @@ class SessionView(object):
 
     def read_metadata(self):
         metadata = json.loads(self.get_file('data.json'))["Session"]
-        metadata["start_time_iso_with_zone"] = dateutil.parser.parse(metadata["start_time_iso_with_zone"])
-        metadata["stop_time_iso_with_zone"] = dateutil.parser.parse(metadata["stop_time_iso_with_zone"])
+        metadata["start_time_iso_with_zone"] = dateutil.parser.parse(
+            metadata["start_time_iso_with_zone"])
+        metadata["stop_time_iso_with_zone"] = dateutil.parser.parse(
+            metadata["stop_time_iso_with_zone"])
 
         return metadata
 
@@ -111,6 +114,7 @@ class SessionView(object):
 
     def has_artifact(self, file_name):
         full_path = self.expand_artifact_path(file_name)
+        print(full_path)
 
         return path.exists(full_path)
 
