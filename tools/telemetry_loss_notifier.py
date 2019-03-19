@@ -131,5 +131,8 @@ for i in range(args.start + 1, args.start + args.next + 1):
 print(message)
 
 # show only after manual sessions (manual sesion => telemetry download)
-if start_session_view.read_metadata()["status"] == "success" or start_session_view.read_metadata()["status"] == "planned":
-    notify_oper(message)
+try:
+    if "telemetry" in start_session_view.read_metadata()["session_tasks"]:
+        notify_oper(message)
+except Exception:
+    traceback.print_exc()

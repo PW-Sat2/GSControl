@@ -245,3 +245,25 @@ def generate_data_points(timestamp, telemetry, extra_tags):
         p['tags'].update(tags)
 
     return points
+
+
+def generate_deep_sleep_data_points(timestamp, telemetry, extra_tags):
+    tags = {
+        "source": "comm",
+    }
+
+    tags.update(extra_tags)
+
+    telemetry_point = [_data_point(
+        timestamp=timestamp,
+        measurement="deep_beacon",
+        tags=tags,
+        fields=_telemetry_fields(telemetry)
+    )]
+
+    points = telemetry_point
+
+    for p in points:
+        p['tags'].update(tags)
+
+    return points
