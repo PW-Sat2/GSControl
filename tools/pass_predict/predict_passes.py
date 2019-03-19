@@ -102,7 +102,7 @@ def generateSessions(predictions, min_elev, session_start_index, lastPowerCycleC
         if sat_pass.maxElev >= min_elev:
             session = OrderedDict()
             session['index'] = session_index
-            session['phase'] = "after_sail_deployment"
+            session['phase'] = "zZz"
             session['primary'] = "elka" if (sat_pass.aosAzimuth < 90.0 or sat_pass.aosAzimuth > 270.0) else "fp"
             session['start_time_iso_with_zone'] = sat_pass.getIsoStartDateString()
             session['stop_time_iso_with_zone'] = sat_pass.getIsoEndDateString()
@@ -112,7 +112,7 @@ def generateSessions(predictions, min_elev, session_start_index, lastPowerCycleC
             day = sat_pass.getIsoStartDate().date()
             session_tasks = []
 
-            if (day not in power_cycle_days) and (not (sat_pass.aosAzimuth < 90.0 or sat_pass.aosAzimuth > 270.0)) and (sat_pass.maxElev >= powerCycleMinElevation):
+            if False and (day not in power_cycle_days) and (not (sat_pass.aosAzimuth < 90.0 or sat_pass.aosAzimuth > 270.0)) and (sat_pass.maxElev >= powerCycleMinElevation):
                 currentPowerCycleController = "power-cycle-B" if lastPowerCycleController == "power-cycle-A" else "power-cycle-A"
 
                 session_tasks = [currentPowerCycleController, 'telemetry']
@@ -121,7 +121,7 @@ def generateSessions(predictions, min_elev, session_start_index, lastPowerCycleC
                 lastPowerCycleController = currentPowerCycleController
                 power_cycle_days.add(day)
             else:
-                session_tasks = ['keep-alive']
+                session_tasks = ['sleep-beacon']
                 session['status'] = "auto"
 
             session['session_tasks'] = session_tasks
