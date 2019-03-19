@@ -19,8 +19,10 @@ from utils import ensure_byte_list
 import response_frames
 from radio.radio_frame_decoder import FallbackResponseDecorator
 from devices import BeaconFrame
-from data_point import generate_data_points
+from response_frames.deep_sleep_beacon import DeepSleepBeacon
+from data_point import generate_data_points, generate_deep_sleep_data_points
 from tools.parse_beacon import ParseBeacon
+from tools.parse_deep_beacon import ParseDeepBeacon
 
 
 if os.getenv("CLICOLOR_FORCE") == "1":
@@ -83,13 +85,17 @@ for l in args.file.readlines():
 
     frame_decoder = FallbackResponseDecorator(response_frames.FrameDecoder(response_frames.frame_factories))
     frame = frame_decoder.decode(frame_body)
-    if not isinstance(frame, BeaconFrame):
+    if isinstance(frame, BeaconFrame):
+        telemetry = ParseBeacon.parse(frame)
+        points = generate_data_points(timestamp, telemetry, {
+            'ground_station': args.gs
+        })
+    elif isinstance(frame, DeepSleepBeacon):
+        telemetry = ParseDeepBeacon.parse(frame)
+        points = generate_deep_sleep_data_points(timestamp, telemetry, {
+            'ground_station': args.gs
+        })
+    else:
         continue
-
-    telemetry = ParseBeacon.parse(frame)
-
-    points = generate_data_points(timestamp, telemetry, {
-        'ground_station': args.gs
-    })
 
     db.write_points(points)
