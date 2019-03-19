@@ -94,12 +94,14 @@ gs_name = ''
 on_primary_gs = False
 auto_session = False
 auto_session_str = ''
+current_session = None
 
 def mark_main_session(session):
     global gs_name
     global on_primary_gs
     global auto_session
     global auto_session_str
+    global current_session
 
     gs_name = os.environ['GS_NAME']
     on_primary_gs = False
@@ -108,6 +110,7 @@ def mark_main_session(session):
         gs_name += '-primary'
 
     auto_session = session.auto
+    current_session = session
 
     auto_session_str = ''
     if auto_session:
@@ -115,12 +118,13 @@ def mark_main_session(session):
 
 
 class Session:
-    def __init__(self, nr, start, stop, primary_gs, auto):
+    def __init__(self, nr, start, stop, primary_gs, auto, tasks):
         self.nr = nr
         self.start = start
         self.stop = stop
         self.primary_gs = primary_gs
         self.auto = auto
+        self.tasks = tasks
 
     def __repr__(self):
         return str(self.nr) + ': ' + str(self.start) + ' -> ' + \
@@ -133,7 +137,8 @@ class Session:
                str(self.start) == str(other.start) and \
                str(self.stop) == str(other.stop) and \
                self.primary_gs == other.primary_gs and \
-               self.auto == other.auto
+               self.auto == other.auto and \
+               self.tasks == other.tasks
 
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -152,11 +157,12 @@ def parse_sessions():
         start = parser.parse(j['Session']['start_time_iso_with_zone']).astimezone(pytz.utc).replace(tzinfo=None)
         stop = parser.parse(j['Session']['stop_time_iso_with_zone']).astimezone(pytz.utc).replace(tzinfo=None)
         primary = j['Session'].get('primary') or ''
+        tasks = j['Session'].get('session_tasks') or []
         auto = False
         if j['Session'].get('status') == 'auto':
             auto = True
 
-        sessions.append(Session(nr, start, stop, primary, auto))
+        sessions.append(Session(nr, start, stop, primary, auto, tasks))
 
     return sorted(sessions, key=lambda x: x.start)
 
@@ -247,9 +253,13 @@ def start_session():
 
 def run_keep_alive():
     if on_primary_gs and auto_session:
+        scenario = 'keep-alive'
+        if 'sleep-beacon' in current_session.tasks:
+            scenario = 'deep_sleep.py'
+
         run_cmd("python2 " + gscontrol + "/auto_session/execute_session.py" +
                 " --downlink fp,elka --uplink " + session.primary_gs +
-                " --config /gs/config.py &", 'execute_session')
+                " --config /gs/config.py --scenario " + scenario +" &", 'execute_session')
 
 
 def stop_keep_alive():
