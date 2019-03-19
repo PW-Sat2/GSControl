@@ -5,11 +5,10 @@ from datetime import datetime, timedelta
 import argparse
 import zmq
 
-sys.path.append(os.path.join(os.path.dirname(__file__), '../PWSat2OBC/integration_tests'))
+sys.path.append(os.path.join(os.path.dirname(
+    __file__), '../PWSat2OBC/integration_tests'))
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
-from radio.radio_sender import Sender
-from auto_session.session_base import SessionScope
 
 GS_LIST = dict(map(lambda i: (i['name'], i), [
     dict(
@@ -45,8 +44,12 @@ def parse_args():
 
     parser.add_argument('--downlink', '-d', type=gs_list, help="Comma separated list of downlink GSes",
                         default=gs_list('elka,fp'))
-    parser.add_argument('--config', '-c', help="Config file (Python one)", required=True)
-    parser.add_argument('--uplink', '-u', type=gs, help="GS to be used for uplink", required=True)
+    parser.add_argument(
+        '--config', '-c', help="Config file (Python one)", required=True)
+    parser.add_argument('--uplink', '-u', type=gs,
+                        help="GS to be used for uplink", required=True)
+    parser.add_argument('--scenario', help="Scenario to execute",
+                        required=False, default='keep_alive.py')
 
     return parser.parse_args()
 
@@ -55,7 +58,7 @@ def load_session(file_name):
     scope = {}
 
     with open(file_name, 'r') as f:
-        exec (f, scope)
+        exec(f, scope)
 
     return scope['session']
 
@@ -70,10 +73,12 @@ def build_recv_sock(gs):
 
 
 def run(args):
+    from radio.radio_sender import Sender
+    from auto_session.session_base import SessionScope
     import imp
     cfg = imp.load_source('config', args.config)
 
-    session_file = os.path.join(os.path.dirname(__file__), 'keep_alive.py')
+    session_file = os.path.join(os.path.dirname(__file__), args.scenario)
     session = load_session(session_file)
 
     steps = list(session(
