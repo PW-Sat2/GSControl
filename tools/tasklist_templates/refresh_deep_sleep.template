@@ -8,7 +8,7 @@ tasks = [
     [tc.PingTelecommand(), Send, WaitMode.Wait],
 
     # Set bitrate
-    [tc.SetBitrate(1, BaudRate.BaudRate9600), Send, WaitMode.NoWait],
+    [tc.SetBitrate(1, BaudRate.BaudRate9600), Send, WaitMode.Wait],
 
     # Get few beacons from nominal OBC
     [tc.SendBeacon(), Send, WaitMode.Wait],
@@ -18,7 +18,7 @@ tasks = [
     # Carefully waste some session time
     [tc.SendBeacon(), Send, WaitMode.Wait],
 
-    ["Set bootslots for deep_sleep.", Print, WaitMode.Wait],
+    ["Set bootslots for deep_sleep.", Print, WaitMode.NoWait],
     [tc.SetBootSlots(103, 0b111000, 0b111), Send, WaitMode.Wait],
 
     # Wait for good uplink before power cycle
