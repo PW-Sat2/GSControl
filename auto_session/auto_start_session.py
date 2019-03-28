@@ -48,7 +48,7 @@ def send_to_slack_important(text):
         s = Slacker(slack_token)
         channel_id = s.channels.get_channel_id(slack_important_channel)
         print text
-        s.chat.command(channel=channel_id, command='/imgflip', text='sad frog; ' + text)
+        s.chat.command(channel=channel_id, command='/meme', text='tried ' + text)
     except Exception:
         traceback.print_exc()
 
@@ -64,11 +64,11 @@ def notify_oper(text, operator='oper'):
     except Exception:
         traceback.print_exc()
 
-def imgflip(text):
+def send_meme(text):
     try:
         s = Slacker(slack_token)
         channel_id = s.channels.get_channel_id(slack_channel)
-        s.chat.command(channel=channel_id, command='/imgflip', text=' ' + text)
+        s.chat.command(channel=channel_id, command='/meme', text='random ' + text)
     except Exception:
         traceback.print_exc()
 
@@ -239,11 +239,7 @@ def run_cmd(cmd, name):
 
 def start_session():
     try:
-        j = json.load(urllib2.urlopen(urllib2.Request('https://api.imgflip.com/get_memes', headers={'User-Agent': "Magic Browser"})))
-        names = [str(i['name']) for i in j['data']['memes']]
-        name = random.choice(names)
-
-        imgflip(name + '; Sesja ' + str(session.nr) + '; {} {}'.format(gs_name, auto_session_str))
+        send_meme('Sesja ' + str(session.nr) + '; {} {}'.format(gs_name, auto_session_str))
     except Exception:
         traceback.print_exc()
 
