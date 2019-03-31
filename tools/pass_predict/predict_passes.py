@@ -11,6 +11,8 @@ import json
 from collections import OrderedDict
 import time
 
+TZ_OFFSET = datetime.timedelta(seconds=time.timezone)
+
 def predict_pass(tle, qths, end_datetime, count):
     def predictOneStation(tle, qth):
         predictions = []
@@ -206,7 +208,8 @@ def getLastPowerCycleController(data):
     return None
 
 def fromLocalStringToTimestamp(timestampString):
-    return (datetime.datetime.strptime(timestampString.split("+")[0], "%Y-%m-%dT%H:%M:%S") - datetime.datetime(1970, 1, 1)).total_seconds()
+    return int(time.mktime((datetime.datetime.strptime(timestampString.split("+")[0], "%Y-%m-%dT%H:%M:%S") - TZ_OFFSET).timetuple()))
+
 
 def main():
     parser = argparse.ArgumentParser()
