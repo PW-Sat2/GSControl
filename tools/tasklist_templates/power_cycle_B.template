@@ -27,13 +27,21 @@ tasks = [
     {4}
     # auto-generated telemetry end
 
-    # auto-generated file download start
+
+    # missing from previous session start
     {5}
+    # missing from previous session end
+
+
+    # auto-generated file download start
+    {6}
     # auto-generated file download end
 
+
     # auto-generated file remove start
-    {6}
+    {7}
     # auto-generated file remove end
+
 
     [[tc.SendBeacon(), 20], SendLoop, WaitMode.NoWait],
 ]

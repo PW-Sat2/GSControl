@@ -68,6 +68,10 @@ def read_session_list_files(session):
 
     return all_files
 
+def generate_missings_from_session(session):
+    missing = session.read_artifact(session.expand_artifact_path('tasklist.missing.py'))
+    return missing.replace('\r', '').replace('\t', '').replace(',\n', '\n').split('\n')[1:-1]
+
 def get_latest_file_list(store):
     def to_session_nr(name):
         try:
@@ -123,6 +127,9 @@ def generate_remove_files_tasks(mission_store, files_to_delete, cid_start):
             cid,
             file))
         cid += 1
+
+    tasklist.append("[tc.ListFiles({}, '/'), Send, WaitMode.Wait]".format(cid))
+    cid += 1
     return tasklist
 
 class MissingFilesTasklistGenerator:
@@ -299,6 +306,8 @@ if __name__ == '__main__':
                             help="Files to download.")
         parser.add_argument('-d', '--files-to-delete', nargs='+', default=[],
                             help="Files to delete.")
+        parser.add_argument('-r', '--missings', action='store_true',
+                            help="Get missing tasklist from previous session")
 
         return parser.parse_args()
 
@@ -319,11 +328,19 @@ if __name__ == '__main__':
                 start_session_view, 
                 end_session_view.read_metadata()["start_time_iso_with_zone"])
 
+            if args.missings:
+                missings = generate_missings_from_session(store.get_session(end_session - 1))
+                correlation_id += len(missings)
+                print "Generated missings!"
+                generated_tasks_missings = ",\n    ".join(missings) + ','
+            else:
+                generated_tasks_missings = ""
+
             if not (estimation is None):
                 generated_tasks = task_generator.generate_telemetry_tasks(
                     estimation, 
                     density_level=4, 
-                    chunks_per_tc=args.chunks_per_tc,
+                        chunks_per_tc=args.chunks_per_tc,
                     cid_start=correlation_id
                     )
                 correlation_id += len(generated_tasks)
@@ -341,7 +358,7 @@ if __name__ == '__main__':
                 generated_file_download_tasks = []
                 generated_file_download_tasks_string = ""
             
-            if args.files_to_download != []:
+            if args.files_to_delete != []:
                 print "Removing files: {}".format(args.files_to_delete)
                 remove_file_tasks = generate_remove_files_tasks(store, args.files_to_delete, correlation_id)
                 correlation_id += len(remove_file_tasks)
@@ -355,6 +372,7 @@ if __name__ == '__main__':
                 end_session,
                 end_session_view.read_metadata()["start_time_iso_with_zone"],
                 generated_tasks_string,
+                generated_tasks_missings,
                 generated_file_download_tasks_string,
                 remove_file_tasks_string,
             ])
