@@ -114,7 +114,7 @@ class SessionView(object):
 
     def has_artifact(self, file_name):
         full_path = self.expand_artifact_path(file_name)
-        print(full_path)
+        # print(full_path)
 
         return path.exists(full_path)
 
