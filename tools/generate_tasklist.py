@@ -48,6 +48,83 @@ def pop_matching(arr, total, delegate):
 
     return taken
 
+def read_session_list_files(session):
+    # get newest list files
+    file_list_paths = sorted(glob.glob(session.expand_artifact_path('file_list*')), key=os.path.basename, reverse=True)
+    
+    if len(file_list_paths) == 0:
+        raise Exception("No file list in session {}".format(session.session_number))
+
+    all_files = []
+
+    for files in file_list_paths:
+        file_list_txt = session.read_artifact(files)
+        loaded_list = json.loads(file_list_txt.replace("'", '"'))
+
+        for file in loaded_list:
+            # if file not in all_files, add it
+            if len(filter(lambda x: x['File'] == file['File'], all_files)) == 0:
+                all_files.append(file)
+
+    return all_files
+
+def get_latest_file_list(store):
+    def to_session_nr(name):
+        try:
+            return int(os.path.basename(name))
+        except ValueError:
+            return 0
+
+    f = glob.glob(store.root + "/sessions/*")
+    session_nrs = [to_session_nr(i) for i in glob.glob(store.root + "/sessions/*")]
+    session_nrs = sorted(session_nrs, reverse=True)
+    for session in session_nrs:
+        try:
+            return read_session_list_files(store.get_session(session))
+        except:
+            continue
+    return {}
+
+def generate_download_files_tasks(mission_store, files_to_download, chunks_per_tc, cid_start):
+    file_list = get_latest_file_list(mission_store)
+
+    cid = cid_start
+
+    tasklist = []
+
+    for file in files_to_download:
+        file_description = filter(lambda x: x['File'] == file, file_list)
+        if len(file_description) != 1:
+            raise Exception("Cannot find description of file {}".format(file))
+        file_description = file_description[0]
+
+        chunks_all = splitAllChunks(range(0, file_description["Chunks"]), chunks_per_tc)
+
+        for chunks in chunks_all:
+            tasklist.append(MissingFilesTasklistGenerator._generateTelecommandText({
+                "cid": cid,
+                "chunks": ', '.join(map(str, chunks)),
+                "file": file
+            }))
+            cid += 1
+
+    return tasklist
+
+def generate_remove_files_tasks(mission_store, files_to_delete, cid_start):
+    cid = cid_start
+    tasklist = []
+    file_list = get_latest_file_list(mission_store)
+
+    for file in files_to_delete:
+        if filter(lambda x: x['File'] == file, file_list) == []:
+            print "WARNING: File {} not found in last file list!".format(file)
+
+        tasklist.append("[tc.RemoveFile({}, \'{}\'), Send, WaitMode.Wait]".format(
+            cid,
+            file))
+        cid += 1
+    return tasklist
+
 class MissingFilesTasklistGenerator:
     @staticmethod
     def _generateTelecommandData(missing_files, max_chunks, cid_start):
@@ -128,24 +205,10 @@ class NextSessionTelemetryTasklistGenerator:
 
 
     def read_session_telemetry_chunks(self, session):
+        files = read_session_list_files(session)
 
-        file_list_paths = glob.glob(session.expand_artifact_path('file_list*'))
-        
-        for file_list_file in file_list_paths:
-            loaded_list = []
-            
-            if session.has_artifact(file_list_file) == False:
-                continue
-
-            file_list_txt = session.read_artifact(file_list_file)
-            loaded_list = json.loads(file_list_txt.replace("'", '"'))
-
-            telemetry_entries = filter(lambda x: x["File"] == 'telemetry.current', loaded_list)
-
-            if len(telemetry_entries) == 0:
-                continue
-
-            return telemetry_entries[0]["Chunks"]
+        telemetry_entries = filter(lambda x: x["File"] == 'telemetry.current', files)
+        return telemetry_entries[0]["Chunks"]
 
     def estimate_session(self, previous_session, next_session_start):
         start_time = previous_session.read_metadata()["start_time_iso_with_zone"]
@@ -232,6 +295,10 @@ if __name__ == '__main__':
                             help="Beginning of generated correlation id", default=30, type=int)
         parser.add_argument('-t', '--template-path', required=False,
                             help="Path to template of the tasklist", type=str, default=default_template_path)
+        parser.add_argument('-f', '--files-to-download', nargs='+', default=[],
+                            help="Files to download.")
+        parser.add_argument('-d', '--files-to-delete', nargs='+', default=[],
+                            help="Files to delete.")
 
         return parser.parse_args()
 
@@ -246,7 +313,7 @@ if __name__ == '__main__':
             store = MissionStore(root=args.mission_path)
             start_session_view = store.get_session(args.start_session)
             end_session_view = store.get_session(end_session)
-
+            correlation_id = args.cid_start
             task_generator = NextSessionTelemetryTasklistGenerator()
             estimation = task_generator.estimate_session(
                 start_session_view, 
@@ -257,21 +324,43 @@ if __name__ == '__main__':
                     estimation, 
                     density_level=4, 
                     chunks_per_tc=args.chunks_per_tc,
-                    cid_start=args.cid_start
+                    cid_start=correlation_id
                     )
+                correlation_id += len(generated_tasks)
+                generated_tasks_string = ",\n    ".join(generated_tasks) + ','
             else:
                 generated_tasks = []
+                generated_tasks_string = ""
 
-            generated_tasks_string = ",\n    ".join(generated_tasks)
+            if args.files_to_download != []:
+                print "Downloading files: {}".format(args.files_to_download)
+                generated_file_download_tasks = generate_download_files_tasks(store, args.files_to_download, args.chunks_per_tc, correlation_id)
+                correlation_id += len(generated_file_download_tasks)
+                generated_file_download_tasks_string = ",\n    ".join(generated_file_download_tasks) + ','
+            else:
+                generated_file_download_tasks = []
+                generated_file_download_tasks_string = ""
+            
+            if args.files_to_download != []:
+                print "Removing files: {}".format(args.files_to_delete)
+                remove_file_tasks = generate_remove_files_tasks(store, args.files_to_delete, correlation_id)
+                correlation_id += len(remove_file_tasks)
+                remove_file_tasks_string = ",\n    ".join(remove_file_tasks) + ','
+            else:
+                remove_file_tasks = []
+                remove_file_tasks_string = ""
+
             format_args.extend([
                 args.start_session,
                 end_session,
                 end_session_view.read_metadata()["start_time_iso_with_zone"],
-                generated_tasks_string
+                generated_tasks_string,
+                generated_file_download_tasks_string,
+                remove_file_tasks_string,
             ])
         else:
             generated_tasks = ''
-
+            
         with open(args.template_path, 'r') as template:
             output_file = open(args.output, 'w')
             
