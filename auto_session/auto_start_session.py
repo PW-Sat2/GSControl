@@ -249,9 +249,15 @@ def start_session():
 
 def run_keep_alive():
     if on_primary_gs and auto_session:
-        scenario = 'keep-alive'
+        # 'deep_sleep.py' as the default scenario
+        scenario = 'deep_sleep.py'
+
         if 'sleep-beacon' in current_session.tasks:
             scenario = 'deep_sleep.py'
+        elif 'keep-alive' in current_session.tasks:
+            scenario = 'keep-alive.py'
+
+        send_to_slack(gs_name + ': auto-session scenario: `' + scenario + '`')
 
         run_cmd("python2 " + gscontrol + "/auto_session/execute_session.py" +
                 " --downlink fp,elka --uplink " + session.primary_gs +
