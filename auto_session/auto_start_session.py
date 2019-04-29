@@ -180,6 +180,21 @@ def execute(time_events):
         print i[1].__name__, "finished"
         print ""
 
+
+def check_disk_space():
+    try:
+        import psutil
+        (_1, _2, free, _3) =  psutil.disk_usage('/archive')
+        freeGB = free / 1024.0 / 1024.0 / 1024.0
+
+        if freeGB < 20.0:
+            send_to_slack(gs_name + ': @oper: Low space on disk: `' + freeGB + ' GB`')
+        else:
+            send_to_slack(gs_name + ': Archive free space: `' + freeGB + ' GB`')
+    except Exception:
+        traceback.print_exc()
+
+
 # --------------------------------------------------
 
 
@@ -242,6 +257,7 @@ def start_session():
         send_meme('Sesja ' + str(session.nr) + '; {} {}'.format(gs_name, auto_session_str))
     except Exception:
         traceback.print_exc()
+    check_disk_space()
 
     run_cmd(gscontrol + '/scripts/start_auto_session.sh ' + str(session.nr),
             'start ' + str(session.nr))
