@@ -136,14 +136,6 @@ def generateSessions(predictions, min_elev, session_start_index, lastPowerCycleC
             session_index += 1
     return sessions
 
-def fallbackDesc(desc):
-    return """{{% extends "/sessions/_layout/index.md" %}}
-
-{{% block goal %}}
-{0}
-{{% endblock %}}
-""".format(desc)
-
 def saveSessions(sessionNumber, sessionsData, missionPath):
     sessionIndex = sessionNumber
     for session in sessionsData:
@@ -154,9 +146,6 @@ def saveSessions(sessionNumber, sessionsData, missionPath):
         with open(dataPath, "w") as outFile:
             json.dump(session, outFile, indent=4)
 
-        descPath = os.path.join(sessionFolderPath, "index.md")
-        with open(descPath, "w") as outFile:
-            outFile.write(fallbackDesc(session["Session"]["short_description"]))
         sessionIndex = sessionIndex + 1
 
 def qthListToQth(qthlist):
