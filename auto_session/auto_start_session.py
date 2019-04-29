@@ -188,9 +188,9 @@ def check_disk_space():
         freeGB = free / 1024.0 / 1024.0 / 1024.0
 
         if freeGB < 20.0:
-            send_to_slack(gs_name + ': @oper: Low space on disk: `' + freeGB + ' GB`')
+            send_to_slack('{}: @oper: Low space on disk: `{:.1f} GB`'.format(gs_name, freeGB))
         else:
-            send_to_slack(gs_name + ': Archive free space: `' + freeGB + ' GB`')
+            send_to_slack('{}: Archive free space: `{:.1f} GB`'.format(gs_name, freeGB))
     except Exception:
         traceback.print_exc()
 
