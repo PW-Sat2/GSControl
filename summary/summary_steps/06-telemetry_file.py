@@ -22,6 +22,9 @@ def load_telemetry_file(file_name):
         'import_marker': '{}-session-{}'.format(path.basename(file_name), session.session_number)
     }
 
+    for i in entry_mapping:
+        print(i.db_timestamp)
+
     all_points = []
 
     for item in entry_mapping:

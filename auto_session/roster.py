@@ -37,8 +37,22 @@ class RosterDay(object):
         else:
             return self.morning
 
+    def assign_morning(self, operator):
+        self.morning = operator
+        self.operators = [self.morning, self.evening]
+
+    def assign_evening(self, operator):
+        self.evening = operator
+        self.operators = [self.morning, self.evening]
+
+    def swap_operators(self):
+        tmp = self.evening
+        self.evening = self.morning
+        self.morning = tmp
+        self.operators = [self.morning, self.evening]
+
     def __repr__(self):
-        return '{:%Y-%m-%d} {}/{}'.format(self.date, self.morning, self.evening)
+        return u'{:%Y-%m-%d} {}/{}'.format(self.date, self.morning, self.evening)
 
 class Roster(object):
     SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly']
@@ -51,7 +65,7 @@ class Roster(object):
         self.api = service.spreadsheets()
 
     def find_assignment_for_date(self, date):
-        assignments = self._download_month(date)
+        assignments = self.download_month(date)
 
         result = filter(lambda a: a.date.date() == date.date(), assignments)
         if result:
@@ -76,7 +90,7 @@ class Roster(object):
 
         return result
 
-    def _download_month(self, month_start):
+    def download_month(self, month_start):
         month_start = datetime(year=month_start.year, month=month_start.month, day=1)
         result = self.api.values().get(
             spreadsheetId=self.spreadsheet_id, 
