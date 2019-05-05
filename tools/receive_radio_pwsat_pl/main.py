@@ -17,7 +17,9 @@ parser.add_argument('-o', '--origin', required=False,
                     help="Origin", default='https://radio.pw-sat.pl/')
 parser.add_argument('-c', '--callsign-file', required=False, help="Callsigns JSON file", default=False)
 parser.add_argument('-d', '--debug', required=False, action='store_true',
-                    help="Debug", default=False)                    
+                    help="Debug", default=False)
+parser.add_argument('-a', '--all_frames', required=False, action='store_true',
+                    help="All frames / turn off GS filtering", default=False)                    
 
 args = parser.parse_args()
 
@@ -37,9 +39,12 @@ while True:
         if args.debug:
             print(raw)
 
+        userId = get_userId(raw)
+        if not args.all_frames and callsign_decoder.is_on_black_list(userId):
+            continue
+
         frame_string_view = make_frame_object(raw)
         counter += 1
-        userId = get_userId(raw)
         callsign = callsign_decoder.decode(userId)
 
         timestamp_str = '{}{}{}'.format(colorama.Fore.CYAN, datetime.datetime.now().time().strftime('%H:%M:%S'), colorama.Fore.RESET)
