@@ -31,3 +31,7 @@ def _create_frame_object(frame_data):
 
 def _parse_packet(frame_data):
     return decoder.decode(ensure_byte_list(frame_data[17:-2]))
+
+def get_userId(data):
+    packet = json.loads(data)
+    return packet['userId']
