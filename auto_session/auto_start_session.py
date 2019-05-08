@@ -193,6 +193,10 @@ def check_disk_space():
             send_to_slack('{}: Archive free space: `{:.1f} GB`'.format(gs_name, freeGB))
     except Exception:
         traceback.print_exc()
+        try:
+            send_to_slack('{}: @oper: EXCEPTION WITH DISK: `{}`'.format(gs_name, traceback.format_exc()))
+        except Exception:
+            pass
 
 
 # --------------------------------------------------
