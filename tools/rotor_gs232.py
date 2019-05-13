@@ -19,6 +19,8 @@ while True:
     sock, addr = server.accept()
 
     print "Connected from: %s:%d" % (addr[0], addr[1])
+    az_prev = 0
+    el_prev = 0
 
     while True:
         data = sock.recv(1024)
@@ -32,9 +34,16 @@ while True:
             az = int(parsed[0].split(",")[0])
             el = int(parsed[1].split(",")[0])
 
-            rot.write("W{:03d} {:03d}\n".format(az, el))
+            if (az != az_prev) or (el != el_prev):
+                print("Set az, el!")
+                rot.write("W{:03d} {:03d}\n".format(az, el))
+                az_prev = az
+                el_prev = el
+            else:
+                print("Identical az, el, do not set!")
 
             sock.sendall("RPRT 0\n")
+
         elif data.startswith('p'):
             sock.sendall("p\n0\n0")
 
