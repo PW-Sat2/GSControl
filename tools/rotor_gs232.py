@@ -14,10 +14,10 @@ time.sleep(0.5)  # TODO: Find better way to know if init is all done
 while True:
     rot = serial.Serial('/dev/rotor', 600)
 
-    print "Waiting for connection on: %s:%d" % bind_to
+    print("Waiting for connection on: %s:%d" % bind_to)
     sock, addr = server.accept()
 
-    print "Connected from: %s:%d" % (addr[0], addr[1])
+    print("Connected from: %s:%d" % (addr[0], addr[1]))
     az_prev = 0
     el_prev = 0
 
@@ -48,4 +48,4 @@ while True:
 
     sock.close()
     rot.close()
-    print "Disconnected from: %s:%d" % (addr[0], addr[1])
+    print("Disconnected from: %s:%d" % (addr[0], addr[1]))
