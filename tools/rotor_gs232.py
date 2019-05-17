@@ -1,10 +1,7 @@
 import socket
 import time
 import serial
-
 import parse
-
-rot = serial.Serial('/dev/rotor', 600)
 
 bind_to = ('', 4533)
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -15,6 +12,8 @@ server.listen(0)
 time.sleep(0.5)  # TODO: Find better way to know if init is all done
 
 while True:
+    rot = serial.Serial('/dev/rotor', 600)
+
     print "Waiting for connection on: %s:%d" % bind_to
     sock, addr = server.accept()
 
