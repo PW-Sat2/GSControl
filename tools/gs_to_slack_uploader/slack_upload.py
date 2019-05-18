@@ -73,6 +73,8 @@ class UploadSlack(Thread):
                 # filter out FileSendSuccessFrame
                 if isinstance(decoded_frame, response_frames.common.FileSendSuccessFrame):
                     self.logger.log(logging.DEBUG, frame_text)
+                elif isinstance(decoded_frame, response_frames.common.FileSendErrorFrame):
+                    self.logger.log(logging.DEBUG, frame_text)
                 else:
                     requests.post(self.slack_url, json={'username': 'GS Frames', 'text': formated_message})
 
