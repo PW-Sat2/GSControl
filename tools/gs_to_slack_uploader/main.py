@@ -42,4 +42,4 @@ signal.signal(signal.SIGINT, signal_handler)
 print('Press Ctrl+C to finish...')
 
 while True:
-    pass    
+    time.sleep(10)
