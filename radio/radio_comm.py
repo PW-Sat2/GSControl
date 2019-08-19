@@ -1,5 +1,6 @@
 import os
 import sys
+import json
 
 from datetime import datetime
 
@@ -104,10 +105,17 @@ if __name__ == '__main__':
     shell.run_code('import response_frames as rf')
 
     if args.session != 0:
-        tasklist_file = os.path.join(os.path.dirname(__file__), '..', '..', 'mission', 'sessions', str(args.session), 'tasklist.py')
-        shell.run_code('tasks = load(\"{}\")'.format(tasklist_file))
-        shell.run_code('analyze(tasks)')
-        shell.set_next_input('run(tasks)')
+        with open(os.path.join(os.path.dirname(__file__), '..', '..', 'mission', 'sessions', str(args.session), 'data.json'), 'r') as session_data_file:
+            session_data = json.load(session_data_file)
+
+            if 'refresh-deep-sleep' in session_data['Session']['session_tasks']:
+                tasklist_file = os.path.join(os.path.dirname(__file__), '..', 'tools', 'tasklist_templates', 'refresh_deep_sleep.template')
+            else:
+                tasklist_file = os.path.join(os.path.dirname(__file__), '..', '..', 'mission', 'sessions', str(args.session), 'tasklist.py')
+        
+            shell.run_code('tasks = load(\"{}\")'.format(tasklist_file))
+            shell.run_code('analyze(tasks)')
+            shell.set_next_input('run(tasks)')
 
     if args.receiver:
         shell.run_code('frames = receiver_loop()')
