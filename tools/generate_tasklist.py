@@ -140,6 +140,8 @@ class MissingFilesTasklistGenerator:
             "chunks": splitAllChunks(info["MissingChunks"], max_chunks)
         }), missing_files.items())
 
+        missingSplittedChunksPerFile.sort(key= MissingFilesTasklistGenerator._generateMissingFilesSortKey)
+
         flattenedChunksPerFile = [{"name": x["name"], "chunks": y} for x in missingSplittedChunksPerFile for y in
                                   x["chunks"]]
 
@@ -150,6 +152,14 @@ class MissingFilesTasklistGenerator:
         }), enumerate(flattenedChunksPerFile))
 
         return telecommandData
+
+    @staticmethod
+    def _generateMissingFilesSortKey(item):
+        name = item['name']
+        chunks = len(item['chunks'])
+        isTelemetry = 0 if 'telemetry' in name else 1
+        key = "{}_{:02}_{}".format(isTelemetry, chunks, name)
+        return key
 
     @staticmethod
     def _generateTelecommandText(singleTelecommandData):
