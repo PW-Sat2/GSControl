@@ -14,8 +14,14 @@ def write_file_from_description(file_path, description):
     error_chunk_ids = description['ErrorChunks']
     downloaded_chunks = description['ChunkFrames']
 
+    missing_file_name = file_path + '.missing'
+
     if len(missing_chunk_ids) > 0:
-        session.write_artifact(file_path + '.missing', ', '.join(map(str, missing_chunk_ids)))
+        session.write_artifact(missing_file_name, ', '.join(map(str, missing_chunk_ids)))
+    else:
+        if session.has_artifact(missing_file_name):
+            logging.warning('Removing obsolete missing file {}'.format(missing_file_name))
+            session.remove_artifact(missing_file_name)
 
     if len(error_chunk_ids) > 0:
         session.write_artifact(file_path + '.error', ', '.join(map(str, error_chunk_ids)))

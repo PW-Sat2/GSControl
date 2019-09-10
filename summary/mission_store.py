@@ -118,6 +118,11 @@ class SessionView(object):
 
         return path.exists(full_path)
 
+    def remove_artifact(self, file_name):
+        if self.has_artifact(file_name):
+            full_path = self.expand_artifact_path(file_name)
+            os.remove(full_path)
+
 
 class MissionStore(object):
     def __init__(self, root):
