@@ -159,10 +159,12 @@ def getSessionFolders(missionRepoPath):
 
     sessionDirs = []
     for d in dirList:
+        if d.startswith('_'):
+            continue
         try:
             sessionDirs.append(int(d))
         except:
-            print("Not a session dir!")
+            print("Not a session dir!" + d)
 
     return sessionDirs
 

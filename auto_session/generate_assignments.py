@@ -20,6 +20,15 @@ def select_operator(last_assignments, exclude=[]):
         if item in exclude:
             continue
 
+        if R.random() <= 0.1:
+            continue
+
+        return item
+
+    for item in s:
+        if item in exclude:
+            continue
+
         return item
 
 def find_last_assignments(assignments, operators):
@@ -69,7 +78,7 @@ def fill_assignment(empty_assignment_idx, all_assignments):
         print('Eve: {}'.format(empty_assignment.operators))
         empty_assignment.assign_evening(select_operator(last_evening, empty_assignment.operators))
 
-    if both_empty and R.random() <= 0.3:
+    if both_empty and R.random() <= 0.4:
         print('Swapping {}'.format(empty_assignment.operators))
         empty_assignment.swap_operators()
 
@@ -82,6 +91,8 @@ def main():
         roster.download_month(datetime(year=2019, month=5, day=1)),
         roster.download_month(datetime(year=2019, month=6, day=1)),
         roster.download_month(datetime(year=2019, month=7, day=1)),
+        roster.download_month(datetime(year=2019, month=8, day=1)),
+        roster.download_month(datetime(year=2019, month=9, day=1)),
     ]
 
     assignments = []
