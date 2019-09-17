@@ -21,7 +21,7 @@ def parse_args():
     from config import config
 
     if not config.viewkeys() >= {'AZ_OFFSET', 'EL_OFFSET', 'GPREDICT_PORT', 'ROTCTRLD_PORT'}:
-        print "Both azimuth and elevation offsets must be specified in config file. Exiting."
+        print("Both azimuth and elevation offsets must be specified in config file. Exiting.")
         return -1
     else:
         print("Config OK!")
@@ -90,10 +90,12 @@ def gpredict_to_rotctrld(config, rotctrld_socket, gpredict_socket):
 
                 el = int(parsed[1].split(",")[0]) + config['EL_OFFSET']
 
-                rotctrld_socket.send("P {} {}\n".format(az, el))
+                output_message = "P {} {}\n".format(az, el)
+                rotctrld_socket.send(output_message)
+                print("-> {}".format(output_message))
             else:
                 rotctrld_socket.send(data)
-                print(data)
+                print("-> {}".format(data))
 
         print("gpredict_to_rotctrld disconneted!")
         gpredict_socket.close()
@@ -113,8 +115,16 @@ def rotctrld_to_gpredict(config, rotctrld_socket, gpredict_socket):
             if not data:
                 break
 
-            print(data)
-            gpredict_socket.send(data)
+            print("<- {}".format(data))
+            parsed = parse.parse("{:.6f}\n{:.6f}", data)
+            if parsed is not None:
+                az = parsed[0] - config['AZ_OFFSET']
+                el = parsed[1] - config['EL_OFFSET']
+                message = "{:.6f}\n{:.6f}\n".format(az, el)
+                print("to GPredict > {:.6f} {:.6f}".format(az, el))
+                gpredict_socket.send(message)
+            else:
+                gpredict_socket.send(data)
 
         print("rotctrld_to_gpredict disconneted!")
         gpredict_socket.close()
@@ -135,10 +145,10 @@ def connect_rotctrld(config):
             rotctrld_socket.connect(('localhost', config['ROTCTRLD_PORT']))
             break
         except rotctrld_socket.error:
-            print "Wait for rotctrld"
+            print("Wait for rotctrld")
             time.sleep(1)
 
-    print "rotctrld Connected!"
+    print("rotctrld Connected!")
     time.sleep(2)
 
     return rotctrld_socket
@@ -151,10 +161,10 @@ def connect_gpredict(config):
     server.bind(bind_to)
     server.listen(0)
 
-    print "Waiting for connection on: %s:%d" % bind_to
+    print("Waiting for connection on: %s:%d" % bind_to)
     sock, addr = server.accept()
 
-    print "Connected from: %s:%d" % (addr[0], addr[1])
+    print("Connected from: %s:%d" % (addr[0], addr[1]))
 
     return sock
 
