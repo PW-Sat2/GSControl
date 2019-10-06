@@ -81,6 +81,12 @@ class SessionView(object):
             f.write(content)
 
     def frames(self, sources, unique_only=True):
+        def sorter(x):
+            try:
+                return (x.correlation_id, x.ReceivedAPID, x._seq)
+            except:
+                return (0,0,0)
+
         payloads = []
 
         for source in sources:
@@ -110,13 +116,20 @@ class SessionView(object):
 
             frames.append(frame)
 
-        return list(frames)
+        result = list(frames)
+        result.sort(key= sorter)
+        return result
 
     def has_artifact(self, file_name):
         full_path = self.expand_artifact_path(file_name)
         # print(full_path)
 
         return path.exists(full_path)
+
+    def remove_artifact(self, file_name):
+        if self.has_artifact(file_name):
+            full_path = self.expand_artifact_path(file_name)
+            os.remove(full_path)
 
 
 class MissionStore(object):
