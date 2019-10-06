@@ -83,9 +83,9 @@ class SessionView(object):
     def frames(self, sources, unique_only=True):
         def sorter(x):
             try:
-                return "{:03}_{:02}_{:05}".format(x.correlation_id, x.ReceivedAPID, x._seq)
+                return (x.correlation_id, x.ReceivedAPID, x._seq)
             except:
-                return "0"
+                return (0,0,0)
 
         payloads = []
 
