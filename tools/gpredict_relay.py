@@ -49,27 +49,36 @@ def gpredict():
 
     while True:
         log.debug("Waiting for connection on: %s:%d" % bind_to)
-        sock, addr = server.accept()
+        try:
+            sock, addr = server.accept()
+        except KeyboardInterrupt:
+            log.info("Keyboard interrupt. Exiting.")
+            break
 
         log.info("Connected from: %s:%d" % (addr[0], addr[1]))
 
         cur_freq = 0
         while True:
-            data = sock.recv(1024)
-            if not data:
-                break
+            try:
+                data = sock.recv(1024)
+                if not data:
+                    break
 
-            if data.startswith('F'):
-                freq = int(data[1:].strip())
-                if cur_freq != freq:
-                    log.debug("New frequency: %d" % freq)
+                if data.startswith('F'):
+                    freq = int(data[1:].strip())
+                    if cur_freq != freq:
+                        log.debug("New frequency: %d" % freq)
 
-                    set_freq(freq)
+                        set_freq(freq)
 
-                    cur_freq = freq
-                sock.sendall("RPRT 0\n")
-            elif data.startswith('f'):
-                sock.sendall("f: %d\n" % cur_freq)
+                        cur_freq = freq
+                    sock.sendall("RPRT 0\n")
+                elif data.startswith('f'):
+                    sock.sendall("f: %d\n" % cur_freq)
+            except KeyboardInterrupt:
+                log.info("Keyboard interrupt. Exiting.")
+                sock.close()
+                break             
 
         sock.close()
         log.info("Disconnected from: %s:%d" % (addr[0], addr[1]))
@@ -78,20 +87,25 @@ def gpredict():
 def gnuradio():
     log = logging.getLogger("Gnuradio")
     gnuradio_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    is_connected = False
 
     while True:
         try:
             gnuradio_socket.connect(('localhost', 4532))
+            gnuradio_socket.settimeout(0.1)
+            log.info("Gnuradio Connected!")
+            is_connected = True
             break
         except socket.error:
             log.debug("Wait for gnuradio")
-            time.sleep(1)
-
-    gnuradio_socket.settimeout(0.1)
-    log.info("Gnuradio Connected!")
+            try:
+                time.sleep(1)
+            except KeyboardInterrupt:
+                break
+            
     time.sleep(2)
 
-    while 1:
+    while is_connected:
         try:
             data = gnuradio_socket.recv(1024)
             if not data:
