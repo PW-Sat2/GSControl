@@ -93,6 +93,7 @@ def main():
         roster.download_month(datetime(year=2019, month=7, day=1)),
         roster.download_month(datetime(year=2019, month=8, day=1)),
         roster.download_month(datetime(year=2019, month=9, day=1)),
+        roster.download_month(datetime(year=2019, month=10, day=1)),
     ]
 
     assignments = []
