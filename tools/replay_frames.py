@@ -26,11 +26,16 @@ def run(args):
         finished = False
 
         while not finished:
-            for line in progressbar.progressbar(lines):
-                frame = line.split(',')[2]
-                frame = b64decode(frame)
-                socket.send(frame)
-                time.sleep(args.delay)
+            with progressbar.ProgressBar(max_value=len(lines)) as bar:
+                index = 0
+                for line in lines:
+                    frame = line.split(',')[2]
+                    frame = b64decode(frame)
+                    socket.send(frame)
+                    time.sleep(args.delay)
+                    
+                    index += 1
+                    bar.update(index)
 
             finished = True and not args.loop
 

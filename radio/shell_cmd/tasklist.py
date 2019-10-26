@@ -151,6 +151,11 @@ def build(sender, rcv, frame_decoder, analyzer, ns):
     
     def analyze(tasks):
         analyzer.run(tasks)
+
+    def monitor(tasks):
+        from monitor import Monitor
+        monitor = Monitor(rcv, frame_decoder)
+        return monitor.run(tasks)
     
     def load(tasks_file_path, silent=False):
         tasks = analyzer.load(tasks_file_path)
@@ -174,5 +179,6 @@ def build(sender, rcv, frame_decoder, analyzer, ns):
         'analyze': analyze,
         'load': load,
         'panic_power_cycle': panic_power_cycle,
-        'panic_detumbling': panic_detumbling
+        'panic_detumbling': panic_detumbling,
+        'monitor': monitor
     }
