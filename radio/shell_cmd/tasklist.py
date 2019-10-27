@@ -21,12 +21,11 @@ def build(sender, rcv, frame_decoder, analyzer, ns):
     from prompt_toolkit.shortcuts import print_tokens
     from prompt_toolkit.styles import style_from_dict
     from pygments.token import Token
+    from monitor import MonitorConnector
 
-    def send_additional_beacon(style, ns_wrapper):
-        import telecommand as tc
+    def sendExtraCommand(style, ns_wrapper, command):
         from radio.task_actions import Send
-
-        [telecommand, action_type] = [tc.SendBeacon(), Send]
+        [telecommand, action_type] = [command, Send]
 
         tokens = [
             (Token.String, "["),
@@ -42,6 +41,34 @@ def build(sender, rcv, frame_decoder, analyzer, ns):
 
         print_tokens(tokens, style=style)
         action_type(telecommand).do(ns_wrapper)
+
+    def send_additional_beacon(style, ns_wrapper):
+        import telecommand as tc
+        sendExtraCommand(style, ns_wrapper, tc.SendBeacon())
+
+    def get_and_send_missing_chunks_command(style, ns_wrapper, telecommand, monitorConnector):
+        newCommand = monitorConnector.get_missings_for_command(telecommand)
+        if not newCommand:
+            print("Not found.")
+            return 
+
+        sendExtraCommand(style, ns_wrapper, newCommand)
+
+    def add_missings_to_tasklist(style, ns_wrapper, tasks, monitorConnector):
+        import telecommand as tc
+        from radio.task_actions import SendLoop, WaitMode
+
+        newTasks = monitorConnector.get_additional_tasks()
+        if not newTasks or len(newTasks) == 0:
+            print("Not found.")
+            return 
+
+        tasks.append([[tc.SendBeacon(), 20], SendLoop, WaitMode.NoWait])
+
+        #     get_and_send_missing_chunks_command(style, ns_wrapper, tasks, step_no - 1)
+        #     continue
+        # elif user_input == 't':
+        #     add_missings_to_tasklist(style, ns_wrapper, tasks)
 
     def run(tasks, start_from=1):
         """
@@ -66,6 +93,7 @@ def build(sender, rcv, frame_decoder, analyzer, ns):
         })
 
         ns_wrapper = DictWrapper(ns)
+        monitorConnector = MonitorConnector()
 
         step_no = start_from - 1
 
@@ -132,6 +160,12 @@ def build(sender, rcv, frame_decoder, analyzer, ns):
                                 break
                         elif user_input == 'b':
                             send_additional_beacon(style, ns_wrapper)
+                            continue
+                        elif user_input == 'm':
+                            get_and_send_missing_chunks_command(style, ns_wrapper, tasks[step_no][0], monitorConnector)
+                            continue
+                        elif user_input == 't':
+                            add_missings_to_tasklist(style, ns_wrapper, tasks)
                             continue
                         elif user_input == 'q':
                             return

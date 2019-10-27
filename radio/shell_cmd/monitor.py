@@ -9,7 +9,10 @@ sys.path.append(os.path.join(os.path.dirname(__file__),
                 '../..'))
 
 from telecommand.fs import DownloadFile   
-from response_frames.common import FileSendSuccessFrame, FileSendErrorFrame             
+from response_frames.common import FileSendSuccessFrame, FileSendErrorFrame 
+
+import zmq
+import json
 
 class Monitor():
     def __init__(self, recv, frame_decoder):
@@ -92,3 +95,44 @@ class Monitor():
         #     return frames
 
         i = 0
+
+class MonitorConnector:
+    def __init__(self):
+        self.working = False
+        self.socket = zmq.Context.instance().socket(zmq.REQ)
+        self.socket.setsockopt(zmq.RCVTIMEO, 5000)
+        self.port = 7007
+
+        try:
+            self.socket.connect('tcp://127.0.0.1:{}'.format(self.port))
+            self.working = True
+        except:
+            print("Sorry, don't work")
+
+    def get_missings_for_command(self, telecommand):
+        if not self.working:
+            print("Sorry, don't work")      
+            return None     
+
+        if not isinstance(telecommand, DownloadFile):
+            print("Sorry, only for DownloadFile")
+            return None
+
+        try:
+            self.socket.send(json.dumps(['M', telecommand.correlation_id()]))    
+            data = self.socket.recv()
+        except zmq.Again:
+            return None
+        except zmq.ZMQError:
+            self.working = False
+            return None
+        # except:
+        #     print("Sorry, don't work")
+
+        if not data:
+            return None
+
+        newTask = json.loads(data)
+        newCommand = DownloadFile(newTask["_correlation_id"], str(newTask["_path"]), newTask["_seqs"])     
+        print(newCommand)
+        return newCommand

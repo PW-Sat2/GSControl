@@ -3,6 +3,7 @@ import os
 import sys
 import datetime
 import pprint
+import json
 
 #from termgraph import termgraph as tg
 
@@ -135,22 +136,21 @@ def process_frame(already_received, frame, commandsDict):
 
     print_results(commandsDict)
 
-    # if frame.correlation_id != last_cid:
-    #     already_received.clear()
-    #     last_cid = frame.correlation_id
-    #     print("\n\n====================================")
-    #     print("Correlation id: {0}".format(frame.correlation_id))
-    #     print("====================================\n")
+def handle_commands(request, commandsDict, socket):
+    command = json.loads(request)
 
-    # if frame.seq() in already_received:
-    #     return
-
-    # file_list = RemoteFileTools.parse_file_list(frame)
-
-    # for f in file_list:
-    #     print("{0}:\t{1}".format(f['File'], f['Chunks']))
-
-    # already_received.add(frame.seq())
+    if command[0] == 'M':
+        correlation_id = command[1]
+        try:
+            task = commandsDict[correlation_id]
+            task_string = json.dumps(task.__dict__)
+            print("Sending task for file '{}'/{}, length {} ".format(task._path, task._correlation_id, len(task._seqs)))
+        except KeyError:
+            task_string = ""
+            print("No data found for CID {}".format(correlation_id))
+        
+        socket.send(task_string)
+        
 
 
 def run(args):
@@ -183,11 +183,12 @@ def run(args):
         while True:
             (read, _, _) = zmq.select(sockets + [abort_pull] + [command_rep], [], [])
 
-            if abort_pull is read:
+            if abort_pull in read:
                 break
 
-            if command_rep is read:
-                pass
+            if command_rep in read:
+                handle_commands(command_rep.recv(), commandsDict, command_rep)
+                continue
 
             for ready in read:
                 frame = ready.recv()
