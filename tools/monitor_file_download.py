@@ -28,6 +28,7 @@ def parse_args():
     parser.add_argument('session', nargs=1, help='Session number')
     parser.add_argument('address', nargs='+', help='Address to connect for frames')
     parser.add_argument('--port', '-p', help='Command port', type=int, default=7007)
+    parser.add_argument('--mission', '-m', help='Mission repo', default=os.path.join(os.path.dirname(__file__), '..', '..', 'mission'))
 
     return parser.parse_args()
 
@@ -49,8 +50,8 @@ def connect_sockets(addresses):
 def parse_frame(raw_frame):
     return Decoder.decode(ensure_byte_list(raw_frame[16:-2]))
 
-def load_tasklist(session):
-    tasks_file_path = os.path.join(os.path.dirname(__file__), '..', '..', 'mission', 'sessions', str(session), 'tasklist.py')  
+def load_tasklist(mission_path, session):
+    tasks_file_path = os.path.join(mission_path, 'sessions', str(session), 'tasklist.py')  
  
     import telecommand as tc
     import datetime
@@ -144,13 +145,28 @@ def handle_commands(request, commandsDict, socket):
         try:
             task = commandsDict[correlation_id]
             task_string = json.dumps(task.__dict__)
-            print("Sending task for file '{}'/{}, length {} ".format(task._path, task._correlation_id, len(task._seqs)))
+            print("Sending task for file '{}'/{}, length {}.".format(task._path, task._correlation_id, len(task._seqs)))
         except KeyError:
             task_string = ""
             print("No data found for CID {}".format(correlation_id))
         
         socket.send(task_string)
+    elif command[0] == 'T':  
+        tasks = []
+        telemetryTasks = []
+        for _, command in commandsDict.items():
+            if "telemetry" in command._path:
+                telemetryTasks.append(command)
+            else:
+                tasks.append(command.__dict__)
+
+        # move telemetry to the end - it has less priority
+        for telemetryCommand in telemetryTasks:
+            tasks.append(telemetryCommand.__dict__)
         
+        print("Sending new {} tasks.".format(len(tasks)))
+        task_string = json.dumps(tasks)
+        socket.send(task_string)
 
 
 def run(args):
@@ -172,7 +188,7 @@ def run(args):
 
     already_received = set()
 
-    tasklist = load_tasklist(args.session[0])
+    tasklist = load_tasklist(args.mission, args.session[0])
     print("Loaded {} tasks.".format(len(tasklist)))
     commandsDict = create_dictionary(tasklist)
 
@@ -181,7 +197,11 @@ def run(args):
 
     with allow_interrupt(abort):
         while True:
-            (read, _, _) = zmq.select(sockets + [abort_pull] + [command_rep], [], [])
+            try:
+                (read, _, _) = zmq.select(sockets + [abort_pull] + [command_rep], [], [])
+            except KeyboardInterrupt:
+                print("Ending...")
+                break
 
             if abort_pull in read:
                 break

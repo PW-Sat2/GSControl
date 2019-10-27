@@ -55,20 +55,17 @@ def build(sender, rcv, frame_decoder, analyzer, ns):
         sendExtraCommand(style, ns_wrapper, newCommand)
 
     def add_missings_to_tasklist(style, ns_wrapper, tasks, monitorConnector):
-        import telecommand as tc
-        from radio.task_actions import SendLoop, WaitMode
-
         newTasks = monitorConnector.get_additional_tasks()
         if not newTasks or len(newTasks) == 0:
             print("Not found.")
             return 
 
-        tasks.append([[tc.SendBeacon(), 20], SendLoop, WaitMode.NoWait])
-
-        #     get_and_send_missing_chunks_command(style, ns_wrapper, tasks, step_no - 1)
-        #     continue
-        # elif user_input == 't':
-        #     add_missings_to_tasklist(style, ns_wrapper, tasks)
+        indexOfNewTask = len(tasks) + 1
+        tasks.extend(newTasks)
+        print_tokens([
+            (Token.Action, "Added {} new tasks. New items start at {}. ".format(len(newTasks), indexOfNewTask)),
+            (Token.String, "Please repeat: "),
+            ], style=style)
 
     def run(tasks, start_from=1):
         """
@@ -165,7 +162,7 @@ def build(sender, rcv, frame_decoder, analyzer, ns):
                             get_and_send_missing_chunks_command(style, ns_wrapper, tasks[step_no][0], monitorConnector)
                             continue
                         elif user_input == 't':
-                            add_missings_to_tasklist(style, ns_wrapper, tasks)
+                            add_missings_to_tasklist(style, ns_wrapper, tasks, monitorConnector)
                             continue
                         elif user_input == 'q':
                             return
@@ -190,6 +187,14 @@ def build(sender, rcv, frame_decoder, analyzer, ns):
         from monitor import Monitor
         monitor = Monitor(rcv, frame_decoder)
         return monitor.run(tasks)
+
+    def missings():
+        monitorConnector = MonitorConnector()
+        newTasks = monitorConnector.get_additional_tasks()
+        if not newTasks or len(newTasks) == 0:
+            print("Not found.")
+            return []
+        return newTasks
     
     def load(tasks_file_path, silent=False):
         tasks = analyzer.load(tasks_file_path)
@@ -214,5 +219,6 @@ def build(sender, rcv, frame_decoder, analyzer, ns):
         'load': load,
         'panic_power_cycle': panic_power_cycle,
         'panic_detumbling': panic_detumbling,
-        'monitor': monitor
+        'monitor': monitor,
+        'missings': missings
     }
