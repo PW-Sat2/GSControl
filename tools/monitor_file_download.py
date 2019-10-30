@@ -5,8 +5,6 @@ import datetime
 import pprint
 import json
 
-#from termgraph import termgraph as tg
-
 from colorama import Fore, Style, Back
 import zmq
 from zmq.utils.win32 import allow_interrupt
@@ -16,12 +14,13 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '../PWSat2OBC/integratio
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 import response_frames
 from utils import ensure_byte_list, ensure_string
-from telecommand.fs import DownloadFile  
+from telecommand.fs import DownloadFile 
+
+from monitor_file_download_gui import MonitorUI
 
 Decoder = response_frames.FrameDecoder(response_frames.frame_factories)
 
 last_cid = 0
-
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -89,36 +88,11 @@ def generate_new_tasklist(commandsDict):
 
     return newTasks
 
-def print_results(commandsDict):
-    pass
-    # labels = [x._path for x in commandsDict.itervalues()]
-    # data = [len(x._seqs) for x in commandsDict.itervalues()]
+def logFrame(ui, message):
+    ui.logFrame(message)
+    print(message)
 
-    # print("*" * 40)
-    # for i in range(0, len(labels)):
-    #     print("{}\t\t{}".format(labels[i], data[i]))
-
-
-    # labels = ['2007', '2008', '2009', '2010', '2011', '2012', '2014']
-    # data = [[183.32, 190.52], [231.23, 5.0], [16.43, 53.1], [50.21, 7.0], [508.97, 10.45], [212.05, 20.2], [30.0, 20.0]]
-    # normal_data = [[48.059508408796894, 50.0], [60.971862871927556, 0.0],
-    #             [3.080530401034929, 12.963561880120743],
-    #             [12.184670116429496, 0.5390254420008624],
-    #             [135.82632600258734, 1.4688443294523499],
-    #             [55.802608883139285, 4.096593359206555],
-    #             [6.737818025010781, 4.042690815006468]]
-    # len_categories = 2
-    # args = {'filename': 'data/ex4.dat', 'title': None, 'width': 50,
-    #         'format': '{:<5.2f}', 'suffix': '', 'no_labels': True,
-    #         'color': None, 'vertical': False, 'stacked': True,
-    #         'different_scale': False, 'calendar': False,
-    #         'start_dt': None, 'custom_tick': '', 'delim': '',
-    #         'verbose': False, 'version': False}
-    # colors = [91, 94]
-    # tg.chart(None, data, None, labels)
-
-
-def process_frame(already_received, frame, commandsDict):
+def process_frame(already_received, frame, commandsDict, ui):
     global last_cid
     if not isinstance(frame, response_frames.common.FileSendSuccessFrame) and not isinstance(frame, response_frames.common.FileSendErrorFrame):
         return
@@ -132,12 +106,13 @@ def process_frame(already_received, frame, commandsDict):
     except KeyError:
         pass   
 
-    timestamp_str = '\x1b[36m{}\x1b[0m'.format(datetime.datetime.now().time().strftime('%H:%M:%S'))
+    stamp = datetime.datetime.now().time()
+    timestamp_str = '\x1b[36m{}\x1b[0m'.format(stamp.strftime('%H:%M:%S'))
     print("{} {}".format(timestamp_str, pprint.pformat(frame)))
+    ui.logFrame(frame, stamp)
+    ui.update_tasklist(commandsDict)
 
-    print_results(commandsDict)
-
-def handle_commands(request, commandsDict, socket):
+def handle_commands(request, commandsDict, socket, ui):
     command = json.loads(request)
 
     if command[0] == 'M':
@@ -145,10 +120,10 @@ def handle_commands(request, commandsDict, socket):
         try:
             task = commandsDict[correlation_id]
             task_string = json.dumps(task.__dict__)
-            print("Sending task for file '{}'/{}, length {}.".format(task._path, task._correlation_id, len(task._seqs)))
+            ui.log("Sending task for file '{}'/{}, length {}.".format(task._path, task._correlation_id, len(task._seqs)))
         except KeyError:
             task_string = ""
-            print("No data found for CID {}".format(correlation_id))
+            ui.log("No data found for CID {}".format(correlation_id))
         
         socket.send(task_string)
     elif command[0] == 'T':  
@@ -164,7 +139,7 @@ def handle_commands(request, commandsDict, socket):
         for telemetryCommand in telemetryTasks:
             tasks.append(telemetryCommand.__dict__)
         
-        print("Sending new {} tasks.".format(len(tasks)))
+        ui.log("Sending new {} tasks.".format(len(tasks)))
         task_string = json.dumps(tasks)
         socket.send(task_string)
 
@@ -180,6 +155,9 @@ def run(args):
     abort_pull = zmq.Context.instance().socket(zmq.PAIR)
     abort_pull.connect('inproc://download_monitor/abort')
 
+    def abort():
+        abort_push.send('ABORT')
+
     command_rep = zmq.Context.instance().socket(zmq.REP)
     try:
         command_rep.bind('tcp://0.0.0.0:{}'.format(args.port))
@@ -187,33 +165,36 @@ def run(args):
         print("Can't bind to port {}".format(args.port))
 
     already_received = set()
+    session = args.session[0]
 
-    tasklist = load_tasklist(args.mission, args.session[0])
+    tasklist = load_tasklist(args.mission, session)
     print("Loaded {} tasks.".format(len(tasklist)))
     commandsDict = create_dictionary(tasklist)
 
-    def abort():
-        abort_push.send('ABORT')
+    ui = MonitorUI(session, commandsDict, len(tasklist), abort)
+    ui_thread = ui.run()
 
     with allow_interrupt(abort):
         while True:
             try:
                 (read, _, _) = zmq.select(sockets + [abort_pull] + [command_rep], [], [])
             except KeyboardInterrupt:
-                print("Ending...")
+                ui.log("Ending...")
                 break
 
             if abort_pull in read:
                 break
 
             if command_rep in read:
-                handle_commands(command_rep.recv(), commandsDict, command_rep)
+                handle_commands(command_rep.recv(), commandsDict, command_rep, ui)
                 continue
 
             for ready in read:
                 frame = ready.recv()
                 frame = parse_frame(frame)
-                process_frame(already_received, frame, commandsDict)
+                process_frame(already_received, frame, commandsDict, ui)
 
+    ui.stop()
+    ui_thread.join()
 
 run(parse_args())
