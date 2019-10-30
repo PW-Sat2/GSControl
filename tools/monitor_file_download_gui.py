@@ -15,13 +15,26 @@ TICK = '#'#'▇'
 from enum import Enum
 class Colors:
     def __init__(self):
-        curses.init_pair(1,3,0)
-        curses.init_pair(2,4,0)
-        curses.init_pair(3,1,0)
-        curses.init_pair(4,12,0)
-        curses.init_pair(5,10,0)
-        curses.init_pair(6,14,0)
-        curses.init_pair(7,6,0)
+
+        curses.init_pair(1,curses.COLOR_CYAN,0)
+        curses.init_pair(2,curses.COLOR_RED,0)
+        try:
+            curses.init_color(20, 0 ,0 ,700)
+            curses.init_pair(3,20 , 0)
+        except:
+            curses.init_pair(3,curses.COLOR_BLUE, 0)
+        try:
+	    print("NORMAL COLORS")
+            curses.init_pair(4,curses.COLOR_RED + 8,0)
+            curses.init_pair(5,curses.COLOR_GREEN + 8,0)
+            curses.init_pair(6,curses.COLOR_YELLOW + 8,0)
+            curses.init_pair(7,curses.COLOR_BLACK + 8,0)
+        except:
+            print("FALSE COLORS")
+            curses.init_pair(4,curses.COLOR_RED,0)
+            curses.init_pair(5,curses.COLOR_GREEN ,0)
+            curses.init_pair(6,curses.COLOR_YELLOW ,0)
+            curses.init_pair(7,curses.COLOR_GREEN ,0)
 
         self.DCYAN = curses.color_pair(1)
         self.DRED = curses.color_pair(2)
@@ -45,20 +58,23 @@ class MonitorUI:
     def _worker_thread(self, stdscr):
         curses.cbreak()
         curses.noecho()
+        curses.use_default_colors()
         self.colors = Colors()
    
         self.stdscr = stdscr
         maxY, maxX = stdscr.getmaxyx()
 
         mainWidth = min(60, maxX) - 2
+        if maxX <= 80:
+            mainWidth -= 10
 
         self.mainWindowBox = stdscr.subwin(maxY-2, mainWidth+2, 2, 0)
         self.mainWindowBox.box()
         self.mainWindow = self.mainWindowBox.derwin(maxY-4, mainWidth,1,1)
         
-        self.logWindowBox = stdscr.subwin(maxY-2, maxX - mainWidth - 3, 2, mainWidth + 2)
+        self.logWindowBox = stdscr.subwin(maxY-2, maxX - mainWidth - 2, 2, mainWidth + 2)
         self.logWindowBox.box()
-        self.logWindow = self.logWindowBox.derwin(maxY-4, maxX - mainWidth - 5,1,1)
+        self.logWindow = self.logWindowBox.derwin(maxY-4, maxX - mainWidth - 4,1,1)
         self.logWindow.scrollok(True)
         self.logWidth = maxX - mainWidth - 5
 
@@ -110,12 +126,12 @@ class MonitorUI:
         for _, task in tasks.iteritems():
             self.mainWindow.addstr(position, 1, '{:3d}'.format(task.correlation_id()), self.colors.DYELLOW)
             self.mainWindow.clrtoeol()
-            self.mainWindow.addstr(position, 5, task._path[1:], self.colors.DRED)
+            self.mainWindow.addstr(position, 5, task._path[1:], self.colors.DBLUE)
             self.mainWindow.addstr(position, 24, '{:2d}'.format(len(task._seqs)), self.colors.YELLOW)
 
-            graphLength = min(maxX - 31, len(task._seqs))
+            graphLength = min(maxX - 28, len(task._seqs))
             bar = TICK * graphLength
-            self.mainWindow.addstr(position, 28, bar)
+            self.mainWindow.addstr(position, 27, bar)
 
             position+=1
             if position > maxY - 1:
@@ -156,7 +172,7 @@ class MonitorUI:
             path = self.paths[downloadFrame.correlation_id]
         except KeyError:
             path = "UNKNOWN"
-        self.logWindow.addstr(path, self.colors.DRED)
+        self.logWindow.addstr(path, self.colors.DBLUE)
         self.logWindow.addstr(self.log_line, 35, '{:02d}'.format(downloadFrame._seq))
         self._log_finish()
 

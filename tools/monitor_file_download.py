@@ -17,6 +17,9 @@ from utils import ensure_byte_list, ensure_string
 from telecommand.fs import DownloadFile 
 
 from monitor_file_download_gui import MonitorUI
+import locale
+
+locale.setlocale(locale.LC_ALL, '')
 
 Decoder = response_frames.FrameDecoder(response_frames.frame_factories)
 
