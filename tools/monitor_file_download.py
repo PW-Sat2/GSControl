@@ -110,8 +110,8 @@ def process_frame(already_received, frame, commandsDict, ui):
         pass   
 
     stamp = datetime.datetime.now().time()
-    timestamp_str = '\x1b[36m{}\x1b[0m'.format(stamp.strftime('%H:%M:%S'))
-    print("{} {}".format(timestamp_str, pprint.pformat(frame)))
+    #timestamp_str = '\x1b[36m{}\x1b[0m'.format(stamp.strftime('%H:%M:%S'))
+    #print("{} {}".format(timestamp_str, pprint.pformat(frame)))
     ui.logFrame(frame, stamp)
     ui.update_tasklist(commandsDict)
 
@@ -176,7 +176,6 @@ def run(args):
 
     ui = MonitorUI(session, commandsDict, len(tasklist), abort)
     ui_thread = ui.run()
-    ui.log("Loaded {} tasks.".format(len(tasklist)))
 
     with allow_interrupt(abort):
         while True:

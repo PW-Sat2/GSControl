@@ -10,6 +10,8 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '../PWSat2OBC/integratio
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 import response_frames
 
+os.environ['NCURSES_NO_UTF8_ACS'] = '1'
+
 TICK = '#'#'▇'
 
 from enum import Enum
@@ -20,17 +22,17 @@ class Colors:
 
         if curses.COLORS > 8:
             curses.init_color(20, 0 ,0 ,700)
-            curses.init_pair(3,20 , 0)
-            curses.init_pair(4,curses.COLOR_RED + 8,0)
-            curses.init_pair(5,curses.COLOR_GREEN + 8,0)
-            curses.init_pair(6,curses.COLOR_YELLOW + 8,0)
-            curses.init_pair(7,curses.COLOR_BLACK + 8,0)
+            curses.init_pair(3,20 , -1)
+            curses.init_pair(4,curses.COLOR_RED + 8,-1)
+            curses.init_pair(5,curses.COLOR_GREEN + 8,-1)
+            curses.init_pair(6,curses.COLOR_YELLOW + 8,-1)
+            curses.init_pair(7,curses.COLOR_BLACK + 8,-1)
         else:
-            curses.init_pair(3,curses.COLOR_BLUE, 0)
-            curses.init_pair(4,curses.COLOR_RED,0)
-            curses.init_pair(5,curses.COLOR_GREEN,0)
-            curses.init_pair(6,curses.COLOR_YELLOW,0)
-            curses.init_pair(7,curses.COLOR_GREEN,0)
+            curses.init_pair(3,curses.COLOR_BLUE, -1)
+            curses.init_pair(4,curses.COLOR_RED,-1)
+            curses.init_pair(5,curses.COLOR_GREEN,-1)
+            curses.init_pair(6,curses.COLOR_YELLOW,-1)
+            curses.init_pair(7,curses.COLOR_GREEN,-1)
 
         self.DCYAN = curses.color_pair(1)
         self.DRED = curses.color_pair(2)
@@ -54,12 +56,9 @@ class MonitorUI:
     def initialize_windows(self):
         maxY, maxX = self.stdscr.getmaxyx()
         maxMainWidth = min(60, maxX//2) - 2
-        mainWidth = max(47, maxMainWidth)
+        mainWidth = max(43, maxMainWidth)
 
         logWidth = maxX - mainWidth - 2
-        if logWidth <= 34:
-            mainWidth -= 2
-            logWidth = maxX - mainWidth - 2
 
         self.mainWindowBox = self.stdscr.subwin(maxY-2, mainWidth+2, 2, 0)
         self.mainWindowBox.box()
@@ -87,22 +86,24 @@ class MonitorUI:
         curses.noecho()
         curses.use_default_colors()
         self.colors = Colors()
+        curses.halfdelay(3)
    
         self.stdscr = stdscr
         self.initialize_windows()
+        self.log("Loaded {} tasks.".format(len(self.tasks)))
 
         while self.isWorking:
             c = stdscr.getch()
-            if c == ord('q') or c == 3:
+            if c == ord('q') or c == 3 or c == 27:
                 break
             if c == curses.KEY_RESIZE:
                 self.stdscr.clear()
                 maxY, maxX = self.stdscr.getmaxyx()
-                curses.resize_term(maxY, maxX)
                 self.initialize_windows()
-
-                _, tempXX = self.logWindow.getmaxyx()
-                self.log("X: {}".format(tempXX))
+                curses.doupdate()
+            if c == ord('a'):
+                maxY, maxX = self.stdscr.getmaxyx()
+                self.log("MaxX = {}, MaxY = {}".format(maxX, maxY))
 
     def _generate_header(self):
         self.header.addstr(1, 2, 'SESSION:')
@@ -130,30 +131,37 @@ class MonitorUI:
         self.tasks = tasks
 
         maxY, maxX = self.mainWindow.getmaxyx()
+        self.mainWindow.move(0,0)
 
         position = 0
         for _, task in tasks.iteritems():
             self.mainWindow.addstr(position, 1, '{:3d}'.format(task.correlation_id()), self.colors.DYELLOW)
             self.mainWindow.clrtoeol()
             self.mainWindow.addstr(position, 5, task._path[1:], self.colors.DBLUE)
-            self.mainWindow.addstr(position, 24, '{:2d}'.format(len(task._seqs)), self.colors.YELLOW)
+            self.mainWindow.addstr(position, 24, '{:2d} '.format(len(task._seqs)), self.colors.YELLOW)
 
             graphLength = min(maxX - 27, len(task._seqs))
             bar = TICK * graphLength
-            self.mainWindow.addstr(position, 27, bar)
+
+            try:
+                self.mainWindow.addstr(bar)
+            except curses.error:
+                # hack for allowing inserting characer to bottom right position.
+                pass
 
             position+=1
             if position > maxY - 1:
                     break
 
-        self.mainWindow.clrtobot()
+        if position < maxY:
+            self.mainWindow.clrtobot()
         self.mainWindow.noutrefresh()
         self.update_remaining()
         curses.doupdate()
 
     def _log_start(self):     
         maxY, maxX = self.logWindow.getmaxyx()
-        if self.log_line >= maxY:
+        while self.log_line >= maxY:
             self.logWindow.scroll()
             self.log_line -= 1
 
@@ -164,7 +172,6 @@ class MonitorUI:
         curses.doupdate()
 
     def log(self, message):
-        print(message)
         self._log_start()
 
         self.logWindow.addstr(self.log_line, 1, message)
@@ -186,9 +193,9 @@ class MonitorUI:
             path = "UNKNOWN"
 
         _, maxX = self.logWindow.getmaxyx()
-        if maxX >= 39:
+        if maxX >= 40:
             self.logWindow.addstr("{:18s} ".format(path), self.colors.DBLUE)
-        elif maxX >= 32:
+        elif maxX >= 33:
             path = path.replace("telemetry", "t")
             self.logWindow.addstr("{:11s} ".format(path), self.colors.DBLUE)
 
