@@ -4,7 +4,6 @@ from radio.task_actions import WaitMode
 import sys
 import telecommand as tc
 
-
 def custom_raw_input(text=""):
     sys.stdout.write(text)
     return sys.stdin.readline().strip()
@@ -21,7 +20,7 @@ def build(sender, rcv, frame_decoder, analyzer, ns):
     from prompt_toolkit.shortcuts import print_tokens
     from prompt_toolkit.styles import style_from_dict
     from pygments.token import Token
-    from monitor import MonitorConnector
+    from tools.monitor.connector import MonitorConnector
 
     def sendExtraCommand(style, ns_wrapper, command):
         from radio.task_actions import Send
@@ -184,8 +183,8 @@ def build(sender, rcv, frame_decoder, analyzer, ns):
         analyzer.run(tasks)
 
     def monitor(tasks):
-        from monitor import Monitor
-        monitor = Monitor(rcv, frame_decoder)
+        from tools.monitor.live import MonitorLive
+        monitor = MonitorLive(rcv, frame_decoder)
         return monitor.run(tasks)
 
     def missings():

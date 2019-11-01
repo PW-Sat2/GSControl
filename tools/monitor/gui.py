@@ -3,18 +3,20 @@ import curses
 import threading
 from colorama import Fore, Style, Back
 from time import sleep
+from enum import Enum
 
 import sys
 import os
-sys.path.append(os.path.join(os.path.dirname(__file__), '../PWSat2OBC/integration_tests'))
-sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.append(os.path.join(os.path.dirname(__file__), '../../PWSat2OBC/integration_tests'))
+sys.path.append(os.path.join(os.path.dirname(__file__), '../..'))
 import response_frames
+
 
 os.environ['NCURSES_NO_UTF8_ACS'] = '1'
 
 TICK = '#'#'▇'
 
-from enum import Enum
+
 class Colors:
     def __init__(self):
         curses.init_pair(1,curses.COLOR_CYAN,0)

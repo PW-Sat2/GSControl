@@ -10,13 +10,13 @@ import zmq
 from zmq.utils.win32 import allow_interrupt
 from collections import OrderedDict
 
-sys.path.append(os.path.join(os.path.dirname(__file__), '../PWSat2OBC/integration_tests'))
-sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.append(os.path.join(os.path.dirname(__file__), '../../PWSat2OBC/integration_tests'))
+sys.path.append(os.path.join(os.path.dirname(__file__), '../..'))
 import response_frames
 from utils import ensure_byte_list, ensure_string
 from telecommand.fs import DownloadFile 
 
-from monitor_file_download_gui import MonitorUI
+from gui import MonitorUI
 import locale
 
 locale.setlocale(locale.LC_ALL, '')
@@ -30,7 +30,7 @@ def parse_args():
     parser.add_argument('session', nargs=1, help='Session number')
     parser.add_argument('address', nargs='+', help='Address to connect for frames')
     parser.add_argument('--port', '-p', help='Command port', type=int, default=7007)
-    parser.add_argument('--mission', '-m', help='Mission repo', default=os.path.join(os.path.dirname(__file__), '..', '..', 'mission'))
+    parser.add_argument('--mission', '-m', help='Mission repo', default=os.path.join(os.path.dirname(__file__), '..', '..', '..', 'mission'))
 
     return parser.parse_args()
 
@@ -174,6 +174,9 @@ def run(args):
     print("Loaded {} tasks.".format(len(tasklist)))
     commandsDict = create_dictionary(tasklist)
 
+    if (len(tasklist) == 0):
+        return
+
     ui = MonitorUI(session, commandsDict, len(tasklist), abort)
     ui_thread = ui.run()
 
@@ -200,4 +203,4 @@ def run(args):
     ui.stop()
     ui_thread.join()
 
-run(parse_args())
+#run(parse_args())
