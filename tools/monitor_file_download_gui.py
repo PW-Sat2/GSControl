@@ -15,26 +15,22 @@ TICK = '#'#'▇'
 from enum import Enum
 class Colors:
     def __init__(self):
-
         curses.init_pair(1,curses.COLOR_CYAN,0)
         curses.init_pair(2,curses.COLOR_RED,0)
-        try:
+
+        if curses.COLORS > 8:
             curses.init_color(20, 0 ,0 ,700)
             curses.init_pair(3,20 , 0)
-        except:
-            curses.init_pair(3,curses.COLOR_BLUE, 0)
-        try:
-	    print("NORMAL COLORS")
             curses.init_pair(4,curses.COLOR_RED + 8,0)
             curses.init_pair(5,curses.COLOR_GREEN + 8,0)
             curses.init_pair(6,curses.COLOR_YELLOW + 8,0)
             curses.init_pair(7,curses.COLOR_BLACK + 8,0)
-        except:
-            print("FALSE COLORS")
+        else:
+            curses.init_pair(3,curses.COLOR_BLUE, 0)
             curses.init_pair(4,curses.COLOR_RED,0)
-            curses.init_pair(5,curses.COLOR_GREEN ,0)
-            curses.init_pair(6,curses.COLOR_YELLOW ,0)
-            curses.init_pair(7,curses.COLOR_GREEN ,0)
+            curses.init_pair(5,curses.COLOR_GREEN,0)
+            curses.init_pair(6,curses.COLOR_YELLOW,0)
+            curses.init_pair(7,curses.COLOR_GREEN,0)
 
         self.DCYAN = curses.color_pair(1)
         self.DRED = curses.color_pair(2)
@@ -55,6 +51,37 @@ class MonitorUI:
         self.colors = None
         self.paths = self._generatePaths(tasks)
 
+    def initialize_windows(self):
+        maxY, maxX = self.stdscr.getmaxyx()
+        maxMainWidth = min(60, maxX//2) - 2
+        mainWidth = max(47, maxMainWidth)
+
+        logWidth = maxX - mainWidth - 2
+        if logWidth <= 34:
+            mainWidth -= 2
+            logWidth = maxX - mainWidth - 2
+
+        self.mainWindowBox = self.stdscr.subwin(maxY-2, mainWidth+2, 2, 0)
+        self.mainWindowBox.box()
+        self.mainWindow = self.mainWindowBox.derwin(maxY-4, mainWidth,1,1)
+        
+        self.logWindowBox = self.stdscr.subwin(maxY-2, logWidth, 2, mainWidth + 2)
+        self.logWindowBox.box()
+        self.logWindow = self.logWindowBox.derwin(maxY-4, logWidth - 2,1,1)
+        self.logWindow.scrollok(True)
+        self.logWidth = maxX - mainWidth - 5
+
+        self.header = self.stdscr.subwin(3, maxX, 0, 0)
+        self.header.box()
+
+        self._generate_header()
+        self.update_tasklist(self.tasks)
+
+        self.mainWindowBox.noutrefresh()
+        self.logWindowBox.noutrefresh()
+        self.header.noutrefresh()
+        curses.doupdate()
+
     def _worker_thread(self, stdscr):
         curses.cbreak()
         curses.noecho()
@@ -62,38 +89,20 @@ class MonitorUI:
         self.colors = Colors()
    
         self.stdscr = stdscr
-        maxY, maxX = stdscr.getmaxyx()
-
-        mainWidth = min(60, maxX) - 2
-        if maxX <= 80:
-            mainWidth -= 10
-
-        self.mainWindowBox = stdscr.subwin(maxY-2, mainWidth+2, 2, 0)
-        self.mainWindowBox.box()
-        self.mainWindow = self.mainWindowBox.derwin(maxY-4, mainWidth,1,1)
-        
-        self.logWindowBox = stdscr.subwin(maxY-2, maxX - mainWidth - 2, 2, mainWidth + 2)
-        self.logWindowBox.box()
-        self.logWindow = self.logWindowBox.derwin(maxY-4, maxX - mainWidth - 4,1,1)
-        self.logWindow.scrollok(True)
-        self.logWidth = maxX - mainWidth - 5
-
-        self.header = stdscr.subwin(3, maxX, 0, 0)
-        self.header.box()
-
-        self._generate_header()
-        self.update_tasklist(self.tasks)
-
-        self.mainWindowBox.refresh()
-        self.logWindowBox.refresh()
-        self.header.refresh()
+        self.initialize_windows()
 
         while self.isWorking:
-            sleep(1)
             c = stdscr.getch()
             if c == ord('q') or c == 3:
-                self.abortCallback()
                 break
+            if c == curses.KEY_RESIZE:
+                self.stdscr.clear()
+                maxY, maxX = self.stdscr.getmaxyx()
+                curses.resize_term(maxY, maxX)
+                self.initialize_windows()
+
+                _, tempXX = self.logWindow.getmaxyx()
+                self.log("X: {}".format(tempXX))
 
     def _generate_header(self):
         self.header.addstr(1, 2, 'SESSION:')
@@ -115,7 +124,7 @@ class MonitorUI:
     def update_remaining(self):
         _, maxX = self.stdscr.getmaxyx()
         self.header.addstr(1, maxX//2 + 5, '{:3d}'.format(len(self.tasks)), self.colors.GREEN)
-        self.header.refresh()
+        self.header.noutrefresh()
 
     def update_tasklist(self, tasks):
         self.tasks = tasks
@@ -129,7 +138,7 @@ class MonitorUI:
             self.mainWindow.addstr(position, 5, task._path[1:], self.colors.DBLUE)
             self.mainWindow.addstr(position, 24, '{:2d}'.format(len(task._seqs)), self.colors.YELLOW)
 
-            graphLength = min(maxX - 28, len(task._seqs))
+            graphLength = min(maxX - 27, len(task._seqs))
             bar = TICK * graphLength
             self.mainWindow.addstr(position, 27, bar)
 
@@ -138,8 +147,9 @@ class MonitorUI:
                     break
 
         self.mainWindow.clrtobot()
-        self.mainWindow.refresh()
+        self.mainWindow.noutrefresh()
         self.update_remaining()
+        curses.doupdate()
 
     def _log_start(self):     
         maxY, maxX = self.logWindow.getmaxyx()
@@ -149,8 +159,9 @@ class MonitorUI:
 
     def _log_finish(self):
         self.log_line += 1
-        self.logWindow.refresh()
-        self.header.refresh()
+        self.logWindow.noutrefresh()
+        self.header.noutrefresh()
+        curses.doupdate()
 
     def log(self, message):
         print(message)
@@ -168,24 +179,34 @@ class MonitorUI:
         else:
             self.logWindow.addstr("+ ", self.colors.GREEN)
         self.logWindow.addstr('{:3d} '.format(downloadFrame.correlation_id), self.colors.DYELLOW)
+
         try:
             path = self.paths[downloadFrame.correlation_id]
         except KeyError:
             path = "UNKNOWN"
-        self.logWindow.addstr(path, self.colors.DBLUE)
-        self.logWindow.addstr(self.log_line, 35, '{:02d}'.format(downloadFrame._seq))
+
+        _, maxX = self.logWindow.getmaxyx()
+        if maxX >= 39:
+            self.logWindow.addstr("{:18s} ".format(path), self.colors.DBLUE)
+        elif maxX >= 32:
+            path = path.replace("telemetry", "t")
+            self.logWindow.addstr("{:11s} ".format(path), self.colors.DBLUE)
+
+        self.logWindow.addstr('{:02d}'.format(downloadFrame._seq))
         self._log_finish()
 
     def _curses_thread(self):
-        curses.wrapper(self._worker_thread)
+        try:
+            curses.wrapper(self._worker_thread)
+        finally:
+            self.stdscr.keypad(0)
+            curses.echo()
+            curses.nocbreak()
+            curses.endwin()
+        self.abortCallback()
 
     def stop(self):
         self.isWorking = False
-
-    def update_remaining_tasks(self, tasklist):
-        _, maxX = self.stdscr.getmaxyx()
-        self.header.addstr(1, maxX//2 + 5, '{:d}'.format(len(tasklist)), self.colors.RED)
-        self.header.refresh()
 
     def run(self):
         self.isWorking = True

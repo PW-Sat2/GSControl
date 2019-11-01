@@ -176,6 +176,7 @@ def run(args):
 
     ui = MonitorUI(session, commandsDict, len(tasklist), abort)
     ui_thread = ui.run()
+    ui.log("Loaded {} tasks.".format(len(tasklist)))
 
     with allow_interrupt(abort):
         while True:
