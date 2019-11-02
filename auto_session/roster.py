@@ -18,6 +18,7 @@ OPERATORS_DEF = [
    ('Piter', 'pkuligowski'),
    (u'Gumiś', 'michalgumiela'),
    ('Grzesiek', 'ggajoch'),
+   ('Mariusz', 'Mariusz Lenczyk'),
 ]
 
 OPERATORS = sorted(map(lambda o: o[0], OPERATORS_DEF))
@@ -79,7 +80,7 @@ class Roster(object):
         month_start = datetime(year=month_start.year, month=month_start.month, day=1)
         result = self.api.values().get(
             spreadsheetId=self.spreadsheet_id, 
-            range='{} {:%y}!B4:H18'.format(MONTHS[month_start.month - 1], month_start)
+            range='{} {:%y}!B4:H21'.format(MONTHS[month_start.month - 1], month_start)
         ).execute()
         values = result.get('values', [])
 
