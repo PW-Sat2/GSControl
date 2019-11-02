@@ -18,7 +18,7 @@ from tools.parse_deep_beacon import ParseDeepBeacon
 
 class BeaconUploaderApp(object):
     @staticmethod
-    def main(args):
+    def parse_args(args):
         parser = argparse.ArgumentParser()
 
         parser.add_argument('-t', '--downlink-host', required=False,
@@ -31,8 +31,20 @@ class BeaconUploaderApp(object):
 
         parser.add_argument('-g', '--gs', required=True,
                             help="Ground Station tag")
+        
+        parser.add_argument('-s', '--silent', action='store_true',
+                            help="Suppress most of output (service use)")
 
-        BeaconUploaderApp(parser.parse_args(args))._run()
+        return parser.parse_args(args)
+
+    @staticmethod
+    def main(args):
+        args_parsed = BeaconUploaderApp.parse_args(args)
+        BeaconUploaderApp(args_parsed)._run()
+        
+    @staticmethod
+    def main_with_args_parsed(args_parsed):
+        BeaconUploaderApp(args_parsed)._run()
 
     def __init__(self, args):
         self._args = args
@@ -83,16 +95,16 @@ class BeaconUploaderApp(object):
         while True:
             frame = self._receiver.receive_no_wait()
             if frame:
-                self._receiver_log.info("Got frame without wait")
+                self._receiver_log.debug("Got frame without wait")
             else:
-                self._receiver_log.info("Waiting for frame")
+                self._receiver_log.debug("Waiting for frame")
                 frame = self._receiver.receive()
 
             if not frame:
                 self._receiver_log.error('Nothing received')
                 continue
 
-            self._receiver_log.info('Pushing frame {} for processing'.format(i))
+            self._receiver_log.debug('Pushing frame {} for processing'.format(i))
             self._new_frame_push.send_pyobj((datetime.utcnow(), i, frame))
             i += 1
 
@@ -102,11 +114,11 @@ class BeaconUploaderApp(object):
             (r, _, _) = zmq.select([self._new_frame_pull, self._publisher_abort], [], [self._new_frame_pull, self._publisher_abort])
 
             if r[0] == self._publisher_abort:
-                self._publisher_log.info('Terminating')
+                self._publisher_log.debug('Terminating')
                 break
 
             (ts, i, frame) = self._new_frame_pull.recv_pyobj()
-            self._receiver_log.info('Recevied frame {}'.format(i))
+            self._receiver_log.debug('Recevied frame {}'.format(i))
 
             data = self._receiver.decode_kiss(frame)
             try:
@@ -120,16 +132,16 @@ class BeaconUploaderApp(object):
         frame = self._frame_decoder.decode(raw_frame)
 
         if isinstance(frame, BeaconFrame):
-            self._publisher_log.info("Received beacon frame")
+            self._publisher_log.debug("Received beacon frame")
             self._process_single_beacon(ts, frame)
         elif isinstance(frame, DeepSleepBeacon):
-            self._publisher_log.info("Received deep sleep beacon frame")
+            self._publisher_log.debug("Received deep sleep beacon frame")
             self._process_single_deep_sleep_beacon(ts, frame)
         else:
-            self._publisher_log.info("Not a beacon")
+            self._publisher_log.debug("Not a beacon")
             return
 
-        self._publisher_log.info("Published")
+        self._publisher_log.debug("Published")
 
     def _process_single_beacon(self, timestamp, beacon):
         telemetry = ParseBeacon.parse(beacon)
