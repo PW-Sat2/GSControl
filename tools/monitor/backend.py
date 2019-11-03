@@ -1,32 +1,42 @@
 import argparse
 import os
 import datetime
-import pprint
 import json
 
-from colorama import Fore, Style, Back
 import zmq
 from zmq.utils.win32 import allow_interrupt
 from collections import OrderedDict
 
 import response_frames
-from response_frames.common import FileSendSuccessFrame, FileSendErrorFrame
-from utils import ensure_byte_list, ensure_string
+from utils import ensure_byte_list
 from telecommand.fs import DownloadFile 
 
 from gui import MonitorUI
-import locale
-
+from model import DownloadFileTask, DownloadFrameView
 
 class MonitorBackend:
-    def __init__(self):
+    def __init__(self, args):
         self.Decoder = response_frames.FrameDecoder(response_frames.frame_factories)
-        self.abort_push = zmq.Context.instance().socket(zmq.PAIR)
-        self.abort_push.bind('inproc://download_monitor/abort')
-        self.abort_pull = zmq.Context.instance().socket(zmq.PAIR)
-        self.abort_pull.connect('inproc://download_monitor/abort')
 
-    def parse_args(self):
+        ctx = zmq.Context.instance()
+        self.abort_push = ctx.socket(zmq.PAIR)
+        self.abort_pull = ctx.socket(zmq.PAIR)
+        self.command_socket = ctx.socket(zmq.REP)
+
+        self.session = args.session
+        self.endpoints = args.address
+        self.port = args.port
+        self.mission_path = args.mission
+
+        self.ui = None
+        self.listening_sockets = None
+        self.download_tasks = None
+ 
+        self.abort_push.bind('inproc://download_monitor/abort')
+        self.abort_pull.connect('inproc://download_monitor/abort')       
+
+    @staticmethod
+    def parse_args():
         parser = argparse.ArgumentParser()
         parser.add_argument('session', type=int, help='Session number')
         parser.add_argument('address', nargs='+', help='Address to connect for frames')
@@ -78,118 +88,116 @@ class MonitorBackend:
                 command = item[0]
                 if not isinstance(command, DownloadFile):
                     continue
-                commandsDict[command._correlation_id] = command
+                commandsDict[command.correlation_id()] = DownloadFileTask.create_from_task(command)
 
             return commandsDict
 
-    def generate_new_tasklist(self, commandsDict):
-        newTasks = []
-        for _, command in commandsDict.items():
-            newTasks.append(command)
-
-        return newTasks
-
-    def process_frame(self, frame, commandsDict, ui):
-        if not type(frame) in [FileSendSuccessFrame, FileSendErrorFrame]:
+    def process_frame(self, frame):
+        if not DownloadFrameView.is_download_frame(frame):
             return
 
+        frameView = DownloadFrameView.create_from_frame(frame)
+
         try:
-            tasklistCommandChunks = commandsDict[frame.correlation_id]._seqs
-            if frame._seq in tasklistCommandChunks:
-                tasklistCommandChunks.remove(frame._seq)
+            tasklistCommandChunks = self.download_tasks[frameView.correlation_id].chunks
+            if frameView.chunk in tasklistCommandChunks:
+                tasklistCommandChunks.remove(frameView.chunk)
             if len(tasklistCommandChunks) == 0:
-                del commandsDict[frame.correlation_id]
+                del self.download_tasks[frameView.correlation_id]
         except KeyError:
             pass   
 
         stamp = datetime.datetime.now().time()
-        ui.logFrame(frame, stamp)
-        ui.update_tasklist(commandsDict)
+        self.ui.logFrame(frameView, stamp)
+        self.ui.update_tasklist(self.download_tasks)
 
-    def _get_missings_for_one_task_command(self, correlation_id, commandsDict, socket, ui):
+    def _get_missings_for_one_task_command(self, correlation_id):
         try:
-            task = commandsDict[correlation_id]
-            task_string = json.dumps(task.__dict__)
-            ui.log("Sending task for file '{}'/{}, length {}.".format(task._path, task._correlation_id, len(task._seqs)))
+            task = self.download_tasks[correlation_id]
+            task_string = json.dumps(task.to_dict())
+            self.ui.log("Sending task for file '{}'/{}, length {}.".format(task.path, task.correlation_id, task.length()))
         except KeyError:
             task_string = ""
-            ui.log("No data found for CID {}".format(correlation_id))
+            self.ui.log("No data found for CID {}".format(correlation_id))
         
-        socket.send(task_string)
+        self.command_socket.send(task_string)
 
-    def _get_tasklist_with_all_missings_command(self, commandsDict, socket, ui):
+    def _get_tasklist_with_all_missings_command(self):
         tasks = []
-        for _, command in commandsDict.items():
-            tasks.append(command.__dict__)
+        for _, command in self.download_tasks.items():
+            tasks.append(command.to_dict())
 
-        tasks.sort(key=lambda x: ("telemetry" in x['_path'], x['_correlation_id']))
+        tasks.sort(key=lambda x: ("telemetry" in x['path'], x['correlation_id']))
         
-        ui.log("Sending new {} tasks.".format(len(tasks)))
+        self.ui.log("Sending new {} tasks.".format(len(tasks)))
         task_string = json.dumps(tasks)
-        socket.send(task_string)
+        self.command_socket.send(task_string)
 
-    def handle_commands(self, request, commandsDict, socket, ui):
+    def handle_commands(self, request):
         command = json.loads(request)
         try:
             command_name = command['command']
         except:
-            ui.log("Unknown command")
+            self.ui.log("Unknown command")
             return
 
         if command_name == 'GetMissingsForOneTask':
-            self._get_missings_for_one_task_command(command['data'], commandsDict, socket, ui)
+            self._get_missings_for_one_task_command(command['data'])
 
         elif command_name == 'GetTasklistWithAllMissings':  
-            self._get_tasklist_with_all_missings_command(commandsDict, socket, ui)
+            self._get_tasklist_with_all_missings_command()
 
-    def run(self, args):
-        import colorama
-        colorama.init()
-        locale.setlocale(locale.LC_ALL, '')
-
-        sockets = self.connect_sockets(args.address)
-
-        def abort():
+    def abort(self):
             self.abort_push.send('ABORT')
 
-        command_rep = zmq.Context.instance().socket(zmq.REP)
+    def run(self):
+        self.listening_sockets = self.connect_sockets(self.endpoints)
+   
         try:
-            command_rep.bind('tcp://0.0.0.0:{}'.format(args.port))
+            self.command_socket.bind('tcp://0.0.0.0:{}'.format(self.port))
         except:
-            print("Can't bind to port {}".format(args.port))
+            print("Can't bind to port {}".format(self.port))
 
-        session = args.session
+        tasklist = self.load_tasklist(self.mission_path, self.session)
+        original_tasklist_length = len(tasklist)
+        print("Loaded {} tasks.".format(original_tasklist_length))
+        self.download_tasks = self.create_dictionary(tasklist)
 
-        tasklist = self.load_tasklist(args.mission, session)
-        print("Loaded {} tasks.".format(len(tasklist)))
-        commandsDict = self.create_dictionary(tasklist)
-
-        if (len(tasklist) == 0):
+        if original_tasklist_length == 0:
             return
 
-        ui = MonitorUI(session, commandsDict, len(tasklist), abort)
-        ui_thread = ui.run()
+        self.ui = MonitorUI(self.session, self.download_tasks, original_tasklist_length, self.abort)
+        ui_thread = self.ui.run()
 
-        with allow_interrupt(abort):
+        with allow_interrupt(self.abort):
             while True:
                 try:
-                    (read, _, _) = zmq.select(sockets + [self.abort_pull] + [command_rep], [], [])
+                    (read, _, _) = zmq.select(self.listening_sockets + [self.abort_pull] + [self.command_socket], [], [])
                 except KeyboardInterrupt:
-                    ui.log("Ending...")
+                    self.ui.log("Ending...")
                     break
 
                 if self.abort_pull in read:
                     break
 
-                if command_rep in read:
-                    self.handle_commands(command_rep.recv(), commandsDict, command_rep, ui)
+                if self.command_socket in read:
+                    self.handle_commands(self.command_socket.recv())
                     continue
 
                 for ready in read:
                     frame = ready.recv()
                     frame = self.parse_frame(frame)
-                    self.process_frame(frame, commandsDict, ui)
+                    self.process_frame(frame)
 
-        ui.stop()
+        self.ui.stop()
         ui_thread.join()
+
+    @staticmethod
+    def main():
+        import locale
+        locale.setlocale(locale.LC_ALL, '')
+
+        args = MonitorBackend.parse_args()
+        monitor = MonitorBackend(args)
+        monitor.run()
 

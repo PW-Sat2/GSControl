@@ -5,5 +5,4 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 from monitor.backend import MonitorBackend
 
-monitor = MonitorBackend()
-monitor.run(monitor.parse_args())
+MonitorBackend.main()

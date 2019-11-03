@@ -4,7 +4,6 @@ import threading
 from colorama import Fore, Style, Back
 from time import sleep
 from enum import Enum
-import response_frames
 
 import os
 os.environ['NCURSES_NO_UTF8_ACS'] = '1'
@@ -99,7 +98,8 @@ class MonitorUI:
                 curses.doupdate()
             if c == ord('a'):
                 maxY, maxX = self.stdscr.getmaxyx()
-                self.log("MaxX = {}, MaxY = {}".format(maxX, maxY))
+                _, logX = self.logWindow.getmaxyx()
+                self.log("MaxX = {}, MaxY = {}, LogX = {}".format(maxX, maxY, logX))
 
     def _generate_header(self):
         self.header.addstr(1, 2, 'SESSION:')
@@ -115,7 +115,7 @@ class MonitorUI:
     def _generatePaths(self,tasks):
         paths = {}
         for _, task in tasks.iteritems():
-            paths[task.correlation_id()] = task._path[1:]
+            paths[task.correlation_id] = task.file_name()
         return paths
 
     def update_remaining(self):
@@ -131,12 +131,12 @@ class MonitorUI:
 
         position = 0
         for _, task in tasks.iteritems():
-            self.mainWindow.addstr(position, 1, '{:3d}'.format(task.correlation_id()), self.colors.DYELLOW)
+            self.mainWindow.addstr(position, 0, '{:3d} '.format(task.correlation_id), self.colors.DYELLOW)
             self.mainWindow.clrtoeol()
-            self.mainWindow.addstr(position, 5, task._path[1:], self.colors.DBLUE)
-            self.mainWindow.addstr(position, 24, '{:2d} '.format(len(task._seqs)), self.colors.YELLOW)
+            self.mainWindow.addstr(task.file_name(), self.colors.DBLUE)
+            self.mainWindow.addstr(position, 23, '{:2d} '.format(len(task.chunks)), self.colors.YELLOW)
 
-            graphLength = min(maxX - 27, len(task._seqs))
+            graphLength = min(maxX - 26, len(task.chunks))
             bar = TICK * graphLength
 
             try:
@@ -156,7 +156,7 @@ class MonitorUI:
         curses.doupdate()
 
     def _log_start(self):     
-        maxY, maxX = self.logWindow.getmaxyx()
+        maxY, _ = self.logWindow.getmaxyx()
         while self.log_line >= maxY:
             self.logWindow.scroll()
             self.log_line -= 1
@@ -170,32 +170,32 @@ class MonitorUI:
     def log(self, message):
         self._log_start()
 
-        self.logWindow.addstr(self.log_line, 1, message)
+        self.logWindow.addstr(self.log_line, 0, message)
         self._log_finish()
 
-    def logFrame(self, downloadFrame, stamp):
+    def logFrame(self, downloadFrameView, stamp):
         self._log_start()
 
-        self.logWindow.addstr(self.log_line, 1, "{} ".format(stamp.strftime('%H:%M:%S')), self.colors.DCYAN)
-        if isinstance(downloadFrame, response_frames.common.FileSendErrorFrame):
-            self.logWindow.addstr("- ", self.colors.RED)
-        else:
+        self.logWindow.addstr(self.log_line, 0, "{} ".format(stamp.strftime('%H:%M:%S')), self.colors.DCYAN)
+        if downloadFrameView.is_success:
             self.logWindow.addstr("+ ", self.colors.GREEN)
-        self.logWindow.addstr('{:3d} '.format(downloadFrame.correlation_id), self.colors.DYELLOW)
+        else:
+            self.logWindow.addstr("- ", self.colors.RED)
+        self.logWindow.addstr('{:3d} '.format(downloadFrameView.correlation_id), self.colors.DYELLOW)
 
         try:
-            path = self.paths[downloadFrame.correlation_id]
+            path = self.paths[downloadFrameView.correlation_id]
         except KeyError:
             path = "UNKNOWN"
 
         _, maxX = self.logWindow.getmaxyx()
-        if maxX >= 40:
+        if maxX >= 39:
             self.logWindow.addstr("{:18s} ".format(path), self.colors.DBLUE)
-        elif maxX >= 33:
+        elif maxX >= 32:
             path = path.replace("telemetry", "t")
             self.logWindow.addstr("{:11s} ".format(path), self.colors.DBLUE)
 
-        self.logWindow.addstr('{:02d}'.format(downloadFrame._seq))
+        self.logWindow.addstr('{:02d}'.format(downloadFrameView.chunk))
         self._log_finish()
 
     def _curses_thread(self):

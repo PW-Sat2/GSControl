@@ -1,25 +1,19 @@
-import sys
-import os
 import zmq
 import json
-
-# sys.path.append(os.path.join(os.path.dirname(__file__),
-#                 '../../PWSat2OBC/integration_tests'))
-# sys.path.append(os.path.join(os.path.dirname(__file__),
-#                 '../..'))
 
 from telecommand.fs import DownloadFile   
 from radio.task_actions import Send, SendLoop, WaitMode
 import telecommand as tc
+from model import DownloadFileTask
 
 class MonitorConnector:
-    def __init__(self, host="tcp://127.0.0.1", port=7007):
+    def __init__(self, host="localhost", port=7007):
         self.working = False
         self.socket = zmq.Context.instance().socket(zmq.REQ)
         self.socket.setsockopt(zmq.RCVTIMEO, 1000)
 
         try:
-            self.socket.connect('{}:{}'.format(host, port))
+            self.socket.connect('tcp://{}:{}'.format(host, port))
             self.working = True
         except:
             print("Sorry, don't work")
@@ -49,8 +43,8 @@ class MonitorConnector:
         if not data:
             return None
 
-        newTask = json.loads(data)
-        newCommand = DownloadFile(newTask["_correlation_id"], str(newTask["_path"]), newTask["_seqs"])     
+        newTask = json.loads(data, object_hook=DownloadFileTask.from_dict)
+        newCommand = DownloadFile(newTask.correlation_id, newTask.path, newTask.chunks)
         return newCommand
 
     def get_additional_tasks(self):
@@ -73,10 +67,10 @@ class MonitorConnector:
         if not data:
             return None
 
-        newItems = json.loads(data)
+        newItems = json.loads(data, object_hook=DownloadFileTask.from_dict)
         newTasks = []
         for newItem in newItems:
-            newCommand = DownloadFile(newItem["_correlation_id"], str(newItem["_path"]), newItem["_seqs"]) 
+            newCommand = DownloadFile(newItem.correlation_id, newItem.path, newItem.chunks) 
             newTasks.append([newCommand, Send, WaitMode.Wait])
         newTasks.append([[tc.SendBeacon(), 20], SendLoop, WaitMode.NoWait])
         return newTasks
