@@ -1,13 +1,4 @@
-
-import sys
-import os
 from collections import OrderedDict
-
-sys.path.append(os.path.join(os.path.dirname(__file__),
-                '../../PWSat2OBC/integration_tests'))
-sys.path.append(os.path.join(os.path.dirname(__file__),
-                '../..'))
-
 from telecommand.fs import DownloadFile   
 from response_frames.common import FileSendSuccessFrame, FileSendErrorFrame 
 
@@ -17,20 +8,16 @@ class MonitorLive():
         self.frame_decoder = frame_decoder
 
     def run(self, tasks):
-
         download_commands = []
-
         for item in tasks:
             command = item[0]
             if isinstance(command, DownloadFile):
                 download_commands.append(command)
-
-        
+     
         return self.receiver_loop(download_commands)
 
     def _createDictionary(self, commands):
         commandsDict = OrderedDict()
-
         for command in commands:
             commandsDict[command._correlation_id] = command
 

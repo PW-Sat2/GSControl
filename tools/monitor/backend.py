@@ -1,6 +1,5 @@
 import argparse
 import os
-import sys
 import datetime
 import pprint
 import json
@@ -10,9 +9,8 @@ import zmq
 from zmq.utils.win32 import allow_interrupt
 from collections import OrderedDict
 
-sys.path.append(os.path.join(os.path.dirname(__file__), '../../PWSat2OBC/integration_tests'))
-sys.path.append(os.path.join(os.path.dirname(__file__), '../..'))
 import response_frames
+from response_frames.common import FileSendSuccessFrame, FileSendErrorFrame
 from utils import ensure_byte_list, ensure_string
 from telecommand.fs import DownloadFile 
 
@@ -30,7 +28,7 @@ class MonitorBackend:
 
     def parse_args(self):
         parser = argparse.ArgumentParser()
-        parser.add_argument('session', nargs=1, help='Session number')
+        parser.add_argument('session', type=int, help='Session number')
         parser.add_argument('address', nargs='+', help='Address to connect for frames')
         parser.add_argument('--port', '-p', help='Command port', type=int, default=7007)
         parser.add_argument('--mission', '-m', help='Mission repo', default=os.path.join(os.path.dirname(__file__), '..', '..', '..', 'mission'))
@@ -54,6 +52,9 @@ class MonitorBackend:
 
     def load_tasklist(self, mission_path, session):
         tasks_file_path = os.path.join(mission_path, 'sessions', str(session), 'tasklist.py')  
+        if not os.path.exists(tasks_file_path):
+            print("Could not find file {}".format(tasks_file_path))
+            return []
     
         import telecommand as tc
         import datetime
@@ -63,14 +64,11 @@ class MonitorBackend:
         from devices.camera import CameraLocation, PhotoResolution
         from devices.comm import BaudRate
         
-        if not os.path.exists(tasks_file_path):
-            print("Could not find file {}".format(tasks_file_path))
-            return []
-
+        local_values = locals()
         with open(tasks_file_path) as tasks_file:
-            exec(tasks_file)
-            tasks_file.close()
+            exec(tasks_file, globals(), local_values)
 
+        tasks = local_values['tasks']
         return tasks
 
     def create_dictionary(self, tasklist):
@@ -92,7 +90,7 @@ class MonitorBackend:
         return newTasks
 
     def process_frame(self, frame, commandsDict, ui):
-        if not isinstance(frame, response_frames.common.FileSendSuccessFrame) and not isinstance(frame, response_frames.common.FileSendErrorFrame):
+        if not type(frame) in [FileSendSuccessFrame, FileSendErrorFrame]:
             return
 
         try:
@@ -108,37 +106,41 @@ class MonitorBackend:
         ui.logFrame(frame, stamp)
         ui.update_tasklist(commandsDict)
 
+    def _get_missings_for_one_task_command(self, correlation_id, commandsDict, socket, ui):
+        try:
+            task = commandsDict[correlation_id]
+            task_string = json.dumps(task.__dict__)
+            ui.log("Sending task for file '{}'/{}, length {}.".format(task._path, task._correlation_id, len(task._seqs)))
+        except KeyError:
+            task_string = ""
+            ui.log("No data found for CID {}".format(correlation_id))
+        
+        socket.send(task_string)
+
+    def _get_tasklist_with_all_missings_command(self, commandsDict, socket, ui):
+        tasks = []
+        for _, command in commandsDict.items():
+            tasks.append(command.__dict__)
+
+        tasks.sort(key=lambda x: ("telemetry" in x['_path'], x['_correlation_id']))
+        
+        ui.log("Sending new {} tasks.".format(len(tasks)))
+        task_string = json.dumps(tasks)
+        socket.send(task_string)
+
     def handle_commands(self, request, commandsDict, socket, ui):
         command = json.loads(request)
+        try:
+            command_name = command['command']
+        except:
+            ui.log("Unknown command")
+            return
 
-        if command[0] == 'M':
-            correlation_id = command[1]
-            try:
-                task = commandsDict[correlation_id]
-                task_string = json.dumps(task.__dict__)
-                ui.log("Sending task for file '{}'/{}, length {}.".format(task._path, task._correlation_id, len(task._seqs)))
-            except KeyError:
-                task_string = ""
-                ui.log("No data found for CID {}".format(correlation_id))
-            
-            socket.send(task_string)
-        elif command[0] == 'T':  
-            tasks = []
-            telemetryTasks = []
-            for _, command in commandsDict.items():
-                if "telemetry" in command._path:
-                    telemetryTasks.append(command)
-                else:
-                    tasks.append(command.__dict__)
+        if command_name == 'GetMissingsForOneTask':
+            self._get_missings_for_one_task_command(command['data'], commandsDict, socket, ui)
 
-            # move telemetry to the end - it has less priority
-            for telemetryCommand in telemetryTasks:
-                tasks.append(telemetryCommand.__dict__)
-            
-            ui.log("Sending new {} tasks.".format(len(tasks)))
-            task_string = json.dumps(tasks)
-            socket.send(task_string)
-
+        elif command_name == 'GetTasklistWithAllMissings':  
+            self._get_tasklist_with_all_missings_command(commandsDict, socket, ui)
 
     def run(self, args):
         import colorama
@@ -156,7 +158,7 @@ class MonitorBackend:
         except:
             print("Can't bind to port {}".format(args.port))
 
-        session = args.session[0]
+        session = args.session
 
         tasklist = self.load_tasklist(args.mission, session)
         print("Loaded {} tasks.".format(len(tasklist)))

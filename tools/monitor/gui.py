@@ -4,18 +4,12 @@ import threading
 from colorama import Fore, Style, Back
 from time import sleep
 from enum import Enum
-
-import sys
-import os
-sys.path.append(os.path.join(os.path.dirname(__file__), '../../PWSat2OBC/integration_tests'))
-sys.path.append(os.path.join(os.path.dirname(__file__), '../..'))
 import response_frames
 
-
+import os
 os.environ['NCURSES_NO_UTF8_ACS'] = '1'
 
 TICK = '#'#'▇'
-
 
 class Colors:
     def __init__(self):

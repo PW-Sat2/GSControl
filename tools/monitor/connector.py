@@ -13,14 +13,13 @@ from radio.task_actions import Send, SendLoop, WaitMode
 import telecommand as tc
 
 class MonitorConnector:
-    def __init__(self):
+    def __init__(self, host="tcp://127.0.0.1", port=7007):
         self.working = False
         self.socket = zmq.Context.instance().socket(zmq.REQ)
         self.socket.setsockopt(zmq.RCVTIMEO, 1000)
-        self.port = 7007
 
         try:
-            self.socket.connect('tcp://127.0.0.1:{}'.format(self.port))
+            self.socket.connect('{}:{}'.format(host, port))
             self.working = True
         except:
             print("Sorry, don't work")
@@ -35,7 +34,11 @@ class MonitorConnector:
             return None
 
         try:
-            self.socket.send(json.dumps(['M', telecommand.correlation_id()]))    
+            command = {
+                "command" : "GetMissingsForOneTask",
+                "data" : telecommand.correlation_id()
+            }
+            self.socket.send(json.dumps(command))    
             data = self.socket.recv()
         except zmq.Again:
             return None
@@ -56,7 +59,8 @@ class MonitorConnector:
             return None     
 
         try:
-            self.socket.send(json.dumps(['T']))    
+            command = { "command" : "GetTasklistWithAllMissings" }
+            self.socket.send(json.dumps(command))    
             data = self.socket.recv()
         except zmq.Again:
             print("Not connected. ") 
