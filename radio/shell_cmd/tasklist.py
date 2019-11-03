@@ -15,12 +15,11 @@ class DictWrapper(object):
     def __getattr__(self, name):
         return self._d[name]
 
-def build(sender, rcv, frame_decoder, analyzer, ns):
+def build(sender, rcv, frame_decoder, analyzer, ns, monitor_connector):
     import pprint
     from prompt_toolkit.shortcuts import print_tokens
     from prompt_toolkit.styles import style_from_dict
     from pygments.token import Token
-    from tools.monitor.connector import MonitorConnector
 
     def sendExtraCommand(style, ns_wrapper, command):
         from radio.task_actions import Send
@@ -45,20 +44,32 @@ def build(sender, rcv, frame_decoder, analyzer, ns):
         import telecommand as tc
         sendExtraCommand(style, ns_wrapper, tc.SendBeacon())
 
-    def get_and_send_missing_chunks_command(style, ns_wrapper, telecommand, monitorConnector):
-        newCommand = monitorConnector.get_missings_for_command(telecommand)
+    def get_and_send_missing_chunks_command(style, ns_wrapper, telecommand, monitor_connector):
+        newCommand = monitor_connector.get_missings_for_command(telecommand)
+        if newCommand is None:
+            print_tokens([
+                (Token.Action, "Command failed. "),
+                (Token.String, "Please repeat: "),
+                ], style=style)
+            return 
         if not newCommand:
-            print("Not found.")
+            print_tokens([
+                (Token.Action, "No missings for command. "),
+                (Token.String, "Please repeat: "),
+                ], style=style)
             return 
 
         sendExtraCommand(style, ns_wrapper, newCommand)
 
-    def add_missings_to_tasklist(style, ns_wrapper, tasks, monitorConnector):
-        newTasks = monitorConnector.get_additional_tasks()
-        if not newTasks or len(newTasks) == 0:
-            print("Not found.")
+    def add_missings_to_tasklist(style, ns_wrapper, tasks, monitor_connector):
+        newTasks = monitor_connector.get_additional_tasks()
+        if newTasks is None or len(newTasks) == 0:
+            print_tokens([
+                (Token.Action, "Command failed. "),
+                (Token.String, "Please repeat: "),
+                ], style=style)
             return 
-
+        
         indexOfNewTask = len(tasks) + 1
         tasks.extend(newTasks)
         print_tokens([
@@ -89,7 +100,7 @@ def build(sender, rcv, frame_decoder, analyzer, ns):
         })
 
         ns_wrapper = DictWrapper(ns)
-        monitorConnector = MonitorConnector()
+        monitor_connector.connect()
 
         step_no = start_from - 1
 
@@ -158,10 +169,10 @@ def build(sender, rcv, frame_decoder, analyzer, ns):
                             send_additional_beacon(style, ns_wrapper)
                             continue
                         elif user_input == 'm':
-                            get_and_send_missing_chunks_command(style, ns_wrapper, tasks[step_no][0], monitorConnector)
+                            get_and_send_missing_chunks_command(style, ns_wrapper, tasks[step_no][0], monitor_connector)
                             continue
                         elif user_input == 't':
-                            add_missings_to_tasklist(style, ns_wrapper, tasks, monitorConnector)
+                            add_missings_to_tasklist(style, ns_wrapper, tasks, monitor_connector)
                             continue
                         elif user_input == 'q':
                             return
@@ -188,8 +199,8 @@ def build(sender, rcv, frame_decoder, analyzer, ns):
         return monitor.run(tasks)
 
     def missings():
-        monitorConnector = MonitorConnector()
-        newTasks = monitorConnector.get_additional_tasks()
+        monitor_connector.connect()
+        newTasks = monitor_connector.get_additional_tasks()
         if not newTasks or len(newTasks) == 0:
             print("Not found.")
             return []
