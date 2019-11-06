@@ -63,7 +63,7 @@ def main():
         rotctrld_socket.close()
 
         try:
-            thread_gpredict_to_rotctrld.termiante()
+            thread_gpredict_to_rotctrld.terminate()
         except:
             pass
 
