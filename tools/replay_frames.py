@@ -30,10 +30,8 @@ def run(args):
                 frame = line.split(',')[2]
                 frame = b64decode(frame)
                 socket.send(frame)
-                time.sleep(args.delay)
+                time.sleep(args.delay)     
 
             finished = True and not args.loop
-
-
 
 run(parse_args())
