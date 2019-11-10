@@ -38,7 +38,7 @@ class Colors:
         self.DYELLOW = curses.color_pair(7)
 
 class MonitorUI:
-    def __init__(self, session, tasks, total_tasks, abortCallback):
+    def __init__(self, session, tasks, total_tasks, abortCallback, is_bound):
         self.isWorking = False
         self.session = session
         self.tasks = tasks
@@ -47,6 +47,7 @@ class MonitorUI:
         self.abortCallback = abortCallback
         self.colors = None
         self.paths = self._generatePaths(tasks)
+        self.is_bound = is_bound
 
     def initialize_windows(self):
         maxY, maxX = self.stdscr.getmaxyx()
@@ -104,6 +105,8 @@ class MonitorUI:
     def _generate_header(self):
         self.header.addstr(1, 2, 'SESSION:')
         self.header.addstr(1, 11, '{}'.format(self.session), self.colors.YELLOW)
+        if not self.is_bound:
+            self.header.addstr(' UNBOUND', self.colors.RED)
 
         _, maxX = self.stdscr.getmaxyx()
         self.header.addstr(1, maxX - 18, 'Total tasks:')

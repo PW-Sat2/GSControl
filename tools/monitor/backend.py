@@ -22,6 +22,7 @@ class MonitorBackend:
         self.abort_push = ctx.socket(zmq.PAIR)
         self.abort_pull = ctx.socket(zmq.PAIR)
         self.command_socket = ctx.socket(zmq.REP)
+        self.command_bound = False
 
         self.session = args.session
         self.endpoints = args.address
@@ -155,6 +156,7 @@ class MonitorBackend:
    
         try:
             self.command_socket.bind('tcp://0.0.0.0:{}'.format(self.port))
+            self.command_bound = True
         except:
             print("Can't bind to port {}".format(self.port))
 
@@ -166,7 +168,7 @@ class MonitorBackend:
         if original_tasklist_length == 0:
             return
 
-        self.ui = MonitorUI(self.session, self.download_tasks, original_tasklist_length, self.abort)
+        self.ui = MonitorUI(self.session, self.download_tasks, original_tasklist_length, self.abort, self.command_bound)
         ui_thread = self.ui.run()
 
         with allow_interrupt(self.abort):
