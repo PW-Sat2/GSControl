@@ -36,7 +36,7 @@ def pop_matching(arr, total, delegate):
     idx = 0
     while True:    
         if (len(taken) >= total) or (idx >= len(arr)):
-            break;
+            break
 
         val = arr[idx]
 
@@ -137,13 +137,19 @@ class MissingFilesTasklistGenerator:
     def _generateTelecommandData(missing_files, max_chunks, cid_start):
         missingSplittedChunksPerFile = map(lambda (name, info): ({
             "name": name,
-            "chunks": splitAllChunks(info["MissingChunks"], max_chunks)
+            "chunks": splitAllChunks(info["MissingChunks"], max_chunks),
+            "index": 0
         }), missing_files.items())
 
         missingSplittedChunksPerFile.sort(key= MissingFilesTasklistGenerator._generateMissingFilesSortKey)
 
         flattenedChunksPerFile = [{"name": x["name"], "chunks": y} for x in missingSplittedChunksPerFile for y in
                                   x["chunks"]]
+
+        for (i, x) in enumerate(flattenedChunksPerFile):
+            flattenedChunksPerFile[i]['index'] = i
+
+        flattenedChunksPerFile.sort(key= MissingFilesTasklistGenerator._generateMissingFilesSortKey)
 
         telecommandData = map(lambda (i, x): ({
             "cid": i + cid_start,
@@ -156,9 +162,25 @@ class MissingFilesTasklistGenerator:
     @staticmethod
     def _generateMissingFilesSortKey(item):
         name = item['name']
-        chunks = len(item['chunks'])
-        isTelemetry = 0 if 'telemetry' in name else 1
-        key = "{}_{:02}_{}".format(isTelemetry, chunks, name)
+        chunks = item['chunks']
+        index = item['index']
+        chunks_order = len(chunks)
+
+        priority = 5
+        if 'telemetry' in name:
+            priority = 0
+        elif 'radfet' in name or 'suns' in name:
+            priority = 1
+        elif 'dummy' in name:
+            priority = 9
+        elif 0 in chunks:
+            priority = 2
+        elif len(chunks) <= 2:
+            priority = 3
+        elif len(chunks) > 2:
+            chunks_order = 99 - chunks_order
+
+        key = (priority, index, chunks_order, name)
         return key
 
     @staticmethod
@@ -206,7 +228,7 @@ class NextSessionTelemetryTasklistGenerator:
         estimation.previous_start = -1
         estimation.previous_end = -1
         
-        totalSeconds = (nextTime - startTime).total_seconds();
+        totalSeconds = (nextTime - startTime).total_seconds()
 
         estimation.generated_chunks = int((totalSeconds / 60) * chunksPerMinute) + self.CHUNKS_SAFE_BUFFER
 
@@ -251,7 +273,7 @@ class NextSessionTelemetryTasklistGenerator:
             divisor = max(1, int(chunk_step/(2**current_level))) 
             indexes = indexes + flat_array([[index-divisor, index+divisor] for index in indexes[-(2**(current_level-2)):]])
             if divisor == 1:
-                break;
+                break
 
         chunks_offsets = map(lambda start: range(start, estimation.generated_chunks, chunk_step) ,indexes)
         chunk_index_offset = -estimation.current_start if estimation.previous_end == -1 else  estimation.previous_end - estimation.previous_start
