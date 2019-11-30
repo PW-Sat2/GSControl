@@ -88,12 +88,14 @@ def main():
     assignments_per_month = [
         # roster.download_month(datetime(year=2019, month=3, day=1)),
         # roster.download_month(datetime(year=2019, month=4, day=1)),
-        roster.download_month(datetime(year=2019, month=5, day=1)),
-        roster.download_month(datetime(year=2019, month=6, day=1)),
-        roster.download_month(datetime(year=2019, month=7, day=1)),
-        roster.download_month(datetime(year=2019, month=8, day=1)),
-        roster.download_month(datetime(year=2019, month=9, day=1)),
-        roster.download_month(datetime(year=2019, month=10, day=1)),
+        # roster.download_month(datetime(year=2019, month=5, day=1)),
+        # roster.download_month(datetime(year=2019, month=6, day=1)),
+        # roster.download_month(datetime(year=2019, month=7, day=1)),
+        # roster.download_month(datetime(year=2019, month=8, day=1)),
+        # roster.download_month(datetime(year=2019, month=9, day=1)),
+        # roster.download_month(datetime(year=2019, month=10, day=1)),
+        roster.download_month(datetime(year=2019, month=11, day=1)),
+        roster.download_month(datetime(year=2019, month=12, day=1)),
     ]
 
     assignments = []
@@ -110,3 +112,4 @@ def main():
     pprint(empty_assignments)
 
 main()
+
