@@ -16,18 +16,20 @@ class Colors:
         curses.init_pair(2,curses.COLOR_RED,0)
 
         if curses.COLORS > 8:
-            curses.init_color(20, 0 ,0 ,700)
+            curses.init_color(20, 0 ,0 ,850)
             curses.init_pair(3,20 , -1)
             curses.init_pair(4,curses.COLOR_RED + 8,-1)
             curses.init_pair(5,curses.COLOR_GREEN + 8,-1)
             curses.init_pair(6,curses.COLOR_YELLOW + 8,-1)
             curses.init_pair(7,curses.COLOR_BLACK + 8,-1)
+            curses.init_pair(8,curses.COLOR_CYAN + 8,-1)
         else:
             curses.init_pair(3,curses.COLOR_BLUE, -1)
             curses.init_pair(4,curses.COLOR_RED,-1)
             curses.init_pair(5,curses.COLOR_GREEN,-1)
             curses.init_pair(6,curses.COLOR_YELLOW,-1)
             curses.init_pair(7,curses.COLOR_GREEN,-1)
+            curses.init_pair(8,curses.COLOR_CYAN,-1)
 
         self.DCYAN = curses.color_pair(1)
         self.DRED = curses.color_pair(2)
@@ -36,6 +38,7 @@ class Colors:
         self.GREEN = curses.color_pair(5)
         self.YELLOW = curses.color_pair(6)
         self.DYELLOW = curses.color_pair(7)
+        self.CYAN = curses.color_pair(8)
 
 class MonitorUI:
     def __init__(self, session, tasks, total_tasks, abortCallback, is_bound):
@@ -159,16 +162,19 @@ class MonitorUI:
         maxY, maxX = self.mainWindow.getmaxyx()
         self.mainWindow.move(0,0)
 
+        x_download_counter = 23
+
         position = 0
         for index, (_, task) in enumerate(tasks.iteritems()):
             if index < self.first_line:
                 continue
-            self.mainWindow.addstr(position, 0, '{:3d} '.format(task.correlation_id), self.colors.DYELLOW)
+            self.mainWindow.addstr(position, 0, '{:3d} '.format(task.index), self.colors.CYAN)
+            self.mainWindow.addstr('{:3d} '.format(task.correlation_id), self.colors.DYELLOW)
             self.mainWindow.clrtoeol()
             self.mainWindow.addstr(task.file_name(), self.colors.DBLUE)
-            self.mainWindow.addstr(position, 23, '{:2d} '.format(len(task.chunks)), self.colors.YELLOW)
+            self.mainWindow.addstr(position, x_download_counter, '{:2d} '.format(len(task.chunks)), self.colors.YELLOW)
 
-            graphLength = min(maxX - 26, len(task.chunks))
+            graphLength = min(maxX - (x_download_counter + 3), len(task.chunks))
             bar = TICK * graphLength
 
             try:

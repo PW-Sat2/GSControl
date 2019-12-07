@@ -1,14 +1,15 @@
 from response_frames.common import FileSendSuccessFrame, FileSendErrorFrame
 
 class DownloadFileTask:
-    def __init__(self, correlation_id, path, chunks):
+    def __init__(self, correlation_id, path, chunks, index= 0):
         self.correlation_id = correlation_id
         self.path = path
         self.chunks = chunks
+        self.index = index
 
     @staticmethod
-    def create_from_task(taskitem):
-        return DownloadFileTask(taskitem._correlation_id, taskitem._path, taskitem._seqs)
+    def create_from_task(taskitem, index= 0):
+        return DownloadFileTask(taskitem._correlation_id, taskitem._path, taskitem._seqs, index)
 
     def length(self):
         return len(self.chunks)
@@ -18,6 +19,7 @@ class DownloadFileTask:
 
     def to_dict(self):
         return {
+            "index" : self.index,
             "correlation_id" : self.correlation_id,
             "path" : self.path,
             "chunks" : self.chunks
@@ -26,7 +28,7 @@ class DownloadFileTask:
     @staticmethod
     def from_dict(fields):
         try:
-            return DownloadFileTask(fields["correlation_id"], str(fields["path"]), fields["chunks"])
+            return DownloadFileTask(fields["correlation_id"], str(fields["path"]), fields["chunks"], fields["index"])
         except:
             return None
 

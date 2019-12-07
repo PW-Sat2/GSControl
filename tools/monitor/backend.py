@@ -85,11 +85,11 @@ class MonitorBackend:
     def create_dictionary(self, tasklist):
             commandsDict = OrderedDict()
 
-            for item in tasklist:
+            for index, item in enumerate(tasklist, start=1):
                 command = item[0]
                 if not isinstance(command, DownloadFile):
                     continue
-                commandsDict[command.correlation_id()] = DownloadFileTask.create_from_task(command)
+                commandsDict[command.correlation_id()] = DownloadFileTask.create_from_task(command, index)
 
             return commandsDict
 
