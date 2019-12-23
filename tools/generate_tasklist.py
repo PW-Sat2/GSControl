@@ -164,21 +164,19 @@ class MissingFilesTasklistGenerator:
         name = item['name']
         chunks = item['chunks']
         index = item['index']
-        chunks_order = len(chunks)
+        chunks_order = 1
 
         priority = 5
         if 'telemetry' in name:
             priority = 0
         elif 'radfet' in name or 'suns' in name:
             priority = 1
+            if '_sec' in name:
+                priority = 8
         elif 'dummy' in name:
             priority = 9
         elif 0 in chunks:
             priority = 2
-        elif len(chunks) <= 2:
-            priority = 3
-        elif len(chunks) > 2:
-            chunks_order = 99 - chunks_order
 
         key = (priority, index, chunks_order, name)
         return key
