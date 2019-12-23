@@ -334,19 +334,15 @@ def wait_for_files(directory, files, timeout):
 def concat_frames(directory, in_files, out_file):
     with open(os.path.join(directory, out_file), 'w') as fo:
         for f in in_files:
-            with open(os.path.join(directory, f), 'r') as fi:
-                fo.writelines(fi.readlines())
+            p = os.path.join(directory, f)
+            if os.path.exists(p):
+                with open(p, 'r') as fi:
+                    fo.writelines(fi.readlines())
 
 def all_frames_summary():
     if on_primary_gs:
-        # random sleep from 10 to 30 seconds
         wait_for_files(session.artifacts_path, ['elka_downlink.frames', 'fp-gs_downlink.frames'], timeout=5 * 60)
-        # time.sleep(float(random.randint(10000, 30000))/1000.)
-        # origin.pull(rebase=True)
         concat_frames(session.artifacts_path, ['elka_downlink.frames', 'fp-gs_downlink.frames'], 'all.frames')
-
-        # run_cmd('yes \'y\' | ' + gscontrol + '/scripts/download_all_frames.sh ' + str(session.nr),
-        #         'all.frames')
 
         run_cmd('yes \'y\' | ' + gscontrol + '/scripts/summary.sh ' + str(session.nr),
                 'summary')
