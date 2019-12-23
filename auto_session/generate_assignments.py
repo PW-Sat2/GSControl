@@ -13,7 +13,7 @@ roster = Roster('1RrK5RQMWtoE-6tf9BmMLXoLmMOboBQ-doXpRB51Fy7I', 'C:/PW-Sat/missi
 R = Random(x=42)
 
 def select_operator(last_assignments, exclude=[]):
-    s = sorted(last_assignments, key=last_assignments.get)
+    s = sorted(last_assignments, key=lambda k: last_assignments.get(k) or datetime.min)
 
     for item in s:
         print('{} in {}: {}'.format(item, exclude, item in exclude))
@@ -93,7 +93,7 @@ def main():
         # roster.download_month(datetime(year=2019, month=7, day=1)),
         # roster.download_month(datetime(year=2019, month=8, day=1)),
         # roster.download_month(datetime(year=2019, month=9, day=1)),
-        # roster.download_month(datetime(year=2019, month=10, day=1)),
+        roster.download_month(datetime(year=2019, month=10, day=1)),
         roster.download_month(datetime(year=2019, month=11, day=1)),
         roster.download_month(datetime(year=2019, month=12, day=1)),
     ]
