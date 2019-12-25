@@ -43,6 +43,7 @@ def send_to_slack(msg):
         requests.post(slack_url, json={'text': msg})
     except Exception:
         traceback.print_exc()
+
 def send_to_slack_important(text):
     try:
         s = Slacker(slack_token)
@@ -356,6 +357,19 @@ def all_frames_summary():
         run_cmd("python2 " + gscontrol + "/tools/telemetry_loss_notifier.py" + " -s " + str(session.nr) + " -c " + slack_important_channel + " -t " + slack_token,
                 'telemetry loss notifier')
 
+def generate_sessions():
+    SESSIONS_MARGIN = 60
+
+    if on_primary_gs:
+        print("Checking if sessions have to be generated (< {})!".format(SESSIONS_MARGIN))
+
+        if len(sessions)-1 < SESSIONS_MARGIN:
+            run_cmd("python2 " + gscontrol + "/tools/pass_predict/predict_passes.py" + " -c /gs/config.py -n 10 -m " + mission_repo_path,
+                    'pass predict')
+            run_cmd(gscontrol + '/scripts/commit_sessions.sh ', 'add and commit new sessions')
+        else:
+            print("Not generating - there are {} upcomming sessions".format(len(sessions)-1))
+
 
 time_events = [
     (session.start - timedelta(minutes=2), start_session),
@@ -363,6 +377,7 @@ time_events = [
     (session.stop + timedelta(seconds=30), stop_keep_alive),
     (session.stop + timedelta(minutes=1),  stop_session),
     (session.stop + timedelta(minutes=2),  all_frames_summary),
+    (session.stop + timedelta(minutes=3), generate_sessions),
 ]
 
 execute(time_events)
