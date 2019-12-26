@@ -377,7 +377,7 @@ time_events = [
     (session.stop + timedelta(seconds=30), stop_keep_alive),
     (session.stop + timedelta(minutes=1),  stop_session),
     (session.stop + timedelta(minutes=2),  all_frames_summary),
-    (session.stop + timedelta(minutes=3), generate_sessions),
+    (session.stop + timedelta(minutes=3),  generate_sessions),
 ]
 
 execute(time_events)
