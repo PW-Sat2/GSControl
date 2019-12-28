@@ -8,7 +8,6 @@ from radio import analyzer
 from utils import ensure_byte_list, ensure_string
 from radio.radio_frame_decoder import FallbackResponseDecorator
 import response_frames
-from weakref import WeakValueDictionary
 
 
 class SessionView(object):
@@ -137,7 +136,7 @@ class MissionStore(object):
     def __init__(self, root):
         self.root = root
         self.analyzer = analyzer.Analyzer()
-        self._sessions =  {}
+        self._sessions = {}
 
     def get_session(self, session_number):
         if not session_number in self._sessions:

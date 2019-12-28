@@ -7,8 +7,6 @@ from utils import ensure_byte_list
 
 
 def decode_photo(file_name, output_file_name=None):
-    chunks = []
-
     (basename, _) = path.splitext(file_name)
     jpg_file_name = output_file_name or (basename + '.jpg')
 

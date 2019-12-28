@@ -52,7 +52,7 @@ def get_downloaded_files(tasklist, frames):
         correlation_ids = files[file_name]['CorrelationIds']
 
         downloaded_chunks = []
-        seqs = set()
+
         for cid in correlation_ids:
             downloaded_chunks.extend(chunks_by_correlation_id[cid])
             del chunks_by_correlation_id[cid]
