@@ -39,14 +39,24 @@ def get_requested_files(tasklist):
 def get_downloaded_files(tasklist, frames):
     files = dict(get_requested_files(tasklist))
 
-    file_chunks = only_type(frames, response_frames.FileSendSuccessFrame)
+    file_chunks = list(only_type(frames, response_frames.FileSendSuccessFrame))
     error_frames = only_type(frames, response_frames.FileSendErrorFrame)
+
+    chunks_by_correlation_id = defaultdict(lambda: [])
+
+    for c in file_chunks:
+        chunks_by_correlation_id[c.correlation_id].append(c)
 
     for file_name in files.keys():
         requested_chunk_ids = files[file_name]['RequestedChunks']
         correlation_ids = files[file_name]['CorrelationIds']
 
-        downloaded_chunks = filter(lambda f: f.correlation_id in correlation_ids, file_chunks)
+        downloaded_chunks = []
+
+        for cid in correlation_ids:
+            downloaded_chunks.extend(chunks_by_correlation_id[cid])
+            del chunks_by_correlation_id[cid]
+
         downloaded_chunks = unique_seqs(downloaded_chunks)
         downloaded_chunks = sorted(downloaded_chunks, key=lambda f: f.seq())
 
