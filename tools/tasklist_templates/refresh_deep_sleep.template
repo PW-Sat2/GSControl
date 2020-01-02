@@ -2,10 +2,10 @@ tasks = [
     # Generated on {0}
 
     # Get beacons from deep-sleep
-    [[tc.SendBeacon(), 20], SendLoop, WaitMode.NoWait],
+    [[tc.SendBeacon(), 15], SendLoop, WaitMode.NoWait],
 
     # Wake-up from deep-sleep
-    [tc.PingTelecommand(), Send, WaitMode.Wait],
+    [[tc.PingTelecommand(), 15], SendLoop, WaitMode.NoWait],
 
     # Set bitrate
     [tc.SetBitrate(1, BaudRate.BaudRate9600), Send, WaitMode.Wait],
