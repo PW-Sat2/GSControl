@@ -13,7 +13,7 @@ if os.getenv("CLICOLOR_FORCE") == "1":
     colorama.deinit()
 
 
-def _setup_log():
+def _setup_log(silent):
     root_logger = logging.getLogger()
 
     handler = colorlog.StreamHandler()
@@ -32,12 +32,16 @@ def _setup_log():
     handler.setFormatter(formatter)
 
     root_logger.addHandler(handler)
-    root_logger.setLevel(logging.DEBUG)
+
+    if silent:
+        root_logger.setLevel(logging.INFO)
+    else:
+        root_logger.setLevel(logging.DEBUG)
     logging.getLogger('urllib3').setLevel(logging.WARNING)
 
 
-_setup_log()
-
 from app import BeaconUploaderApp
+args = BeaconUploaderApp.parse_args(sys.argv[1:])
+_setup_log(args.silent)
 
-BeaconUploaderApp.main(sys.argv[1:])
+BeaconUploaderApp.main_with_args_parsed(args)
