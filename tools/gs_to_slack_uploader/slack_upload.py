@@ -49,6 +49,7 @@ class UploadSlack(Thread):
         self._stop_event.set()
 
     def run(self):
+        self.logger.log(logging.INFO, "Starting Slack Uploader thread.")
         while not self._stop_event.is_set():
             try:
                 packet = self.frames_queue.popleft()
@@ -81,7 +82,7 @@ class UploadSlack(Thread):
             except IndexError:
                 time.sleep(0.1)
 
-        self.logger.log(logging.DEBUG, "Finished ReceiveDistribute")
+        self.logger.log(logging.INFO, "Finished Slack Uploader thread.")
 
 
     def _format_message_new(self, frame_text):

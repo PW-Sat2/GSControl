@@ -4,7 +4,6 @@ from radio.task_actions import WaitMode
 import sys
 import telecommand as tc
 
-
 def custom_raw_input(text=""):
     sys.stdout.write(text)
     return sys.stdin.readline().strip()
@@ -16,17 +15,15 @@ class DictWrapper(object):
     def __getattr__(self, name):
         return self._d[name]
 
-def build(sender, rcv, frame_decoder, analyzer, ns):
+def build(sender, rcv, frame_decoder, analyzer, ns, monitor_connector):
     import pprint
     from prompt_toolkit.shortcuts import print_tokens
     from prompt_toolkit.styles import style_from_dict
     from pygments.token import Token
 
-    def send_additional_beacon(style, ns_wrapper):
-        import telecommand as tc
+    def sendExtraCommand(style, ns_wrapper, command):
         from radio.task_actions import Send
-
-        [telecommand, action_type] = [tc.SendBeacon(), Send]
+        [telecommand, action_type] = [command, Send]
 
         tokens = [
             (Token.String, "["),
@@ -42,6 +39,43 @@ def build(sender, rcv, frame_decoder, analyzer, ns):
 
         print_tokens(tokens, style=style)
         action_type(telecommand).do(ns_wrapper)
+
+    def send_additional_beacon(style, ns_wrapper):
+        import telecommand as tc
+        sendExtraCommand(style, ns_wrapper, tc.SendBeacon())
+
+    def get_and_send_missing_chunks_command(style, ns_wrapper, telecommand, monitor_connector):
+        newCommand = monitor_connector.get_missings_for_command(telecommand)
+        if newCommand is None:
+            print_tokens([
+                (Token.Action, "Command failed. "),
+                (Token.String, "Please repeat: "),
+                ], style=style)
+            return 
+        if not newCommand:
+            print_tokens([
+                (Token.Action, "No missings for command. "),
+                (Token.String, "Please repeat: "),
+                ], style=style)
+            return 
+
+        sendExtraCommand(style, ns_wrapper, newCommand)
+
+    def add_missings_to_tasklist(style, ns_wrapper, tasks, monitor_connector):
+        newTasks = monitor_connector.get_additional_tasks()
+        if newTasks is None or len(newTasks) == 0:
+            print_tokens([
+                (Token.Action, "Command failed. "),
+                (Token.String, "Please repeat: "),
+                ], style=style)
+            return 
+        
+        indexOfNewTask = len(tasks) + 1
+        tasks.extend(newTasks)
+        print_tokens([
+            (Token.Action, "Added {} new tasks. New items start at {}. ".format(len(newTasks), indexOfNewTask)),
+            (Token.String, "Please repeat: "),
+            ], style=style)
 
     def run(tasks, start_from=1):
         """
@@ -66,6 +100,7 @@ def build(sender, rcv, frame_decoder, analyzer, ns):
         })
 
         ns_wrapper = DictWrapper(ns)
+        monitor_connector.connect()
 
         step_no = start_from - 1
 
@@ -133,6 +168,12 @@ def build(sender, rcv, frame_decoder, analyzer, ns):
                         elif user_input == 'b':
                             send_additional_beacon(style, ns_wrapper)
                             continue
+                        elif user_input == 'm':
+                            get_and_send_missing_chunks_command(style, ns_wrapper, tasks[step_no][0], monitor_connector)
+                            continue
+                        elif user_input == 't':
+                            add_missings_to_tasklist(style, ns_wrapper, tasks, monitor_connector)
+                            continue
                         elif user_input == 'q':
                             return
 
@@ -151,6 +192,19 @@ def build(sender, rcv, frame_decoder, analyzer, ns):
     
     def analyze(tasks):
         analyzer.run(tasks)
+
+    def monitor(tasks):
+        from tools.monitor.live import MonitorLive
+        monitor = MonitorLive(rcv, frame_decoder)
+        return monitor.run(tasks)
+
+    def missings():
+        monitor_connector.connect()
+        newTasks = monitor_connector.get_additional_tasks()
+        if not newTasks or len(newTasks) == 0:
+            print("Not found.")
+            return []
+        return newTasks
     
     def load(tasks_file_path, silent=False):
         tasks = analyzer.load(tasks_file_path)
@@ -174,5 +228,7 @@ def build(sender, rcv, frame_decoder, analyzer, ns):
         'analyze': analyze,
         'load': load,
         'panic_power_cycle': panic_power_cycle,
-        'panic_detumbling': panic_detumbling
+        'panic_detumbling': panic_detumbling,
+        'monitor': monitor,
+        'missings': missings
     }

@@ -18,7 +18,7 @@ sed -i 's/\"auto\"/\"planned\"/' $MISSION/sessions/$SESSION/data.json
 sed -i 's/\"sleep-beacon\"/\"refresh-deep-sleep\"/' $MISSION/sessions/$SESSION/data.json
 sed -i 's/\"short_description\": \"\"/\"short_description\": \"Refresh Deep Sleep\"/' $MISSION/sessions/$SESSION/data.json
 
-git -C $MISSION add $MISSION/sessions/$SESSION/tasklist.py $MISSION/sessions/$SESSION/data.json
+git -C $MISSION add $MISSION/sessions/$SESSION/data.json
 git -C $MISSION commit -m "Session $SESSION - deep sleep refresh"
 
 git -C $MISSION push

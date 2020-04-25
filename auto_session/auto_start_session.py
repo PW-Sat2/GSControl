@@ -125,6 +125,7 @@ class Session:
         self.primary_gs = primary_gs
         self.auto = auto
         self.tasks = tasks
+        self.artifacts_path = os.path.join(mission_repo_path, 'sessions', str(nr), 'artifacts')
 
     def __repr__(self):
         return str(self.nr) + ': ' + str(self.start) + ' -> ' + \
@@ -311,15 +312,37 @@ def stop_session():
 
     print "Push failed after 10 tries!"
 
+def wait_for_files(directory, files, timeout):
+    timeout_at = time.time() + timeout
+
+    while True:
+        if time.time() > timeout_at:
+            break
+
+        origin.pull(rebase=True)
+        existing_files = os.listdir(directory)
+
+        missing_files = [f for f in files if not f in existing_files]
+
+        if missing_files == []:
+            print('All files found')
+            break
+
+        print "Missing files: {}. Waiting 10s...".format(missing_files)
+        time.sleep(10)
+
+def concat_frames(directory, in_files, out_file):
+    with open(os.path.join(directory, out_file), 'w') as fo:
+        for f in in_files:
+            p = os.path.join(directory, f)
+            if os.path.exists(p):
+                with open(p, 'r') as fi:
+                    fo.writelines(fi.readlines())
 
 def all_frames_summary():
     if on_primary_gs:
-        # random sleep from 10 to 30 seconds
-        time.sleep(float(random.randint(10000, 30000))/1000.)
-        origin.pull(rebase=True)
-
-        run_cmd('yes \'y\' | ' + gscontrol + '/scripts/download_all_frames.sh ' + str(session.nr),
-                'all.frames')
+        wait_for_files(session.artifacts_path, ['elka_downlink.frames', 'fp-gs_downlink.frames'], timeout=5 * 60)
+        concat_frames(session.artifacts_path, ['elka_downlink.frames', 'fp-gs_downlink.frames'], 'all.frames')
 
         run_cmd('yes \'y\' | ' + gscontrol + '/scripts/summary.sh ' + str(session.nr),
                 'summary')

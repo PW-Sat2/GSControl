@@ -18,7 +18,7 @@ OPERATORS_DEF = [
    ('Piter', 'pkuligowski'),
    (u'Gumiś', 'michalgumiela'),
    ('Grzesiek', 'ggajoch'),
-   ('Mariusz', 'Mariusz Lenczyk'),
+   ('Mariusz', 'mariusz.lenczyk'),
 ]
 
 OPERATORS = sorted(map(lambda o: o[0], OPERATORS_DEF))

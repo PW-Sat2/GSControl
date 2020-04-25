@@ -20,9 +20,10 @@ class ReceiveDistribute(Thread):
         self._stop_event.set()
 
     def run(self):
+        self.logger.log(logging.INFO, "Starting ReceiveDistribute")
         while not self._stop_event.is_set():
             packet = self.rcv.get_packet()
             if packet is not None:
                 self.logger.log(logging.DEBUG, packet)
                 self.rx_queue.append(packet)
-        self.logger.log(logging.DEBUG, "Finished ReceiveDistribute")
+        self.logger.log(logging.INFO, "Finished ReceiveDistribute")

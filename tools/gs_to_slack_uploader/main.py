@@ -24,17 +24,20 @@ parser.add_argument('-u', '--url', required=True,
                 help="Slack URL to upload")
 parser.add_argument('-g', '--gs', required=True,
                 help="GS Name")
+parser.add_argument('-v', '--verbose', action='store_true',
+                help="Verbose / debug mode")
 
 args = parser.parse_args()
 slack_url = args.url
 gs_name = args.gs
 
-setup_log(True)
+setup_log(args.verbose)
 logger = logging.getLogger()
 
 frames_queue = deque()
 rcv_dist = ReceiveDistribute(frames_queue)
 upload = UploadSlack(frames_queue, slack_url, gs_name)
+logger.log(logging.INFO, "Starting Slack Uploader services")
 rcv_dist.start()
 upload.start()
 

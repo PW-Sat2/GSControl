@@ -1,0 +1,12 @@
+[Unit]
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+ExecStart=/usr/bin/python2 -u /gs/control/tools/gpredict_relay.py -s 
+Type=simple
+User=sat_user
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

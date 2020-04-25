@@ -14,6 +14,7 @@ if __name__ == '__main__':
     from analyzer import *
     import response_frames
     from devices.adcs import *
+    from tools.monitor.connector import MonitorConnector
 
     import argparse
     from IPython.terminal.embed import InteractiveShellEmbed
@@ -39,6 +40,10 @@ if __name__ == '__main__':
     parser.add_argument('-s', '--session', required=False,
                         help="Current session to fetch tasklist", default=0, type=int)
     parser.add_argument('-r', '--receiver', help="Start receiver loop", action='store_true')
+    parser.add_argument('--monitor-host', required=False,
+                        help="Missing chunks monitor host", default='localhost')
+    parser.add_argument('--monitor-port', required=False,
+                        help="Missing chunks monitor port", default=7007, type=int)
 
     args = parser.parse_args()
     imp.load_source('config', args.config)
@@ -64,6 +69,7 @@ if __name__ == '__main__':
     sender = Sender(args.uplink_host, args.uplink_port, source_callsign=config['COMM_UPLINK_CALLSIGN'])
     rcv = Receiver(args.downlink_host, args.downlink_port)
     analyzer = Analyzer()
+    monitor_connector = MonitorConnector(args.monitor_host, args.monitor_port)
     
     def get_file(file_dict):
         downloader = RemoteFile(sender, rcv)
@@ -86,7 +92,7 @@ if __name__ == '__main__':
 
     from shell_cmd import build_shell_commands
 
-    shell_cmds = build_shell_commands(sender, rcv, frame_decoder, analyzer, user_ns)
+    shell_cmds = build_shell_commands(sender, rcv, frame_decoder, analyzer, user_ns, monitor_connector)
 
     user_ns.update(shell_cmds)
 
