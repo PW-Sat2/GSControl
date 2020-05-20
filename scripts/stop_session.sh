@@ -19,7 +19,7 @@ pgrep -fx ".*/GSControl/gnuradio/uplink/uplink_watchdog.py" | xargs kill
 pgrep -fx ".*/GSControl/gnuradio/downlink/downlink_double.py" | xargs kill
 
 if test ${GS_NAME} != 'elka'; then
-    $pgrep -fx ".*/GSControl/gnuradio/downlink/source/funcube_source.py" | xargs kill
+    pgrep -fx ".*/GSControl/gnuradio/downlink/source/funcube_source.py" | xargs kill
 fi
 
 sleep 5
