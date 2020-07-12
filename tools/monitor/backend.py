@@ -10,9 +10,10 @@ from collections import OrderedDict
 import response_frames
 from utils import ensure_byte_list
 from telecommand.fs import DownloadFile 
+from telecommand.memory import ReadMemory
 
 from gui import MonitorUI
-from model import DownloadFileTask, DownloadFrameView
+from model import DownloadFileTask, DownloadFrameView, MemoryTask, MemoryFrameView
 
 class MonitorBackend:
     def __init__(self, args):
@@ -87,17 +88,23 @@ class MonitorBackend:
 
             for index, item in enumerate(tasklist, start=1):
                 command = item[0]
-                if not isinstance(command, DownloadFile):
+                if isinstance(command, DownloadFile):
+                    commandsDict[command.correlation_id()] = DownloadFileTask.create_from_task(command, index)
+                elif isinstance(command, ReadMemory):
+                    commandsDict[command.correlation_id()] = MemoryTask.create_from_task(command, index)
+                else:
                     continue
-                commandsDict[command.correlation_id()] = DownloadFileTask.create_from_task(command, index)
 
             return commandsDict
 
     def process_frame(self, frame):
-        if not DownloadFrameView.is_download_frame(frame):
+        frameView = None
+        if DownloadFrameView.is_download_frame(frame):
+            frameView = DownloadFrameView.create_from_frame(frame)    
+        elif MemoryFrameView.is_memory_frame(frame):
+            frameView = MemoryFrameView.create_from_frame(frame)    
+        else:
             return
-
-        frameView = DownloadFrameView.create_from_frame(frame)
 
         try:
             tasklistCommandChunks = self.download_tasks[frameView.correlation_id].chunks
@@ -115,8 +122,12 @@ class MonitorBackend:
     def _get_missings_for_one_task_command(self, correlation_id):
         try:
             task = self.download_tasks[correlation_id]
-            task_string = json.dumps(task.to_dict())
-            self.ui.log("Sending task for file '{}'/{}, length {}.".format(task.path, task.correlation_id, task.length()))
+            if isinstance(task, DownloadFileTask):
+                task_string = json.dumps(task.to_dict())
+                self.ui.log("Sending task for file '{}'/{}, length {}.".format(task.path, task.correlation_id, task.length()))
+            else:
+                task_string = ""
+                self.ui.log("Not supported task CID {}".format(correlation_id))
         except KeyError:
             task_string = ""
             self.ui.log("No data found for CID {}".format(correlation_id))
@@ -126,7 +137,8 @@ class MonitorBackend:
     def _get_tasklist_with_all_missings_command(self):
         tasks = []
         for _, command in self.download_tasks.items():
-            tasks.append(command.to_dict())
+            if isinstance(command, DownloadFileTask):
+                tasks.append(command.to_dict())
 
         tasks.sort(key=lambda x: ("telemetry" in x['path'], x['correlation_id']))
         
