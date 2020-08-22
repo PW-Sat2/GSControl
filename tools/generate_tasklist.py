@@ -82,6 +82,11 @@ def get_latest_file_list(store):
     f = glob.glob(store.root + "/sessions/*")
     session_nrs = [to_session_nr(i) for i in glob.glob(store.root + "/sessions/*")]
     session_nrs = sorted(session_nrs, reverse=True)
+
+    # DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG
+    session_nrs = session_nrs[156:]
+    # DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG
+
     for session in session_nrs:
         try:
             return read_session_list_files(store.get_session(session))
@@ -90,8 +95,15 @@ def get_latest_file_list(store):
     return {}
 
 def load_downloaded_chunk_list(start_session_view):
-    all_frames = start_session_view.read_artifact(start_session_view.expand_artifact_path('all.frames'))
-    return {}
+    downloaded_files = get_downloaded_files(start_session_view.tasklist, start_session_view.all_frames)
+    result = {}
+    for k,v in downloaded_files.items():
+        downloaded_chunks = v.get('DownloadedChunks', [])
+        if len(downloaded_chunks) == 0:
+            continue
+        result[k] = downloaded_chunks
+
+    return result
 
 def generated_tasks_missings_to_chunk_lists(generated_tasks_missings):
     import re
@@ -117,7 +129,7 @@ def generated_tasks_missings_to_chunk_lists(generated_tasks_missings):
 
     return missings
 
-def generate_download_files_tasks(mission_store, files_to_download, chunks_per_tc, cid_start, generated_tasks_missings):
+def generate_download_files_tasks(mission_store, files_to_download, chunks_per_tc, cid_start, generated_tasks_missings, downloaded_chunks):
     file_list = get_latest_file_list(mission_store)
 
     cid = cid_start
@@ -133,6 +145,9 @@ def generate_download_files_tasks(mission_store, files_to_download, chunks_per_t
         chunk_list = range(0, file_description["Chunks"])
         if file in generated_tasks_missings:
             chunk_list = [item for item in chunk_list if item not in generated_tasks_missings[file]]
+
+        if file in downloaded_chunks:
+            chunk_list = [item for item in chunk_list if item not in downloaded_chunks[file]]
 
         chunks_all = splitAllChunks(chunk_list, chunks_per_tc)
 
@@ -414,8 +429,8 @@ if __name__ == '__main__':
             if args.files_to_download != []:
                 print "Downloading files: {}".format(args.files_to_download)
                 missing_chunks = generated_tasks_missings_to_chunk_lists(generated_tasks_missings)
-                # downloaded_chunks = load_downloaded_chunk_list(start_session_view)
-                generated_file_download_tasks = generate_download_files_tasks(store, args.files_to_download, args.chunks_per_tc, correlation_id, missing_chunks)
+                downloaded_chunks = load_downloaded_chunk_list(start_session_view)
+                generated_file_download_tasks = generate_download_files_tasks(store, args.files_to_download, args.chunks_per_tc, correlation_id, missing_chunks, downloaded_chunks)
                 correlation_id += len(generated_file_download_tasks)
                 generated_file_download_tasks_string = ",\n    ".join(generated_file_download_tasks) + ','
             else:
