@@ -1,5 +1,8 @@
+from math import ceil
+
 from response_frames.common import FileSendSuccessFrame, FileSendErrorFrame
 from response_frames.memory import MemoryContent
+from response_frames.file_system import FileListSuccessFrame
 
 class DownloadFileTask:
     def __init__(self, correlation_id, path, chunks, index= 0):
@@ -96,3 +99,27 @@ class MemoryTask:
 
     def file_name(self):
         return '0x{:x}'.format(self.offset)
+
+
+class FileListFrameView:
+    def __init__(self, correlation_id, sequence_number, file_list):
+        self.correlation_id = correlation_id
+        self.chunk = sequence_number
+        self.is_success = True  # used by GUI
+        self.file_list = {}
+        for file in file_list:
+            file_name = file[0]
+            size = file[1]
+            chunks = int(ceil(size/230.))
+            self.file_list[file_name] = chunks
+
+    @staticmethod
+    def create_from_frame(frame):
+        if not FileListFrameView.is_file_list_frame(frame):
+            return None
+   
+        return FileListFrameView(frame.payload()[0], frame.seq(), frame.file_list)
+
+    @staticmethod
+    def is_file_list_frame(frame):
+        return type(frame) == FileListSuccessFrame

@@ -13,7 +13,7 @@ from telecommand.fs import DownloadFile
 from telecommand.memory import ReadMemory
 
 from gui import MonitorUI
-from model import DownloadFileTask, DownloadFrameView, MemoryTask, MemoryFrameView
+from model import DownloadFileTask, DownloadFrameView, MemoryTask, MemoryFrameView, FileListFrameView
 
 class MonitorBackend:
     def __init__(self, args):
@@ -97,12 +97,20 @@ class MonitorBackend:
 
             return commandsDict
 
+    def _process_file_list_frame(self, frame):
+        frameView = FileListFrameView.create_from_frame(frame)  
+        stamp = datetime.datetime.now().time()
+        self.ui.logFileListFrame(frameView, stamp)
+
     def process_frame(self, frame):
         frameView = None
         if DownloadFrameView.is_download_frame(frame):
             frameView = DownloadFrameView.create_from_frame(frame)    
         elif MemoryFrameView.is_memory_frame(frame):
-            frameView = MemoryFrameView.create_from_frame(frame)    
+            frameView = MemoryFrameView.create_from_frame(frame)  
+        elif FileListFrameView.is_file_list_frame(frame):
+            self._process_file_list_frame(frame)
+            return
         else:
             return
 

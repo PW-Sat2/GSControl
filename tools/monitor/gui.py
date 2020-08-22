@@ -118,7 +118,7 @@ class MonitorUI:
             elif c == curses.KEY_PPAGE:
                 maxY, _ = self.mainWindow.getmaxyx()
                 self.first_line -= maxY
-                self._handle_list_scrolling()               
+                self._handle_list_scrolling()    
 
     def _handle_list_scrolling(self):
         maxY, _ = self.mainWindow.getmaxyx()
@@ -205,6 +205,12 @@ class MonitorUI:
         self.header.noutrefresh()
         curses.doupdate()
 
+    def _log_finish_no_advance(self):
+        self.log_line += 1
+        self.logWindow.noutrefresh()
+        self.header.noutrefresh()
+        curses.doupdate()
+
     def log(self, message):
         self._log_start()
 
@@ -235,6 +241,42 @@ class MonitorUI:
 
         self.logWindow.addstr('{:02d}'.format(downloadFrameView.chunk))
         self._log_finish()
+
+    def logFileListFrame(self, fileListFrameView, stamp):
+        self._log_start()
+
+        self.logWindow.addstr(self.log_line, 0, "{} ".format(stamp.strftime('%H:%M:%S')), self.colors.DCYAN)
+        self.logWindow.addstr('{:3d} '.format(fileListFrameView.correlation_id), self.colors.DYELLOW)
+
+        file_list_header = "FILE LIST"
+        _, maxX = self.logWindow.getmaxyx()
+        if maxX >= 39:
+            self.logWindow.addstr("{:18s} ".format(file_list_header), self.colors.YELLOW)
+        elif maxX >= 32:
+            self.logWindow.addstr("{:11s} ".format(file_list_header), self.colors.YELLOW)
+
+        self.logWindow.addstr('{:02d}'.format(fileListFrameView.chunk))
+        self._log_finish()
+
+        for file_name, chunk_count in sorted(fileListFrameView.file_list.items()):
+            self._logFileListItem(file_name, chunk_count)
+
+        #self._log_finish_no_advance()  
+
+    def _logFileListItem(self, file_name, chunk_count):
+        self._log_start()
+        self.logWindow.addstr(self.log_line, 2, '{} '.format(file_name), self.colors.DBLUE)
+
+        _, maxX = self.logWindow.getmaxyx()
+        position = 31
+        if maxX >= 39:
+            position = 31
+        elif maxX >= 32:
+            position = 24
+
+        self.logWindow.addstr(self.log_line, position, "{:3d} ".format(chunk_count), self.colors.DYELLOW)
+        #self.log_line += 1
+        self._log_finish()  
 
     def _curses_thread(self):
         try:
