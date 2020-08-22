@@ -89,7 +89,35 @@ def get_latest_file_list(store):
             continue
     return {}
 
-def generate_download_files_tasks(mission_store, files_to_download, chunks_per_tc, cid_start):
+def load_downloaded_chunk_list(start_session_view):
+    all_frames = start_session_view.read_artifact(start_session_view.expand_artifact_path('all.frames'))
+    return {}
+
+def generated_tasks_missings_to_chunk_lists(generated_tasks_missings):
+    import re
+    pattern = r"\s*\[tc.DownloadFile\([0-9]+, '([^']+)', \[([ ,0-9]+)\]\).*"
+    pattern = re.compile(pattern)
+
+    missings = {}
+
+    lines = generated_tasks_missings.split('\n')
+    for line in lines:
+        line = line.strip()
+        result = pattern.match(line)
+        if result is None:
+            continue
+
+        groups = result.groups()
+        file_name = groups[0][1:]
+        chunks = [int(chunk.strip()) for chunk in groups[1].split(',')]
+        if file_name in missings:
+            missings[file_name].extend(chunks)
+        else:
+            missings[file_name] = chunks
+
+    return missings
+
+def generate_download_files_tasks(mission_store, files_to_download, chunks_per_tc, cid_start, generated_tasks_missings):
     file_list = get_latest_file_list(mission_store)
 
     cid = cid_start
@@ -102,7 +130,11 @@ def generate_download_files_tasks(mission_store, files_to_download, chunks_per_t
             raise Exception("Cannot find description of file {}".format(file))
         file_description = file_description[0]
 
-        chunks_all = splitAllChunks(range(0, file_description["Chunks"]), chunks_per_tc)
+        chunk_list = range(0, file_description["Chunks"])
+        if file in generated_tasks_missings:
+            chunk_list = [item for item in chunk_list if item not in generated_tasks_missings[file]]
+
+        chunks_all = splitAllChunks(chunk_list, chunks_per_tc)
 
         for chunks in chunks_all:
             tasklist.append(MissingFilesTasklistGenerator._generateTelecommandText({
@@ -381,7 +413,9 @@ if __name__ == '__main__':
 
             if args.files_to_download != []:
                 print "Downloading files: {}".format(args.files_to_download)
-                generated_file_download_tasks = generate_download_files_tasks(store, args.files_to_download, args.chunks_per_tc, correlation_id)
+                missing_chunks = generated_tasks_missings_to_chunk_lists(generated_tasks_missings)
+                # downloaded_chunks = load_downloaded_chunk_list(start_session_view)
+                generated_file_download_tasks = generate_download_files_tasks(store, args.files_to_download, args.chunks_per_tc, correlation_id, missing_chunks)
                 correlation_id += len(generated_file_download_tasks)
                 generated_file_download_tasks_string = ",\n    ".join(generated_file_download_tasks) + ','
             else:
