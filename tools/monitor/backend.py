@@ -11,9 +11,11 @@ import response_frames
 from utils import ensure_byte_list
 from telecommand.fs import DownloadFile 
 from telecommand.memory import ReadMemory
+from telecommand.program_upload import WriteProgramPart
 
 from gui import MonitorUI
-from model import DownloadFileTask, DownloadFrameView, MemoryTask, MemoryFrameView, FileListFrameView
+from model import (DownloadFileTask, DownloadFrameView, MemoryTask, MemoryFrameView, 
+    FileListFrameView, WriteProgramPartTask, WriteProgramPartSuccessFrameView)
 
 class MonitorBackend:
     def __init__(self, args):
@@ -92,6 +94,10 @@ class MonitorBackend:
                     commandsDict[command.correlation_id()] = DownloadFileTask.create_from_task(command, index)
                 elif isinstance(command, ReadMemory):
                     commandsDict[command.correlation_id()] = MemoryTask.create_from_task(command, index)
+                elif isinstance(command, WriteProgramPart):
+                    task = WriteProgramPartTask.create_from_task(command, index)
+                    correlation_id = task.get_dummy_correlation_id()
+                    commandsDict[correlation_id] = task
                 else:
                     continue
 
@@ -105,9 +111,11 @@ class MonitorBackend:
     def process_frame(self, frame):
         frameView = None
         if DownloadFrameView.is_download_frame(frame):
-            frameView = DownloadFrameView.create_from_frame(frame)    
+            frameView = DownloadFrameView.create_from_frame(frame)
         elif MemoryFrameView.is_memory_frame(frame):
-            frameView = MemoryFrameView.create_from_frame(frame)  
+            frameView = MemoryFrameView.create_from_frame(frame)
+        elif WriteProgramPartSuccessFrameView.is_write_program_frame(frame):
+            frameView = WriteProgramPartSuccessFrameView.create_from_frame(frame)
         elif FileListFrameView.is_file_list_frame(frame):
             self._process_file_list_frame(frame)
             return
