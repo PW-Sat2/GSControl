@@ -33,6 +33,8 @@ class MonitorUI:
 
         logWidth = maxX - mainWidth - 2
 
+        self._is_incoming_frame_logged = False
+
         self.mainWindowBox = self.stdscr.subwin(maxY-2, mainWidth+2, 2, 0)
         self.mainWindowBox.box()
         self.mainWindow = self.mainWindowBox.derwin(maxY-4, mainWidth,1,1)
@@ -91,7 +93,9 @@ class MonitorUI:
             elif c == curses.KEY_PPAGE:
                 maxY, _ = self.mainWindow.getmaxyx()
                 self.first_line -= maxY
-                self._handle_list_scrolling()    
+                self._handle_list_scrolling()
+            elif c == ord('l'):
+                self._is_incoming_frame_logged = not self._is_incoming_frame_logged
 
     def _handle_list_scrolling(self):
         maxY, _ = self.mainWindow.getmaxyx()
@@ -179,7 +183,6 @@ class MonitorUI:
         curses.doupdate()
 
     def _log_finish_no_advance(self):
-        self.log_line += 1
         self.logWindow.noutrefresh()
         self.header.noutrefresh()
         curses.doupdate()
@@ -191,6 +194,9 @@ class MonitorUI:
         self._log_finish()
 
     def logFrame(self, downloadFrameView, stamp):
+        if not self._is_incoming_frame_logged:
+            return
+
         self._log_start()
 
         self.logWindow.addstr(self.log_line, 0, "{} ".format(stamp.strftime('%H:%M:%S')), self.colors.DCYAN)
@@ -234,7 +240,7 @@ class MonitorUI:
         for file_name, chunk_count in sorted(fileListFrameView.file_list.items()):
             self._logFileListItem(file_name, chunk_count)
 
-        #self._log_finish_no_advance()  
+        self._log_finish_no_advance()  
 
     def _logFileListItem(self, file_name, chunk_count):
         self._log_start()
@@ -248,8 +254,7 @@ class MonitorUI:
             position = 24
 
         self.logWindow.addstr(self.log_line, position, "{:3d} ".format(chunk_count), self.colors.DYELLOW)
-        #self.log_line += 1
-        self._log_finish()  
+        self.log_line += 1
 
     def _curses_thread(self):
         try:
