@@ -10,35 +10,8 @@ os.environ['NCURSES_NO_UTF8_ACS'] = '1'
 
 TICK = '#'#'▇'
 
-class Colors:
-    def __init__(self):
-        curses.init_pair(1,curses.COLOR_CYAN,0)
-        curses.init_pair(2,curses.COLOR_RED,0)
+from .colors import Colors
 
-        if curses.COLORS > 8:
-            curses.init_color(20, 0 ,0 ,850)
-            curses.init_pair(3,20 , -1)
-            curses.init_pair(4,curses.COLOR_RED + 8,-1)
-            curses.init_pair(5,curses.COLOR_GREEN + 8,-1)
-            curses.init_pair(6,curses.COLOR_YELLOW + 8,-1)
-            curses.init_pair(7,curses.COLOR_BLACK + 8,-1)
-            curses.init_pair(8,curses.COLOR_CYAN + 8,-1)
-        else:
-            curses.init_pair(3,curses.COLOR_BLUE, -1)
-            curses.init_pair(4,curses.COLOR_RED,-1)
-            curses.init_pair(5,curses.COLOR_GREEN,-1)
-            curses.init_pair(6,curses.COLOR_YELLOW,-1)
-            curses.init_pair(7,curses.COLOR_GREEN,-1)
-            curses.init_pair(8,curses.COLOR_CYAN,-1)
-
-        self.DCYAN = curses.color_pair(1)
-        self.DRED = curses.color_pair(2)
-        self.DBLUE = curses.color_pair(3)
-        self.RED = curses.color_pair(4)
-        self.GREEN = curses.color_pair(5)
-        self.YELLOW = curses.color_pair(6)
-        self.DYELLOW = curses.color_pair(7)
-        self.CYAN = curses.color_pair(8)
 
 class MonitorUI:
     def __init__(self, session, tasks, total_tasks, abortCallback, is_bound):
