@@ -342,7 +342,7 @@ def concat_frames(directory, in_files, out_file):
 
 def all_frames_summary():
     if on_primary_gs:
-        wait_for_files(session.artifacts_path, ['elka_downlink.frames', 'fp-gs_downlink.frames'], timeout=5 * 60)
+        wait_for_files(session.artifacts_path, ['elka_downlink.frames', 'fp-gs_downlink.frames'], timeout=10)
         concat_frames(session.artifacts_path, ['elka_downlink.frames', 'fp-gs_downlink.frames'], 'all.frames')
 
         run_cmd('yes \'y\' | ' + gscontrol + '/scripts/summary.sh ' + str(session.nr),
