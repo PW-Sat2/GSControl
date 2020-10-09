@@ -1,19 +1,19 @@
 # coding=utf-8
 import curses
 import threading
-from colorama import Fore, Style, Back
-from time import sleep
-from enum import Enum
+
+from .colors import Colors
 
 import os
 os.environ['NCURSES_NO_UTF8_ACS'] = '1'
 
-TICK = '#'#'▇'
-
-from .colors import Colors
+TICK = '#' #  '▇'
 
 
 class MonitorUI:
+    LOG_WINDOW_SIZE_SMALL = 32
+    LOG_WINDOW_SIZE_BIG = 39
+
     def __init__(self, session, tasks, total_tasks, abortCallback, is_bound):
         self.isWorking = False
         self.session = session
@@ -25,6 +25,7 @@ class MonitorUI:
         self.paths = self._generatePaths(tasks)
         self.is_bound = is_bound
         self.first_line = 0
+        self._is_incoming_frame_logged = False
 
     def initialize_windows(self):
         maxY, maxX = self.stdscr.getmaxyx()
@@ -32,8 +33,6 @@ class MonitorUI:
         mainWidth = max(43, maxMainWidth)
 
         logWidth = maxX - mainWidth - 2
-
-        self._is_incoming_frame_logged = False
 
         self.mainWindowBox = self.stdscr.subwin(maxY-2, mainWidth+2, 2, 0)
         self.mainWindowBox.box()
@@ -212,9 +211,9 @@ class MonitorUI:
             path = "UNKNOWN"
 
         _, maxX = self.logWindow.getmaxyx()
-        if maxX >= 39:
+        if maxX >= MonitorUI.LOG_WINDOW_SIZE_BIG:
             self.logWindow.addstr("{:18s} ".format(path), self.colors.DBLUE)
-        elif maxX >= 32:
+        elif maxX >= MonitorUI.LOG_WINDOW_SIZE_SMALL:
             path = path.replace("telemetry", "t")
             self.logWindow.addstr("{:11s} ".format(path), self.colors.DBLUE)
 
@@ -229,9 +228,9 @@ class MonitorUI:
 
         file_list_header = "FILE LIST"
         _, maxX = self.logWindow.getmaxyx()
-        if maxX >= 39:
+        if maxX >= MonitorUI.LOG_WINDOW_SIZE_BIG:
             self.logWindow.addstr("{:18s} ".format(file_list_header), self.colors.YELLOW)
-        elif maxX >= 32:
+        elif maxX >= MonitorUI.LOG_WINDOW_SIZE_SMALL:
             self.logWindow.addstr("{:11s} ".format(file_list_header), self.colors.YELLOW)
 
         self.logWindow.addstr('{:02d}'.format(fileListFrameView.chunk))
@@ -247,11 +246,11 @@ class MonitorUI:
         self.logWindow.addstr(self.log_line, 2, '{} '.format(file_name), self.colors.DBLUE)
 
         _, maxX = self.logWindow.getmaxyx()
-        position = 31
-        if maxX >= 39:
-            position = 31
-        elif maxX >= 32:
-            position = 24
+        position = maxX - 4
+        if maxX >= MonitorUI.LOG_WINDOW_SIZE_BIG:
+            position = MonitorUI.LOG_WINDOW_SIZE_BIG - 8
+        elif maxX >= MonitorUI.LOG_WINDOW_SIZE_SMALL:
+            position = MonitorUI.LOG_WINDOW_SIZE_SMALL - 8
 
         self.logWindow.addstr(self.log_line, position, "{:3d} ".format(chunk_count), self.colors.DYELLOW)
         self.log_line += 1
