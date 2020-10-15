@@ -106,7 +106,7 @@ class MonitorBackend:
     def _process_file_list_frame(self, frame):
         frameView = FileListFrameView.create_from_frame(frame)  
         stamp = datetime.datetime.now().time()
-        self.ui.logFileListFrame(frameView, stamp)
+        self.ui.log_filelist_frame(frameView, stamp)
 
     def process_frame(self, frame):
         frameView = None
@@ -132,7 +132,7 @@ class MonitorBackend:
             pass   
 
         stamp = datetime.datetime.now().time()
-        self.ui.logFrame(frameView, stamp)
+        self.ui.log_frame(frameView, stamp)
         self.ui.update_tasklist(self.download_tasks)
 
     def _get_missings_for_one_task_command(self, correlation_id):

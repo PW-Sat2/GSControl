@@ -192,7 +192,7 @@ class MonitorUI:
         self.logWindow.addstr(self.log_line, 0, message)
         self._log_finish()
 
-    def logFrame(self, downloadFrameView, stamp):
+    def log_frame(self, downloadFrameView, stamp):
         if not self._is_incoming_frame_logged:
             return
 
@@ -220,7 +220,7 @@ class MonitorUI:
         self.logWindow.addstr('{:02d}'.format(downloadFrameView.chunk))
         self._log_finish()
 
-    def logFileListFrame(self, fileListFrameView, stamp):
+    def log_filelist_frame(self, fileListFrameView, stamp):
         self._log_start()
 
         self.logWindow.addstr(self.log_line, 0, "{} ".format(stamp.strftime('%H:%M:%S')), self.colors.DCYAN)
@@ -237,11 +237,11 @@ class MonitorUI:
         self._log_finish()
 
         for file_name, chunk_count in sorted(fileListFrameView.file_list.items()):
-            self._logFileListItem(file_name, chunk_count)
+            self._log_filelist_item(file_name, chunk_count)
 
         self._log_finish_no_advance()  
 
-    def _logFileListItem(self, file_name, chunk_count):
+    def _log_filelist_item(self, file_name, chunk_count):
         self._log_start()
         self.logWindow.addstr(self.log_line, 2, '{} '.format(file_name), self.colors.DBLUE)
 

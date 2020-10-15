@@ -31,8 +31,11 @@ class Colors:
         curses.init_pair(2,curses.COLOR_RED,0)
 
         if curses.COLORS > 8:
-            curses.init_color(20, 0 ,0 ,850)
-            curses.init_pair(3,20 , -1)
+            if curses.COLORS > 16: # Win10 - 768
+                curses.init_color(20, 0 ,0 ,850)
+                curses.init_pair(3,20 , -1)
+            else:  # Win7 - 16
+                curses.init_pair(3,curses.COLOR_BLUE + 8, -1)
             curses.init_pair(4,curses.COLOR_RED + 8,-1)
             curses.init_pair(5,curses.COLOR_GREEN + 8,-1)
             curses.init_pair(6,curses.COLOR_YELLOW + 8,-1)
@@ -47,7 +50,7 @@ class Colors:
             curses.init_pair(8,curses.COLOR_CYAN,-1)
 
     def _get_color(self, color_name, default_index):
-        if self._config is None or color_name not in self._config:
+        if self._config is None or color_name not in self._config or curses.COLORS <= 16:
             return curses.color_pair(default_index)
 
         color_data = self._config.get(color_name, [])
