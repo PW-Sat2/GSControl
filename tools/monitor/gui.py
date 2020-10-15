@@ -1,46 +1,19 @@
 # coding=utf-8
 import curses
 import threading
-from colorama import Fore, Style, Back
-from time import sleep
-from enum import Enum
+
+from .colors import Colors
 
 import os
 os.environ['NCURSES_NO_UTF8_ACS'] = '1'
 
-TICK = '#'#'▇'
+TICK = '#' #  '▇'
 
-class Colors:
-    def __init__(self):
-        curses.init_pair(1,curses.COLOR_CYAN,0)
-        curses.init_pair(2,curses.COLOR_RED,0)
-
-        if curses.COLORS > 8:
-            curses.init_color(20, 0 ,0 ,850)
-            curses.init_pair(3,20 , -1)
-            curses.init_pair(4,curses.COLOR_RED + 8,-1)
-            curses.init_pair(5,curses.COLOR_GREEN + 8,-1)
-            curses.init_pair(6,curses.COLOR_YELLOW + 8,-1)
-            curses.init_pair(7,curses.COLOR_BLACK + 8,-1)
-            curses.init_pair(8,curses.COLOR_CYAN + 8,-1)
-        else:
-            curses.init_pair(3,curses.COLOR_BLUE, -1)
-            curses.init_pair(4,curses.COLOR_RED,-1)
-            curses.init_pair(5,curses.COLOR_GREEN,-1)
-            curses.init_pair(6,curses.COLOR_YELLOW,-1)
-            curses.init_pair(7,curses.COLOR_GREEN,-1)
-            curses.init_pair(8,curses.COLOR_CYAN,-1)
-
-        self.DCYAN = curses.color_pair(1)
-        self.DRED = curses.color_pair(2)
-        self.DBLUE = curses.color_pair(3)
-        self.RED = curses.color_pair(4)
-        self.GREEN = curses.color_pair(5)
-        self.YELLOW = curses.color_pair(6)
-        self.DYELLOW = curses.color_pair(7)
-        self.CYAN = curses.color_pair(8)
 
 class MonitorUI:
+    LOG_WINDOW_SIZE_SMALL = 32
+    LOG_WINDOW_SIZE_BIG = 39
+
     def __init__(self, session, tasks, total_tasks, abortCallback, is_bound):
         self.isWorking = False
         self.session = session
@@ -52,6 +25,7 @@ class MonitorUI:
         self.paths = self._generatePaths(tasks)
         self.is_bound = is_bound
         self.first_line = 0
+        self._is_incoming_frame_logged = False
 
     def initialize_windows(self):
         maxY, maxX = self.stdscr.getmaxyx()
@@ -118,7 +92,9 @@ class MonitorUI:
             elif c == curses.KEY_PPAGE:
                 maxY, _ = self.mainWindow.getmaxyx()
                 self.first_line -= maxY
-                self._handle_list_scrolling()               
+                self._handle_list_scrolling()
+            elif c == ord('l'):
+                self._is_incoming_frame_logged = not self._is_incoming_frame_logged
 
     def _handle_list_scrolling(self):
         maxY, _ = self.mainWindow.getmaxyx()
@@ -205,13 +181,21 @@ class MonitorUI:
         self.header.noutrefresh()
         curses.doupdate()
 
+    def _log_finish_no_advance(self):
+        self.logWindow.noutrefresh()
+        self.header.noutrefresh()
+        curses.doupdate()
+
     def log(self, message):
         self._log_start()
 
         self.logWindow.addstr(self.log_line, 0, message)
         self._log_finish()
 
-    def logFrame(self, downloadFrameView, stamp):
+    def log_frame(self, downloadFrameView, stamp):
+        if not self._is_incoming_frame_logged:
+            return
+
         self._log_start()
 
         self.logWindow.addstr(self.log_line, 0, "{} ".format(stamp.strftime('%H:%M:%S')), self.colors.DCYAN)
@@ -227,14 +211,49 @@ class MonitorUI:
             path = "UNKNOWN"
 
         _, maxX = self.logWindow.getmaxyx()
-        if maxX >= 39:
+        if maxX >= MonitorUI.LOG_WINDOW_SIZE_BIG:
             self.logWindow.addstr("{:18s} ".format(path), self.colors.DBLUE)
-        elif maxX >= 32:
+        elif maxX >= MonitorUI.LOG_WINDOW_SIZE_SMALL:
             path = path.replace("telemetry", "t")
             self.logWindow.addstr("{:11s} ".format(path), self.colors.DBLUE)
 
         self.logWindow.addstr('{:02d}'.format(downloadFrameView.chunk))
         self._log_finish()
+
+    def log_filelist_frame(self, fileListFrameView, stamp):
+        self._log_start()
+
+        self.logWindow.addstr(self.log_line, 0, "{} ".format(stamp.strftime('%H:%M:%S')), self.colors.DCYAN)
+        self.logWindow.addstr('{:3d} '.format(fileListFrameView.correlation_id), self.colors.DYELLOW)
+
+        file_list_header = "FILE LIST"
+        _, maxX = self.logWindow.getmaxyx()
+        if maxX >= MonitorUI.LOG_WINDOW_SIZE_BIG:
+            self.logWindow.addstr("{:18s} ".format(file_list_header), self.colors.YELLOW)
+        elif maxX >= MonitorUI.LOG_WINDOW_SIZE_SMALL:
+            self.logWindow.addstr("{:11s} ".format(file_list_header), self.colors.YELLOW)
+
+        self.logWindow.addstr('{:02d}'.format(fileListFrameView.chunk))
+        self._log_finish()
+
+        for file_name, chunk_count in sorted(fileListFrameView.file_list.items()):
+            self._log_filelist_item(file_name, chunk_count)
+
+        self._log_finish_no_advance()  
+
+    def _log_filelist_item(self, file_name, chunk_count):
+        self._log_start()
+        self.logWindow.addstr(self.log_line, 2, '{} '.format(file_name), self.colors.DBLUE)
+
+        _, maxX = self.logWindow.getmaxyx()
+        position = maxX - 4
+        if maxX >= MonitorUI.LOG_WINDOW_SIZE_BIG:
+            position = MonitorUI.LOG_WINDOW_SIZE_BIG - 8
+        elif maxX >= MonitorUI.LOG_WINDOW_SIZE_SMALL:
+            position = MonitorUI.LOG_WINDOW_SIZE_SMALL - 8
+
+        self.logWindow.addstr(self.log_line, position, "{:3d} ".format(chunk_count), self.colors.DYELLOW)
+        self.log_line += 1
 
     def _curses_thread(self):
         try:

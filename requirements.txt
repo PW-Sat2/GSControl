@@ -19,3 +19,4 @@ google-auth-httplib2
 google-auth-oauthlib
 websocket_client
 pypredict
+progressbar2
