@@ -11,9 +11,11 @@ import response_frames
 from data_point import generate_data_points, generate_deep_sleep_data_points
 from devices import BeaconFrame
 from response_frames.deep_sleep_beacon import DeepSleepBeacon
+from response_frames.little_oryx import LittleOryxDeepSleepBeacon
 from radio.radio_receiver import Receiver
 from tools.parse_beacon import ParseBeacon
 from tools.parse_deep_beacon import ParseDeepBeacon
+from tools.parse_little_oryx_beacon import ParseLittleOryxBeacon
 
 
 class BeaconUploaderApp(object):
@@ -137,6 +139,9 @@ class BeaconUploaderApp(object):
         elif isinstance(frame, DeepSleepBeacon):
             self._publisher_log.debug("Received deep sleep beacon frame")
             self._process_single_deep_sleep_beacon(ts, frame)
+        elif isinstance(frame, LittleOryxDeepSleepBeacon):
+            self._publisher_log.debug("Received Little Oryx beacon frame")
+            self._process_single_little_oryx_beacon(ts, frame)
         else:
             self._publisher_log.debug("Not a beacon")
             return
@@ -158,6 +163,19 @@ class BeaconUploaderApp(object):
 
     def _process_single_deep_sleep_beacon(self, timestamp, beacon):
         telemetry = ParseDeepBeacon.parse(beacon)
+
+        points = generate_deep_sleep_data_points(timestamp, telemetry, {
+            'ground_station': self._args.gs
+        })
+
+        url = urlparse(self._args.influx)
+
+        db = InfluxDBClient(host=url.hostname, port=url.port, database=url.path.strip('/'))
+        db.write_points(points)
+        db.close()
+
+    def _process_single_little_oryx_beacon(self, timestamp, beacon):
+        telemetry = ParseLittleOryxBeacon.parse(beacon)
 
         points = generate_deep_sleep_data_points(timestamp, telemetry, {
             'ground_station': self._args.gs
