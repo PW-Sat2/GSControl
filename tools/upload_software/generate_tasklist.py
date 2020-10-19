@@ -75,14 +75,12 @@ for i in boot_slots:
     not_mask &= ~(1 << i)
 
 
-output_file.write("    [[tc.SetBitrate(1, BaudRate.BaudRate9600), 5], SendLoop, WaitMode.NoWait],\n")
+output_file.write("    # Get beacons from deep-sleep\n")
+output_file.write("    [[tc.SendBeacon(), 15], SendLoop, WaitMode.NoWait],\n")
 output_file.write('\n')
-output_file.write("    [tc.SendBeacon(), Send, WaitMode.Wait],\n")
-output_file.write('\n')
-output_file.write("    [\"The next step is PowerCycleTelecommand\", Print, WaitMode.Wait],\n")
-output_file.write("    [tc.PowerCycleTelecommand(3), Send, WaitMode.Wait],\n")
-output_file.write('\n')
-output_file.write("    [tc.PingTelecommand(), Send, WaitMode.Wait],\n")
+
+output_file.write("    # Wake-up from deep-sleep\n")
+output_file.write("    [[tc.PingTelecommand(), 15], SendLoop, WaitMode.NoWait],\n")
 output_file.write('\n')
 output_file.write("    [tc.SetBitrate(4, BaudRate.BaudRate9600), Send, WaitMode.Wait],\n")
 output_file.write('\n')
@@ -132,20 +130,11 @@ output_file.write("    [tc.PowerCycleTelecommand(100), Send, WaitMode.Wait],\n")
 
 output_file.write('\n')
 
-output_file.write("    [\"The satellite should be inactive for 2 minutes.\", Print, WaitMode.Wait],\n")
+output_file.write("    [\"The satellite shall boot to the new software.\", Print, WaitMode.Wait],\n")
 output_file.write("    [tc.PingTelecommand(), Send, WaitMode.Wait],\n")
-output_file.write("    [tc.SetBitrate(101, BaudRate.BaudRate9600), Send, WaitMode.Wait],\n")
 
 output_file.write('\n')
-
-output_file.write("    [\"Set bootslots for deep_sleep.\", Print, WaitMode.Wait],\n")
-output_file.write("    [tc.SetBootSlots(101, {}, {}), Send, WaitMode.Wait],\n".format(bin(mask), bin(not_mask)))
-
-output_file.write('\n')
-
-output_file.write("    [\"Wait for good Uplink/Downlink. The next step is Ping, later Power Cycle B to switch to deep_sleep.\", Print, WaitMode.Wait],\n")
-output_file.write("    [tc.PingTelecommand(), Send, WaitMode.Wait],\n")
-output_file.write("    [tc.PowerCycleTelecommand(100), Send, WaitMode.Wait],\n")
+output_file.write("    [tc.SendBeacon(), Send, WaitMode.Wait],\n")
 
 output_file.write('\n')
 output_file.write("    [[tc.SendBeacon(), 20], SendLoop, WaitMode.NoWait],\n")
