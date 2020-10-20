@@ -20,9 +20,11 @@ import response_frames
 from radio.radio_frame_decoder import FallbackResponseDecorator
 from devices import BeaconFrame
 from response_frames.deep_sleep_beacon import DeepSleepBeacon
+from response_frames.little_oryx import LittleOryxDeepSleepBeacon
 from data_point import generate_data_points, generate_deep_sleep_data_points
 from tools.parse_beacon import ParseBeacon
 from tools.parse_deep_beacon import ParseDeepBeacon
+from tools.parse_little_oryx_beacon import ParseLttleOryxBeacon
 
 
 if os.getenv("CLICOLOR_FORCE") == "1":
@@ -92,6 +94,11 @@ for l in args.file.readlines():
         })
     elif isinstance(frame, DeepSleepBeacon):
         telemetry = ParseDeepBeacon.parse(frame)
+        points = generate_deep_sleep_data_points(timestamp, telemetry, {
+            'ground_station': args.gs
+        })
+    elif isinstance(frame, LittleOryxDeepSleepBeacon):
+        telemetry = ParseLttleOryxBeacon.parse(frame)
         points = generate_deep_sleep_data_points(timestamp, telemetry, {
             'ground_station': args.gs
         })
