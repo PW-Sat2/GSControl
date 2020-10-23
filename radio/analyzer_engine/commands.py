@@ -895,6 +895,45 @@ class PingTelecommandData(SimpleTelecommandData):
     def __init__(self, telecommand):
         super(PingTelecommandData, self).__init__(telecommand, 4)
 
+class LittleOryxEchoData(SimpleTelecommandData):
+    def __init__(self, telecommand):
+        super(LittleOryxEchoData, self).__init__(telecommand, 1)
+
+class LittleOryxRebootData(SimpleTelecommandData):
+    def __init__(self, telecommand):
+        super(LittleOryxRebootData, self).__init__(telecommand, 1)
+
+    
+    def get_requires_wait(self):
+        return True
+
+    def process(self, state, notes, send_mode, wait_mode, limits):
+        self.process_common_command(state, notes, send_mode, wait_mode, limits)
+        state.reset_satellite()
+        notes.warning("Communication with satellite will be unavailable for the next few seconds")
+        if wait_mode != WaitMode.Wait:
+            notes.error("Wait is suggested as next telecommand will most likely will not be processed")
+
+class LittleOryxRebootToNormalData(SimpleTelecommandData):
+    def __init__(self, telecommand):
+        super(LittleOryxRebootToNormalData, self).__init__(telecommand, 1)
+        
+    def get_requires_wait(self):
+        return True
+
+    def process(self, state, notes, send_mode, wait_mode, limits):
+        self.process_common_command(state, notes, send_mode, wait_mode, limits)
+        state.reset_satellite()
+        notes.warning("Communication with satellite will be unavailable for the next few minutes")
+        if wait_mode != WaitMode.Wait:
+            notes.error("Wait is suggested as next telecommand will most likely will not be processed")
+
+class LittleOryxDelayRebootToNormalData(SimpleTelecommandData):
+    @set_correlation_id
+    def __init__(self, telecommand):
+        super(LittleOryxDelayRebootToNormalData, self).__init__(telecommand, 2)
+          
+
 class TelecommandDataFactory(object):
     telecommands_map = dict({
         tc.SetBuiltinDetumblingBlockMaskTelecommand: SetBuiltinDetumblingBlockMaskTelecommandData,
@@ -938,7 +977,11 @@ class TelecommandDataFactory(object):
         tc.GetSunSDataSets: GetSunSDataSetsData,
         tc.SetTimeCorrectionConfig: SetTimeCorrectionConfigData,
         tc.SetTime: SetTimeData,
-        tc.PingTelecommand: PingTelecommandData
+        tc.PingTelecommand: PingTelecommandData,
+        tc.little_oryx.Echo: LittleOryxEchoData,
+        tc.little_oryx.Reboot: LittleOryxRebootData,
+        tc.little_oryx.RebootToNormal: LittleOryxRebootToNormalData,
+        tc.little_oryx.DelayRebootToNormal: LittleOryxDelayRebootToNormalData,
     })
 
     def get_telecommand_data(self, telecommand):
