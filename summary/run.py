@@ -45,7 +45,7 @@ def setup_logging():
     logging.getLogger('urllib3').setLevel(logging.WARNING)
 
 
-def run_summary(influx, upload, store, current_session):
+def run_summary(influx, upload, store, current_session, lo_tools_path):
     steps_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'summary_steps')
     steps = os.listdir(steps_folder)
     steps = sorted(steps)
@@ -61,6 +61,7 @@ def run_summary(influx, upload, store, current_session):
     scope_module.store = store
     scope_module.influx = influx
     scope_module.upload = upload
+    scope_module.lo_tools_path = lo_tools_path
 
     sys.modules['summary.scope'] = scope_module
 
@@ -85,10 +86,13 @@ def parse_args():
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     mission_repo_default = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'mission'))
+    logs_decoder_default = os.path.abspath(
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'little-oryx'))
 
     parser.add_argument('-m', '--mission', help="Path to mission repository", default=mission_repo_default)
     parser.add_argument('-d', '--influx', required=True, help="InfluxDB url")
     parser.add_argument('-u', '--upload', help="Run upload actions", action='store_true')
+    parser.add_argument('--lo-tools', help="Little Oryx tools", required=False, default=logs_decoder_default)
     parser.add_argument('session', help="Session ID (number) to summarise", type=int)
 
     return parser.parse_args()
@@ -102,7 +106,7 @@ def main(args):
     url = urlparse(args.influx)
     influx_client = InfluxDBClient(host=url.hostname, port=url.port, database=url.path.strip('/'))
 
-    run_summary(influx_client, args.upload, store, session)
+    run_summary(influx_client, args.upload, store, session, args.lo_tools)
 
 
 setup_logging()
