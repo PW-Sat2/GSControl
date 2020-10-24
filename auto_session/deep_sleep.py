@@ -13,7 +13,7 @@ def session(start, stop):
             [tc.SendBeacon(), Send],
             [20, Sleep]
         ],
-        until=Received(rf.BeaconFrame, min_count=2)
+        until=Received(rf.little_oryx.LittleOryxDeepSleepBeacon, min_count=2)
     )
 
     yield Loop(
