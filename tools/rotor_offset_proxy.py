@@ -87,6 +87,8 @@ def gpredict_to_rotctrld(config, rotctrld_socket, gpredict_socket):
 
                 if az < 0:
                     az = az + 360
+                if az > 540:
+                    az = az - 360
 
                 el = int(parsed[1].split(",")[0]) + config['EL_OFFSET']
 

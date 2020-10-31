@@ -3,3 +3,4 @@
 *.vscode/
 .idea
 google-token.pickle
+tools/rotor_config.py

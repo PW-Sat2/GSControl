@@ -1,6 +1,6 @@
 config = dict(
-    AZ_OFFSET=-64,
-    EL_OFFSET=-9,
+    AZ_OFFSET=None,
+    EL_OFFSET=None,
     GPREDICT_PORT=4543,
     ROTCTRLD_PORT=4533
 )
