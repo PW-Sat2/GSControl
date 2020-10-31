@@ -105,7 +105,7 @@ def generateSessions(predictions, min_elev, session_start_index, lastPowerCycleC
             session = OrderedDict()
             session['index'] = session_index
             session['phase'] = "zZz"
-            session['primary'] = "elka" if (sat_pass.aosAzimuth < 90.0 or sat_pass.aosAzimuth > 270.0) else "fp"
+            session['primary'] = "fp" if (sat_pass.aosAzimuth < 90.0 or sat_pass.aosAzimuth > 270.0) else "fp"
             session['start_time_iso_with_zone'] = sat_pass.getIsoStartDateString()
             session['stop_time_iso_with_zone'] = sat_pass.getIsoEndDateString()
             session['maximum_elevation'] = sat_pass.maxElev
