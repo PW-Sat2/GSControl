@@ -1,0 +1,7 @@
+config = dict(
+    NORAD_ID=43814,
+    SATNOGS_URL='https://db-dev.satnogs.org/api/telemetry/',
+    GS_CALLSIGN='SP9FPS',
+    GS_LATITUDE=50.2785,
+    GS_LONGITUDE=18.6853,
+)

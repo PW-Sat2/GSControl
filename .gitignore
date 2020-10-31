@@ -4,3 +4,4 @@
 .idea
 google-token.pickle
 tools/rotor_config.py
+tools/satnogs_beacon_uploader/satnogs_config.py
