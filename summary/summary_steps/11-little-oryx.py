@@ -7,6 +7,7 @@ import subprocess
 
 def parse_little_oryx_logs(memory_content_cids):
     paths = [session.expand_artifact_path('memory_content_' + str(cid)) for cid in memory_content_cids]
+    paths = [f for f in paths if os.path.exists(f)]
     exts = ['', '.cmd', '.sh']
     tool_path = None
     for e in exts:
