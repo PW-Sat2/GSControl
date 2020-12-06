@@ -358,7 +358,7 @@ def all_frames_summary():
                 'telemetry loss notifier')
 
 def generate_sessions():
-    SESSIONS_MARGIN = 30
+    SESSIONS_MARGIN = 15
 
     if on_primary_gs:
         print("Checking if sessions have to be generated (< {})!".format(SESSIONS_MARGIN))
