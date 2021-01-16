@@ -364,7 +364,7 @@ def generate_sessions():
         print("Checking if sessions have to be generated (< {})!".format(SESSIONS_MARGIN))
 
         if len(sessions)-1 < SESSIONS_MARGIN:
-            run_cmd("python2 " + gscontrol + "/tools/pass_predict/predict_passes.py" + " -c /gs/config.py -n 10 -m " + mission_repo_path,
+            run_cmd("python2 " + gscontrol + "/tools/pass_predict/predict_passes.py" + " -c /gs/config.py -n 6 -m " + mission_repo_path,
                     'pass predict')
             run_cmd(gscontrol + '/scripts/commit_sessions.sh ', 'add and commit new sessions')
         else:
