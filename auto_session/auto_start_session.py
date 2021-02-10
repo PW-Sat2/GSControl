@@ -358,13 +358,13 @@ def all_frames_summary():
                 'telemetry loss notifier')
 
 def generate_sessions():
-    SESSIONS_MARGIN = 9
+    SESSIONS_MARGIN = 3
 
     if on_primary_gs:
         print("Checking if sessions have to be generated (< {})!".format(SESSIONS_MARGIN))
 
         if len(sessions)-1 < SESSIONS_MARGIN:
-            run_cmd("python2 " + gscontrol + "/tools/pass_predict/predict_passes.py" + " -c /gs/config.py -n 6 -m " + mission_repo_path,
+            run_cmd("python2 " + gscontrol + "/tools/pass_predict/predict_passes.py" + " -c /gs/config.py -n 3 -m " + mission_repo_path,
                     'pass predict')
             run_cmd(gscontrol + '/scripts/commit_sessions.sh ', 'add and commit new sessions')
         else:
