@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from gpredict_tle_loader import GpredictTleLoader
+from celestrak_tle_loader import CelestrakTleLoader
 from prediction import Predicton
 import predict
 import argparse
@@ -71,7 +72,7 @@ def mergeStationPredictions(allStationPredictions):
         newElev = max([e.maxElev for e in group])
         newAosAzimuth = [e.aosAzimuth for e in group if e.start == newStart][0]
         newPrediction = Predicton(newStart, newEnd, newElev, newAosAzimuth)
-        print newPrediction
+        print(newPrediction)
         merged.append(newPrediction)
 
     return merged
@@ -142,7 +143,7 @@ def saveSessions(sessionNumber, sessionsData, missionPath):
         sessionFolderPath = os.path.join(missionPath, "sessions", str(sessionIndex))
         os.mkdir(sessionFolderPath)
         dataPath = os.path.join(sessionFolderPath, "data.json")
-        print dataPath
+        print(dataPath)
         with open(dataPath, "w") as outFile:
             json.dump(session, outFile, indent=4)
 
@@ -214,13 +215,15 @@ def main():
                         help="Minimum elevation for power cycle", default=20, type=int)
     parser.add_argument('-m', '--mission-path', required=False,
                         help="Path to Mission repository", default="~/gs/mission")
+    parser.add_argument('-d', '--dry', action='store_true',
+                        help="Dry run, not saving files.")
     
     args = parser.parse_args()
     imp.load_source('config', args.config)
     from config import config
 
     if "QTH" not in config:
-        print "Ground Station location not found in config file. Exiting."
+        print("Ground Station location not found in config file. Exiting.")
         return -1
 
     gpredict_path = "~/.config/GPredict/satdata/" if 'GPREDICT_PATH' not in config else config['GPREDICT_PATH']
@@ -236,8 +239,17 @@ def main():
 
     qths = qthListToQth(config['QTH'])
 
-    tleLoadter = GpredictTleLoader(gpredict_path)
-    tleLines = tleLoadter.loadTle(noradId)
+    tleLines = []
+
+    try:
+        print('Downloading current TLE')
+        tleLoader = CelestrakTleLoader()
+        tleLines = tleLoader.loadTle(noradId)
+    except Exception as ex:
+        print(ex)
+        tleLoader = GpredictTleLoader(gpredict_path)
+        tleLines = tleLoader.loadTle(noradId)
+
     allStationPredictions = predict_pass("\n".join(tleLines),
                                          qths,
                                          stop_time,
@@ -252,13 +264,16 @@ def main():
                                 lastPowerCycleController,
                                 args.power_cycle_min_elevation,
                                 lastPowerCycleSessionData)
-
-    if args.session:
-        saveSessions(args.session, sessions, args.mission_path)
+    if not args.dry:
+        if args.session:
+            saveSessions(args.session, sessions, args.mission_path)
+        else:
+            saveSessions(nextSessionIndex, sessions, args.mission_path)
+            for s in sessions:
+                print(json.dumps(s, indent=4))
     else:
-        saveSessions(nextSessionIndex, sessions, args.mission_path)
         for s in sessions:
-            print json.dumps(s, indent=4)
+                print(json.dumps(s, indent=4))
 
 if __name__ == "__main__":
     main()
