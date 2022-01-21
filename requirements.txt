@@ -4,7 +4,7 @@ pyzmq
 aprs==6.0.0
 kiss==6.0.0
 enum34
-ipython==5.5.0
+ipython==7.16.3
 influxdb
 colorlog
 hypothesis
